@@ -1,0 +1,5 @@
+node_modules
+.vscode
+demo/credentials
+demo/cookies.json
+demo/blocklist.json

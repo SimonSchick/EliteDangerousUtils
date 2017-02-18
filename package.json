@@ -1,0 +1,24 @@
+{
+  "name": "edlog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "request": "^2.79.0",
+
+  },
+  "devDependencies": {
+    "@types/request": "0.0.39",
+    "say": "^0.11.0",
+    "tough-cookie-filestore": "0.0.1",
+    "ts-node": "^2.0.0",
+    "typescript": "^2.1.5"
+  },
+  "scripts": {
+    "start": "ts-node EDLog.demo.ts",
+    "tsnode": "ts-node",
+    "build": "tsc EDCompanionAPI.demo.ts"
+  },
+  "author": "",
+  "license": "ISC"
+}
