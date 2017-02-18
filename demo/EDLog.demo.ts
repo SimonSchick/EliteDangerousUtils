@@ -72,6 +72,11 @@ log.on('event:FSDJump', event => {
 			materials.push(...byStateAllegiance[event.FactionState][event.SystemAllegiance])
 		}
 		if (materials.length > 0) {
+            if (materials.length > 5) {
+                const origLength = materials.length;
+                materials = materials.slice(0, 5);
+                materials.push(`and ${origLength - 5} more materials`);
+            }
 			info.push(`Materials: ${materials.join(', ')}`);
 		}
 	} else {

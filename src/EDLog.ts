@@ -48,8 +48,8 @@ export interface IFSDJump extends IBaseLocation {
 	JumpDist: number;
 	FuelUsed: number;
 	FuelLevel: number;
-	Powers: string[]; // TODO: enum
-	PowerplayState: string; // TODO: enum
+	Powers?: string[]; // TODO: enum
+	PowerplayState?: string; // TODO: enum
 }
 
 export interface IReceivedText extends IEventBase {
@@ -126,6 +126,12 @@ export interface ICommitCrime extends IEventBase {
     Faction: string;
     Victim: string;
     Bounty: number;
+}
+
+export interface IMaterialCollected extends IEventBase {
+    Category: 'Encoded';
+    Name: string;
+    Count: number;
 }
 
 export interface ILogFileSwap {
