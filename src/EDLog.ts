@@ -77,23 +77,23 @@ export class EDEvent {
 	}
 }
 
-export interface IBounty {
+export interface IBounty extends IEventBase {
 	Target: string;
 	VictimFaction: string;
 	TotalReward: number;
 }
 
-export interface IFuelScoop {
+export interface IFuelScoop extends IEventBase {
 	Scooped: number;
 	Total: number;
 }
 
-export interface ILaunchSRV {
+export interface ILaunchSRV extends IEventBase {
 	Loadout: 'starter';
 	PlayerController: boolean;
 }
 
-export interface ILoadGame {
+export interface ILoadGame extends IEventBase {
 	Commander: string;
 	Ship: string;
 	ShipID: number;
@@ -102,13 +102,30 @@ export interface ILoadGame {
 	Loan: 0;
 }
 
-export interface IRankProgress {
+export interface IRankProgress extends IEventBase {
 	Combat: number;
 	Trade: number;
 	Explorer: number;
 	Empire: number;
 	Federation: number;
 	CQC: number;
+}
+
+export interface ISupercruiseExit extends IEventBase {
+    StarSystem: string;
+    Body: string;
+    BodyType: 'Star' | 'Planet';
+}
+
+export interface ISupercruiseEntry extends IEventBase {
+    StarSystem: string;
+}
+
+export interface ICommitCrime extends IEventBase {
+    CrimeType: 'assault';
+    Faction: string;
+    Victim: string;
+    Bounty: number;
 }
 
 export interface ILogFileSwap {
@@ -173,6 +190,12 @@ export class EDLog extends EventEmitter {
 	public on(event: 'event:SendText', cb: (event: ISendText) => void): this;
 	public on(event: 'event:Bounty', cb: (event: IBounty) => void): this;
 	public on(event: 'event:FuelScoop', cb: (event: IFuelScoop) => void): this;
+	public on(event: 'event:LaunchSRV', cb: (event: ILaunchSRV) => void): this;
+	public on(event: 'event:LoadGame', cb: (event: ILoadGame) => void): this;
+	public on(event: 'event:RankProgress', cb: (event: IRankProgress) => void): this;
+	public on(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
+	public on(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
+	public on(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
 	public on(event: 'event', cb: (event: EDEvent) => void): this;
 	public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
 	public on(event: 'warn', cb: (event: Error) => void): this;
@@ -186,6 +209,12 @@ export class EDLog extends EventEmitter {
 	public once(event: 'event:SendText', cb: (event: ISendText) => void): this;
 	public once(event: 'event:Bounty', cb: (event: IBounty) => void): this;
 	public once(event: 'event:FuelScoop', cb: (event: IFuelScoop) => void): this;
+    public once(event: 'event:LaunchSRV', cb: (event: ILaunchSRV) => void): this;
+	public once(event: 'event:LoadGame', cb: (event: ILoadGame) => void): this;
+	public once(event: 'event:RankProgress', cb: (event: IRankProgress) => void): this;
+	public once(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
+	public once(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
+	public once(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
 	public once(event: 'event', cb: (event: EDEvent) => void): this;
 	public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
 	public once(event: 'warn', cb: (event: Error) => void): this;
