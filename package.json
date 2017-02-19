@@ -1,7 +1,7 @@
 {
-  "name": "edlog",
+  "name": "elite-dangerous-utils",
   "version": "1.0.0",
-  "description": "",
+  "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
   "dependencies": {
     "request": "^2.79.0"
   },
@@ -16,6 +16,12 @@
   "engines": {
     "node": "^6.0.0"
   },
+  "keywords": [
+      "Elite: Dangerous",
+      "elite",
+      "dangerous",
+      "typescript"
+  ],
   "os": [
     "win32"
   ],
@@ -26,5 +32,5 @@
     "prepublishOnly": "npm run build"
   },
   "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }

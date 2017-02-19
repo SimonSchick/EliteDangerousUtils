@@ -179,12 +179,16 @@ export interface ICredentials {
     password: string;
 }
 
+/**
+ * HTTP Status codes.
+ */
 const enum HTTPStatus {
-    Ok = 200,
-    NoContent = 204,
     MovedPermanently = 302,
 }
 
+/**
+ * Client for the Elite: Dangerous Companion App API
+ */
 export class EDCompanionAPI {
     private apiURL = 'https://companion.orerve.net/';
     private requestOptions: Partial<request.CoreOptions> = {
@@ -193,33 +197,37 @@ export class EDCompanionAPI {
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B411',
         },
     };
+    /**
+     * @param A cookie store used to avoid login in repetetly.
+     * @param Asyncronously provides credentials.
+     */
     constructor (jar: ICookieStore | string, private credentialFetcher: ICredentialsFetcher) {
         this.requestOptions.jar = (<any>request.jar)(jar);
-        this.requestOptions.jar
     }
 
-    private fetchCode (): Promise<string> {
-        return Promise.resolve(this.credentialFetcher.getCode());
-    }
-
+    /**
+     * Helper method to run a request on the API.
+     */
     private request<T>(opts: (request.CoreOptions & request.UriOptions)): Promise<request.RequestResponse & { body: T }> {
-        console.log(opts);
         return new Promise((resolve, reject) => {
+            opts.uri = `${this.apiURL}${opts.uri}`;
             request(Object.assign(opts, this.requestOptions), (error, response) => {
-                console.log(response.statusCode, response.headers, (<any>response).body);
                 if (error) {
                     reject(error);
                     return;
                 }
                 resolve(response);
-                return;
-            })
+            });
         });
     }
 
+    /**
+     * Fetches all data from /profile.
+     * This may invoke the `ICredentialsFetcher`s `getLogin` and `getCode` if no cookie is provided.
+     */
     public getProfile (): Promise<IAPIResponseRoot> {
         return this.request<IAPIResponseRoot>({
-            uri: this.apiURL + 'profile',
+            uri: 'profile',
             json: true,
         })
         .then(response => {
@@ -231,11 +239,15 @@ export class EDCompanionAPI {
         })
     }
 
+    /**
+     * Handles the confirm code confirmation.
+     * Rejects if code is invalid.
+     */
     private confirm () {
-        return this.fetchCode()
+        return Promise.resolve(this.credentialFetcher.getCode())
         .then(code => {
             return this.request<string>({
-                uri: this.apiURL + 'user/confirm',
+                uri: 'user/confirm',
                 method: 'post',
                 form: {
                     code,
@@ -256,11 +268,15 @@ export class EDCompanionAPI {
         .then(() => undefined)
     }
 
+    /**
+     * Runs the login, eventually falls back to confirm.
+     * Rejects if invalid credentials are used.
+     */
     private login (): Promise<void> {
         return Promise.resolve(this.credentialFetcher.getLogin())
         .then(credentials =>
             this.request({
-                uri: this.apiURL + 'user/login',
+                uri: 'user/login',
                 method: 'post',
                 form: credentials,
             })

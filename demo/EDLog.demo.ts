@@ -1,5 +1,3 @@
-'use strict';
-
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
 import { locations, starSystemDistance } from '../src/EDLog/locations';

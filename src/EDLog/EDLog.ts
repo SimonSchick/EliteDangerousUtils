@@ -28,6 +28,9 @@ export interface RawLog {
     event: string;
 }
 
+/**
+ * Util wrapper for ED events.
+ */
 export class EDEvent implements EDEvent {
     public timestamp: Date;
     public readonly event: string;
@@ -89,6 +92,9 @@ export class EDLog extends EventEmitter {
         return super.once(event, cb);
     }
 
+    /**
+     * Ends the log reader.
+     */
     public end (): void {
         delete this.fileName;
         if (this.fileStream) {
@@ -108,6 +114,7 @@ export class EDLog extends EventEmitter {
 
         this.fileName = file;
         this.fileStream = new ContinuesReadStream(file);
+        this.fileStream.on('error', error => this.emit('warn', error));
         if (skip) {
             this.fileStream.seekToEnd();
         }
@@ -121,6 +128,9 @@ export class EDLog extends EventEmitter {
         });
     }
 
+    /**
+     * Launches the log reader.
+     */
     public start () {
         const fileMatcher = /Journal\.(\d+)\.\d+.log$/;
 

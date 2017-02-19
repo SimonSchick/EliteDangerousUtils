@@ -1,6 +1,9 @@
 import { Readable, ReadableOptions } from 'stream';
 import * as fs from 'fs';
 
+/**
+ * Stream that allows continiously reading from a file that is procedually being (via append etc).
+ */
 export class ContinuesReadStream extends Readable {
     private closed = false;
     private offset = 0;
@@ -12,10 +15,16 @@ export class ContinuesReadStream extends Readable {
         this.closed = false;
     }
 
+    /**
+     * Skips all content and seeks to the end of file.
+     */
     public seekToEnd () {
         this.offset = fs.statSync(this.fileName).size;
     }
 
+    /**
+     * Closes the stream.
+     */
     public close () {
         if (this.closed) {
             throw new Error('Already closed');
@@ -28,6 +37,9 @@ export class ContinuesReadStream extends Readable {
         this.closed = true;
     }
 
+    /**
+     * @override
+     */
     protected _read () {
         if (this.file) {
             return;
