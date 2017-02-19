@@ -1,4 +1,5 @@
 # elite-dangerous-utils
+[![npm version](https://badge.fury.io/js/elite-dangerous-utils.svg)](https://badge.fury.io/js/elite-dangerous-utils)
 
 Collection of components that allow interacting with [Elite: Dangerous JSON Log JSON API](https://forums.frontier.co.uk/attachment.php?attachmentid=112608&d=1477509102])
 and the Companion API.
