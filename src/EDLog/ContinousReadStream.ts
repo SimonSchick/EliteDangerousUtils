@@ -7,7 +7,7 @@ export class ContinuesReadStream extends Readable {
     private file: number;
     private poll: NodeJS.Timer;
     private buffer: Buffer;
-    constructor (private fileName: string, opts?: ReadableOptions) {
+    constructor (public readonly fileName: string, opts?: ReadableOptions, public readonly pollInterval: number = 100) {
         super(opts);
         this.closed = false;
     }
@@ -44,6 +44,6 @@ export class ContinuesReadStream extends Readable {
             } catch (e) {
                 process.nextTick(() => this.emit('error', e));
             }
-        }, 100);
+        }, this.pollInterval);
     }
 }
