@@ -66,7 +66,7 @@ For a more complex demo see [demo folder](demo/EDLog.demo.ts).
     - `file`: The file path of the new file.
 - `warn`: Emits an error object.
 
-For all other docs please see the `.d.ts` files.
+For all other docs please see the `.ts` files.
 
 ---
 
@@ -113,4 +113,4 @@ For a _slighty_ more complex demo see [demo folder](demo/EDLog.demo.ts).
 
 ### Docs
 
-Due to the size of the schema of this API, please refer to the `d.ts` files, most types should be documented.
+Due to the size of the schema of this API, please refer to the `.ts` files, most types should be documented.
