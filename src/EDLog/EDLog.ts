@@ -15,7 +15,15 @@ import {
     IMaterialDiscarded,
     ILogFileSwap,
     IMissionAccepted,
-    IMissionCompleted
+    IMissionCompleted,
+    IModuleBuy,
+    ISellExplorationData,
+    IRefuelAll,
+    IBuyAmmo,
+    IShieldState,
+    IDockingGranted,
+    IMarketBuy,
+    IMarketSell,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -57,10 +65,18 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
     public on(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
     public on(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
-    public on(event: 'event:IMaterialCollected', cb: (event: IMaterialCollected) => void): this;
-    public on(event: 'event:IMaterialDiscarded', cb: (event: IMaterialDiscarded) => void): this;
+    public on(event: 'event:MaterialCollected', cb: (event: IMaterialCollected) => void): this;
+    public on(event: 'event:MaterialDiscarded', cb: (event: IMaterialDiscarded) => void): this;
     public on(event: 'event:MissionAccepted', cb: (event: IMissionAccepted) => void): this;
     public on(event: 'event:MissionCompleted', cb: (event: IMissionCompleted) => void): this;
+    public on(event: 'event:ModuleBuy', cb: (event: IModuleBuy) => void): this;
+    public on(event: 'event:SellExplorationData', cb: (event: ISellExplorationData) => void): this;
+    public on(event: 'event:RefuelAll', cb: (event: IRefuelAll) => void): this;
+    public on(event: 'event:BuyAmmo', cb: (event: IBuyAmmo) => void): this;
+    public on(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
+    public on(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
+    public on(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
+    public on(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -80,10 +96,18 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
     public once(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
     public once(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
-    public once(event: 'event:IMaterialCollected', cb: (event: IMaterialCollected) => void): this;
-    public once(event: 'event:IMaterialDiscarded', cb: (event: IMaterialDiscarded) => void): this;
+    public once(event: 'event:MaterialCollected', cb: (event: IMaterialCollected) => void): this;
+    public once(event: 'event:MaterialDiscarded', cb: (event: IMaterialDiscarded) => void): this;
     public once(event: 'event:MissionAccepted', cb: (event: IMissionAccepted) => void): this;
     public once(event: 'event:MissionCompleted', cb: (event: IMissionCompleted) => void): this;
+    public once(event: 'event:ModuleBuy', cb: (event: IModuleBuy) => void): this;
+    public once(event: 'event:SellExplorationData', cb: (event: ISellExplorationData) => void): this;
+    public once(event: 'event:RefuelAll', cb: (event: IRefuelAll) => void): this;
+    public once(event: 'event:BuyAmmo', cb: (event: IBuyAmmo) => void): this;
+    public once(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
+    public once(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
+    public once(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
+    public once(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

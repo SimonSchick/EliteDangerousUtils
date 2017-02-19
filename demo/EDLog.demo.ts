@@ -130,3 +130,5 @@ log.on('event:Bounty', event => {
 log.on('file', ev => console.log(ev.file))
 log.on('event', ev => console.log(ev));
 const backLog = log.start(true);
+
+backLog.forEach(() => {});

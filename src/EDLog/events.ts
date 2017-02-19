@@ -126,6 +126,58 @@ export interface IMissionCompleted extends IMission {
     Reward: number;
 }
 
+export interface IModuleBuy extends IEventBase {
+    Slot: string; // TODO: Possibly enum
+    BuyItem: string;
+    BuyItem_Localised: string;
+    BuyPrice: number;
+    Ship: string; // TODO: possible enum
+    ShipID: number;
+}
+
+export interface IShieldState extends IEventBase {
+    ShieldsUp: boolean;
+}
+
+export interface IRefuelBase extends IEventBase {
+    Cost: number;
+}
+
+export interface IRefuelAll extends IRefuelBase {}
+
+export interface IBuyAmmo extends IRefuelBase {}
+
+export interface ISellExplorationData extends IEventBase {
+    Systems: string[];
+    Discovered: string[]; // TODO: Does this include planets?
+    BaseValue: number;
+    Bonus: number;
+}
+
+export interface IDockingGranted extends IEventBase {
+    LandingPad: number;
+    StationName: string;
+}
+
+export interface IMarketEvent extends IEventBase {
+    Type: string; // TODO: Commodity enum? I'd rather kill myself.
+    Count: number;
+}
+
+export interface IMarketBuy extends IMarketEvent {
+    BuyPrice: number;
+    TotalCost: number;
+}
+
+export interface IMarketSell extends IMarketEvent {
+    SellPrice: number;
+    TotalPrice: number;
+    /**
+     * Per unit.
+     */
+    AvgPricePaid: number;
+}
+
 export interface ILogFileSwap {
     file: string;
 }

@@ -12,6 +12,8 @@ and the Companion API.
 EDLog is a basic `EventEmitter` that acts as a wrapper around
 that handles log rotation, parsing and handling of their events.
 
+It can also act as a backlog reader.
+
 EDLog is very simple to bootstrap as it takes care of pathing too.
 
 Please mind that events may be delayed by about 100ms as the log is polled.
