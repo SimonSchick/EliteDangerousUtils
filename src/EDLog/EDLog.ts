@@ -121,8 +121,8 @@ export class EDLog extends EventEmitter {
         this.lineStream = createInterface({
             input: this.fileStream,
         });
-        this.lineStream.on('line', data => {
-            const ev = new EDEvent(JSON.parse(data));
+        this.lineStream.on('line', line => {
+            const ev = new EDEvent(JSON.parse(line));
             this.emit('event', ev);
             this.emit(`event:${ev.event}`, ev);
         });
@@ -130,8 +130,9 @@ export class EDLog extends EventEmitter {
 
     /**
      * Launches the log reader.
+     * @param If true the method will return an array of event logs, otherwise empty.
      */
-    public start () {
+    public start (processBacklog: boolean = false): EDEvent[] {
         const fileMatcher = /Journal\.(\d+)\.\d+.log$/;
 
         fs.watch(this.directory, (eventType, fileName) => {
@@ -149,12 +150,27 @@ export class EDLog extends EventEmitter {
         });
 
 
-        const latestFile = fs.readdirSync(this.directory).sort((a, b) => {
+        const files = fs.readdirSync(this.directory).sort((a, b) => {
             const aDate = fileMatcher.exec(a);
             const bDate = fileMatcher.exec(b);
             return Number(bDate[1]) - Number(aDate[1]);
-        })[0];
+        });
 
-        this.listenToFile(latestFile, true);
+        const bl: EDEvent[] = [];
+        if (processBacklog) {
+            files.forEach(fileName => {
+                fs.readFileSync(join(this.directory, fileName), 'utf8')
+                .split('\n')
+                .forEach(line => {
+                    if (line === '') {
+                        return;
+                    }
+                    bl.push(new EDEvent(JSON.parse(line)));
+                });
+            });
+        }
+
+        this.listenToFile(files[0], true);
+        return bl;
     }
 }

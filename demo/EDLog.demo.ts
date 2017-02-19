@@ -129,4 +129,4 @@ log.on('event:Bounty', event => {
 });
 log.on('file', ev => console.log(ev.file))
 log.on('event', ev => console.log(ev));
-log.start();
+const backLog = log.start(true);
