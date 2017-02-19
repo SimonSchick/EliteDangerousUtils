@@ -249,7 +249,7 @@ export class EDCompanionAPI {
                 if(response.body.includes('errorSummary')) {
                     throw new VerificationError(response);
                 }
-                
+
                 return response;
             })
         })
