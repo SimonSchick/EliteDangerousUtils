@@ -12,7 +12,7 @@
         "strictNullChecks": false,
         "module": "commonjs",
         "sourceMap": true,
-        "target": "es2017",
+        "target": "es2015",
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
@@ -22,6 +22,9 @@
         },
         "alwaysStrict": true
     },
+    "include": [
+        "src/**/*"
+    ],
     "exclude": [
         "node_modules"
     ]

@@ -2,9 +2,10 @@
 
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
-import { EDLog, starSystemDistance, locations } from '../src/EDLog';
+import { locations, starSystemDistance } from '../src/EDLog/locations';
+import { EDLog } from '../src/EDLog/EDLog';
 import { speak } from 'say';
-import { byAllegiance, byState, byStateAllegiance } from '../src/SystemMaterialList';
+import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
 
 let blocklist: string[];
 try {
