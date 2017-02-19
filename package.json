@@ -1,6 +1,6 @@
 {
   "name": "elite-dangerous-utils",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
   "dependencies": {
     "request": "^2.79.0"
