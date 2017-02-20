@@ -127,8 +127,65 @@ log.on('event:SendText', event => {
 log.on('event:Bounty', event => {
     sayQ(`Killed ${event.Target} for ${event.TotalReward} `);
 });
-log.on('file', ev => console.log(ev.file))
-log.on('event', ev => console.log(ev));
+log.on('file', ev => console.log(ev.file));
+
+const knownEvents = [
+    'FSDJump',
+    'ReceiveText',
+    'SendText',
+    'Bounty',
+    'FuelScoop',
+    'LaunchSRV',
+    'LoadGame',
+    'Rank',
+    'Progress',
+    'SupercruiseExit',
+    'SupercruiseEntry',
+    'CommitCrime',
+    'MaterialCollected',
+    'MaterialDiscarded',
+    'MissionAccepted',
+    'MissionCompleted',
+    'ModuleBuy',
+    'SellExplorationData',
+    'RefuelAll',
+    'BuyAmmo',
+    'ShieldState',
+    'DockingRequested',
+    'DockingGranted',
+    'MarketBuy',
+    'MarketSell',
+    'Docked',
+    'Undocked',
+    'USSDrop',
+    'Touchdown',
+    'Liftoff',
+    'EngineerCraft',
+    'EngineerApply',
+    'EngineerProgress',
+    'HullDamage',
+    'Interdicted',
+    'LaunchFighter',
+    'RepairAll',
+    'Location',
+    'Fileheader',
+    'ShipyardSell',
+    'ShipyardTransfer',
+]
+
+log.on('event', ev => {
+    if (!(<any>knownEvents).includes(ev.event)) {
+        sayQ(`Unknown event discovered: ${ev.event}`);
+        console.log(ev);
+    }
+});
 const backLog = log.start(true);
 
-backLog.forEach(() => {});
+let unknown: string[] = [];
+backLog.forEach(ev => {
+    if (!(<any>knownEvents).includes(ev.event) && !(<any>unknown).includes(ev.event)) {
+        unknown.push(ev.event);
+    }
+});
+sayQ(`Unknown events: ${unknown.length}`);
+console.log(unknown);

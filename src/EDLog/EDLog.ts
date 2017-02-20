@@ -21,9 +21,27 @@ import {
     IRefuelAll,
     IBuyAmmo,
     IShieldState,
+    IDockingRequested,
     IDockingGranted,
     IMarketBuy,
     IMarketSell,
+    IDocked,
+    IUndocked,
+    IUSSDrop,
+    ITouchdown,
+    ILiftoff,
+    IEngineerCraft,
+    IEngineerApply,
+    IEngineerProgress,
+    IHullDamage,
+    IInterdicted,
+    ILaunchFighter,
+    IRepairAll,
+    ILocation,
+    IFileheader,
+    IShipyardSell,
+    IShipyardSwap,
+    IShipyardTransfer,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -61,7 +79,8 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:FuelScoop', cb: (event: IFuelScoop) => void): this;
     public on(event: 'event:LaunchSRV', cb: (event: ILaunchSRV) => void): this;
     public on(event: 'event:LoadGame', cb: (event: ILoadGame) => void): this;
-    public on(event: 'event:RankProgress', cb: (event: IRankProgress) => void): this;
+    public on(event: 'event:Rank', cb: (event: IRankProgress) => void): this;
+    public on(event: 'event:Progress', cb: (event: IRankProgress) => void): this;
     public on(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
     public on(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
     public on(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
@@ -74,9 +93,27 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:RefuelAll', cb: (event: IRefuelAll) => void): this;
     public on(event: 'event:BuyAmmo', cb: (event: IBuyAmmo) => void): this;
     public on(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
+    public on(event: 'event:DockingRequested', cb: (event: IDockingRequested) => void): this;
     public on(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
     public on(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
     public on(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
+    public on(event: 'event:Docked', cb: (event: IDocked) => void): this;
+    public on(event: 'event:Undocked', cb: (event: IUndocked) => void): this;
+    public on(event: 'event:USSDrop', cb: (event: IUSSDrop) => void): this;
+    public on(event: 'event:Touchdown', cb: (event: ITouchdown) => void): this;
+    public on(event: 'event:Liftoff', cb: (event: ILiftoff) => void): this;
+    public on(event: 'event:EngineerCraft', cb: (event: IEngineerCraft) => void): this;
+    public on(event: 'event:EngineerApply', cb: (event: IEngineerApply) => void): this;
+    public on(event: 'event:EngineerProgress', cb: (event: IEngineerProgress) => void): this;
+    public on(event: 'event:HullDamage', cb: (event: IHullDamage) => void): this;
+    public on(event: 'event:Interdicted', cb: (event: IInterdicted) => void): this;
+    public on(event: 'event:LaunchFighter', cb: (event: ILaunchFighter) => void): this;
+    public on(event: 'event:RepairAll', cb: (event: IRepairAll) => void): this;
+    public on(event: 'event:Location', cb: (event: ILocation) => void): this;
+    public on(event: 'event:Fileheader', cb: (event: IFileheader) => void): this;
+    public on(event: 'event:ShipyardSell', cb: (event: IShipyardSell) => void): this;
+    public on(event: 'event:ShipyardSwap', cb: (event: IShipyardSwap) => void): this;
+    public on(event: 'event:ShipyardTransfer', cb: (event: IShipyardTransfer) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -92,7 +129,8 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:FuelScoop', cb: (event: IFuelScoop) => void): this;
     public once(event: 'event:LaunchSRV', cb: (event: ILaunchSRV) => void): this;
     public once(event: 'event:LoadGame', cb: (event: ILoadGame) => void): this;
-    public once(event: 'event:RankProgress', cb: (event: IRankProgress) => void): this;
+    public once(event: 'event:Rank', cb: (event: IRankProgress) => void): this;
+    public once(event: 'event:Progress', cb: (event: IRankProgress) => void): this;
     public once(event: 'event:SupercruiseExit', cb: (event: ISupercruiseExit) => void): this;
     public once(event: 'event:SupercruiseEntry', cb: (event: ISupercruiseEntry) => void): this;
     public once(event: 'event:CommitCrime', cb: (event: ICommitCrime) => void): this;
@@ -105,9 +143,27 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:RefuelAll', cb: (event: IRefuelAll) => void): this;
     public once(event: 'event:BuyAmmo', cb: (event: IBuyAmmo) => void): this;
     public once(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
+    public once(event: 'event:DockingRequested', cb: (event: IDockingRequested) => void): this;
     public once(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
     public once(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
     public once(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
+    public once(event: 'event:Docked', cb: (event: IDocked) => void): this;
+    public once(event: 'event:Undocked', cb: (event: IUndocked) => void): this;
+    public once(event: 'event:USSDrop', cb: (event: IUSSDrop) => void): this;
+    public once(event: 'event:Touchdown', cb: (event: ITouchdown) => void): this;
+    public once(event: 'event:Liftoff', cb: (event: ILiftoff) => void): this;
+    public once(event: 'event:EngineerCraft', cb: (event: IEngineerCraft) => void): this;
+    public once(event: 'event:EngineerApply', cb: (event: IEngineerApply) => void): this;
+    public once(event: 'event:EngineerProgress', cb: (event: IEngineerProgress) => void): this;
+    public once(event: 'event:HullDamage', cb: (event: IHullDamage) => void): this;
+    public once(event: 'event:Interdicted', cb: (event: IInterdicted) => void): this;
+    public once(event: 'event:LaunchFighter', cb: (event: ILaunchFighter) => void): this;
+    public once(event: 'event:RepairAll', cb: (event: IRepairAll) => void): this;
+    public once(event: 'event:Location', cb: (event: ILocation) => void): this;
+    public once(event: 'event:Fileheader', cb: (event: IFileheader) => void): this;
+    public once(event: 'event:ShipyardSell', cb: (event: IShipyardSell) => void): this;
+    public once(event: 'event:ShipyardSwap', cb: (event: IShipyardSwap) => void): this;
+    public once(event: 'event:ShipyardTransfer', cb: (event: IShipyardTransfer) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;
@@ -174,10 +230,11 @@ export class EDLog extends EventEmitter {
         });
 
 
-        const files = fs.readdirSync(this.directory).sort((a, b) => {
+        const files = fs.readdirSync(this.directory)
+        .sort((a, b) => {
             const aDate = fileMatcher.exec(a);
             const bDate = fileMatcher.exec(b);
-            return Number(bDate[1]) - Number(aDate[1]);
+            return Number(aDate[1]) - Number(bDate[1]);
         });
 
         const bl: EDEvent[] = [];
@@ -194,7 +251,7 @@ export class EDLog extends EventEmitter {
             });
         }
 
-        this.listenToFile(files[0], true);
+        this.listenToFile(files[files.length - 1], true);
         return bl;
     }
 }

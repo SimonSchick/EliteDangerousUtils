@@ -11,8 +11,8 @@
     - `BuyAmmo`
     - `ShieldState`
     - `DockingGranted`
-    - `IMarketBuy`
-    - `IMarketSell`
+    - `MarketBuy`
+    - `MarketSell`
 - Fixed typos in events:
     - `MaterialCollected` and `MaterialDiscarded`
 
@@ -21,3 +21,26 @@
     - Now prompts for input via stderr and prints json payload into stdout as pretty print.
     - Added `ICargoItem`
     - Made `modules` on `IAPIShip` more specific, spefication coming soon.
+
+# 1.3.0
+- Added events:
+    - `DockingRequested`
+    - `Docked`
+    - `Undocked`
+    - `USSDrop`
+    - `Touchdown`
+    - `Liftoff`
+    - `EngineerCraft`
+    - `EngineerApply`
+    - `EngineerProgress`
+    - `HullDamage`
+    - `Interdicted`
+    - `LaunchFighter`
+    - `RepairAll`
+    - `Location`
+    - `Fileheader`
+    - `ShipyardSell`
+    - `ShipyardSwap`
+    - `ShipyardTransfer`
+- Added unknown event logging to demo:
+- Fixed backlog incorrect ordering.

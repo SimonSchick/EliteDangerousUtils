@@ -31,6 +31,12 @@ export interface IFSDJump extends IBaseLocation {
     PowerplayState?: string; // TODO: enum
 }
 
+export interface ILocation extends IBaseLocation {
+    Docked: boolean;
+    Body?: string;
+    BodyType?: 'Star';
+}
+
 export interface IReceivedText extends IEventBase {
     Channel: 'local' | 'npc' | 'direct' | 'player';
     // If Channel is player, this will be prefixed with a `&`
@@ -72,6 +78,9 @@ export interface ILoadGame extends IEventBase {
     Loan: 0;
 }
 
+/**
+ * Used once as a rank index progression and once as Rank progress update.
+ */
 export interface IRankProgress extends IEventBase {
     Combat: number;
     Trade: number;
@@ -159,6 +168,10 @@ export interface IDockingGranted extends IEventBase {
     StationName: string;
 }
 
+export interface IDockingRequested extends IEventBase {
+    StationName: string;
+}
+
 export interface IMarketEvent extends IEventBase {
     Type: string; // TODO: Commodity enum? I'd rather kill myself.
     Count: number;
@@ -178,6 +191,111 @@ export interface IMarketSell extends IMarketEvent {
     AvgPricePaid: number;
 }
 
+export interface IDockBase extends IEventBase {
+    StationName: string;
+    StationType: 'Orbis' | 'Coriolis';
+}
+
+export interface IDocked extends IDockBase {
+    StarSystem: string;
+    StationFaction: string;
+    FactionStation: FactionState;
+    StationGovernment: string; // TODO: type
+    StationGovernment_Localised: string;
+    StationAllegiance: Allegiance;
+    StationEconomy: string; // TODO: type
+    StationEconomy_Localised: string;
+}
+
+export interface IUndocked extends IDockBase {}
+
+export interface IUSSDrop extends IEventBase {
+    USSType: '$USS_Type_Aftermath' | '$USS_Type_VeryValuableSalvage;' | '$USS_Type_Salvage;';
+    USSType_Localised: string;
+    USSThreat: number;
+}
+
+export interface IGeoEvent extends IEventBase {
+    Latitude: number;
+    Longitude: number;
+}
+
+export interface ITouchdown extends IGeoEvent {}
+export interface ILiftoff extends IGeoEvent {}
+
+export interface IEngineerEvent extends IEventBase {
+    Engineer: string;
+    Blueprint: string;
+    Level: number;
+}
+
+export interface IEngineerCraft extends IEngineerEvent {
+    Ingredients: { [material: string]: number }
+}
+
+export interface IEngineerApply extends IEngineerEvent {
+    Override?: string;
+}
+
+export interface IEngineerProgress extends IEventBase {
+    Engineer: string;
+    Rank: number;
+}
+
+export interface IHullDamage extends IEventBase {
+    Health: number;
+    PlayerPilot: false;
+    Fighter: boolean;
+}
+
+export interface IInterdicted extends IEventBase {
+    Submitted: boolean;
+    Interdictor: string;
+    Interdictor_Localised: string;
+    IsPlayer: boolean;
+    Faction: string;
+}
+
+export interface ILaunchFighter extends IEventBase {
+    Loadout: 'zero';
+    PlayerControlled: boolean;
+}
+
 export interface ILogFileSwap {
     file: string;
+}
+
+export interface IFileheader extends IEventBase {
+    part: number;
+    language: string;
+    gameversion: string;
+    build: string;
+}
+
+export interface IRepairAll extends IEventBase {
+    Cost: number;
+}
+
+
+export interface IShipyardSell extends IEventBase {
+    ShipType: string;
+    SellShipId: number;
+    ShipPrice: number;
+}
+
+
+export interface IShipyardSwap extends IEventBase {
+    ShipType: string;
+    ShipId: number;
+    ShipPrice: number;
+    StoreOldShip: string,
+    StoreShipID: number;
+}
+
+export interface IShipyardTransfer extends IEventBase {
+    ShipType: string;
+    ShipID: number;
+    System: string;
+    Distance: number;
+    TransferPrice: number;
 }
