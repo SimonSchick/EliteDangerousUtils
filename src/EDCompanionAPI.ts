@@ -34,11 +34,46 @@ export interface IAPIModule {
     cost: number;
 }
 
-export interface IStartPortInfo extends IAPISystemInfo {
-    modules: { [index: number]: IAPIModule }
+export interface IAPICommodity {
+    id: number;
+    name: string;
+    cost_min: string;
+    cost_max: number;
+    cost_mean: string;
+    homebuy: string;
+    homesell: string;
+    consumebuy: string;
+    baseCreationQty: number;
+    baseConsumptionQty: number;
+    capacity: number;
+    buyPrice: number;
+    sellPrice: number;
+    meanPrice: number;
+    demandBracket: number;
+    stockBracket: number;
+    creationQty: number;
+    consumptionQty: number;
+    targetStock: number;
+    stock: number;
+    demand: number;
+    rare_min_stock: string;
+    rare_max_stock: string;
+    market_id?: any;
+    parent_id?: any;
+    statusFlags: any[];
+    categoryname: string;
+    volumescale: string;
+    sec_illegal_min: string;
+    sec_illegal_max: string;
+    stolenmod: string;
 }
 
-export interface IAPIModule {
+export interface IStartPortInfo extends IAPISystemInfo {
+    modules: { [index: number]: IAPIModule }
+    commodities: IAPICommodity[];
+}
+
+export interface IAPIShipModule {
     id: number;
     name: string;
     value: number;
@@ -69,9 +104,114 @@ export interface IAPIModule {
     }
 }
 
+export interface ICargoItem {
+    commodity: string;
+    origin?: number; // TODO: Probably starport ID?
+    powerplayOrigin?: number;
+    masq?: any; // TODO
+    owner?: number; // TODO: Is this the player id? :D
+    mission?: number
+    qty: number;
+    value: number;
+    xyz: {
+        x: number;
+        y: number;
+        z: number;
+    }
+    marked: number; // TODO: bitflag?
+}
+
 export interface IAPIShip {
     name: string;
-    modules: { [name: string]: IAPIModule };
+    modules: {
+        // TODO: Make these more precise.
+        TinyHardpoint1?: IAPIShipModule;
+        TinyHardpoint2?: IAPIShipModule;
+        TinyHardpoint3?: IAPIShipModule;
+        TinyHardpoint4?: IAPIShipModule;
+        TinyHardpoint5?: IAPIShipModule;
+        TinyHardpoint6?: IAPIShipModule;
+        TinyHardpoint7?: IAPIShipModule;
+        TinyHardpoint8?: IAPIShipModule;
+        TinyHardpoint9?: IAPIShipModule;
+        TinyHardpoint10?: IAPIShipModule;
+
+        SmallHardpoint1?: IAPIShipModule;
+        SmallHardpoint2?: IAPIShipModule;
+        SmallHardpoint3?: IAPIShipModule;
+        SmallHardpoint4?: IAPIShipModule;
+        SmallHardpoint5?: IAPIShipModule;
+        SmallHardpoint6?: IAPIShipModule;
+        SmallHardpoint7?: IAPIShipModule;
+        SmallHardpoint8?: IAPIShipModule;
+        SmallHardpoint9?: IAPIShipModule;
+        SmallHardpoint10?: IAPIShipModule;
+
+        MediumHardpoint1?: IAPIShipModule;
+        MediumHardpoint2?: IAPIShipModule;
+        MediumHardpoint3?: IAPIShipModule;
+        MediumHardpoint4?: IAPIShipModule;
+        MediumHardpoint5?: IAPIShipModule;
+        MediumHardpoint6?: IAPIShipModule;
+        MediumHardpoint7?: IAPIShipModule;
+        MediumHardpoint8?: IAPIShipModule;
+        MediumHardpoint9?: IAPIShipModule;
+        MediumHardpoint10?: IAPIShipModule;
+
+        LargeHardpoint1?: IAPIShipModule;
+        LargeHardpoint2?: IAPIShipModule;
+        LargeHardpoint3?: IAPIShipModule;
+        LargeHardpoint4?: IAPIShipModule;
+        LargeHardpoint5?: IAPIShipModule;
+        LargeHardpoint6?: IAPIShipModule;
+        LargeHardpoint7?: IAPIShipModule;
+        LargeHardpoint8?: IAPIShipModule;
+        LargeHardpoint9?: IAPIShipModule;
+        LargeHardpoint10?: IAPIShipModule;
+
+        HugeHardpoint1?: IAPIShipModule;
+        HugeHardpoint2?: IAPIShipModule;
+        HugeHardpoint3?: IAPIShipModule;
+        HugeHardpoint4?: IAPIShipModule;
+        HugeHardpoint5?: IAPIShipModule;
+        HugeHardpoint6?: IAPIShipModule;
+        HugeHardpoint7?: IAPIShipModule;
+        HugeHardpoint8?: IAPIShipModule;
+        HugeHardpoint9?: IAPIShipModule;
+        HugeHardpoint10?: IAPIShipModule;
+
+        Bobble1?: IAPIShipModule;
+        Bobble2?: IAPIShipModule;
+        Bobble3?: IAPIShipModule;
+        Bobble4?: IAPIShipModule;
+        Bobble5?: IAPIShipModule;
+        Bobble6?: IAPIShipModule;
+        Bobble7?: IAPIShipModule;
+        Bobble8?: IAPIShipModule;
+        Bobble9?: IAPIShipModule;
+        Bobble10?: IAPIShipModule;
+
+        ShipKitSpoiler?: IAPIShipModule;
+        ShipKitWings?: IAPIShipModule;
+        ShipKitTail?: IAPIShipModule;
+        ShipKitBumper?: IAPIShipModule;
+        WeaponColour?: IAPIShipModule; // Can be empty array, I bet this is PHP
+        EngineColour?: IAPIShipModule;
+
+        Armour: IAPIShipModule;
+        Paintjob: IAPIShipModule;
+        PowerPlant: IAPIShipModule;
+        MainEngines: IAPIShipModule;
+        FrameShiftDrive: IAPIShipModule;
+        LifeSupport: IAPIShipModule;
+        PowerDistributor: IAPIShipModule;
+        Radar: IAPIShipModule;
+        FuelTank: IAPIShipModule;
+        PlanetaryApproachSuite: IAPIShipModule;
+
+        // Module slots...
+        [name: string]: IAPIShipModule;
+    };
     value: {
         hull: number;
         modules: number;

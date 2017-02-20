@@ -4,7 +4,7 @@ import { createInterface } from 'readline';
 
 function readLineAsync (prompt: string): Promise<string> {
     return new Promise<string>(resolve => {
-        const int = createInterface(process.stdin, process.stdout);
+        const int = createInterface(process.stdin, process.stderr);
         int.question(prompt, response => {
             int.close();
             resolve(response);
@@ -34,5 +34,6 @@ const api = new EDCompanionAPI(new FileCookieStore('cookies.json'), {
     }
 });
 api.getProfile()
+.then(val => JSON.stringify(val, null, '    '))
 .then(console.log)
 .catch(err => console.error(err.stack));

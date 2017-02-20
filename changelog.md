@@ -15,3 +15,7 @@
     - `IMarketSell`
 - Fixed typos in events:
     - `MaterialCollected` and `MaterialDiscarded`
+- Made Companion API demo more useful.
+    - Now prompts for input via stderr and prints json payload into stdout as pretty print.
+    - Added `ICargoItem`
+    - Made `modules` on `IAPIShip` more specific, spefication coming soon.
