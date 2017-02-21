@@ -1,4 +1,5 @@
 import { EDPosition } from './locations';
+import { AllModules } from '../common';
 
 export interface IEventBase {
     timestamp: Date;
@@ -29,8 +30,8 @@ export interface IFSDJump extends IBaseLocation {
     JumpDist: number;
     FuelUsed: number;
     FuelLevel: number;
-    Powers?: string[]; // TODO: enum
-    PowerplayState?: string; // TODO: enum
+    Powers?: ('Li Yong-Rui' | 'Felicia Winters' | 'Edmund Mahon' | 'Denton Patreus' | 'Zachary Hudson' | 'Zermina Torval' | 'Archon Delaine' | 'Aisling Duval' | 'A. Lavigny-Duval' | 'Pranav Antal' | 'Yuri Grom')[];
+    PowerplayState?: 'Exploited' | 'Controlled';
 }
 
 export interface ILocation extends IBaseLocation {
@@ -339,7 +340,7 @@ export interface IPayLegacyFines extends IEventBase {
 }
 
 export interface IRebootRepair extends IEventBase {
-    Modules: any[]; // TODO
+    Modules: AllModules[];
 }
 
 export interface IMaterialDiscovered extends IEventBase {

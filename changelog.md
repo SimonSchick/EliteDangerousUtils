@@ -66,3 +66,7 @@
 ## Demo
 - Randomized material selection for large material sets.
 - Removed hard-coded list for events, pulls from source instead.
+
+# 1.5.0
+- Added powers list type.
+- Completed module list in EDCompanionApp and module type through common definitions file.

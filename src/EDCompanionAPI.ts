@@ -1,4 +1,5 @@
 import * as request from 'request';
+import { OptionalSlots, MandatorySlots } from './common';
 
 export interface Commander {
     id: number;
@@ -124,93 +125,9 @@ export interface ICargoItem {
 export interface IAPIShip {
     name: string;
     modules: {
-        // TODO: Make these more precise.
-        TinyHardpoint1?: IAPIShipModule;
-        TinyHardpoint2?: IAPIShipModule;
-        TinyHardpoint3?: IAPIShipModule;
-        TinyHardpoint4?: IAPIShipModule;
-        TinyHardpoint5?: IAPIShipModule;
-        TinyHardpoint6?: IAPIShipModule;
-        TinyHardpoint7?: IAPIShipModule;
-        TinyHardpoint8?: IAPIShipModule;
-        TinyHardpoint9?: IAPIShipModule;
-        TinyHardpoint10?: IAPIShipModule;
-
-        SmallHardpoint1?: IAPIShipModule;
-        SmallHardpoint2?: IAPIShipModule;
-        SmallHardpoint3?: IAPIShipModule;
-        SmallHardpoint4?: IAPIShipModule;
-        SmallHardpoint5?: IAPIShipModule;
-        SmallHardpoint6?: IAPIShipModule;
-        SmallHardpoint7?: IAPIShipModule;
-        SmallHardpoint8?: IAPIShipModule;
-        SmallHardpoint9?: IAPIShipModule;
-        SmallHardpoint10?: IAPIShipModule;
-
-        MediumHardpoint1?: IAPIShipModule;
-        MediumHardpoint2?: IAPIShipModule;
-        MediumHardpoint3?: IAPIShipModule;
-        MediumHardpoint4?: IAPIShipModule;
-        MediumHardpoint5?: IAPIShipModule;
-        MediumHardpoint6?: IAPIShipModule;
-        MediumHardpoint7?: IAPIShipModule;
-        MediumHardpoint8?: IAPIShipModule;
-        MediumHardpoint9?: IAPIShipModule;
-        MediumHardpoint10?: IAPIShipModule;
-
-        LargeHardpoint1?: IAPIShipModule;
-        LargeHardpoint2?: IAPIShipModule;
-        LargeHardpoint3?: IAPIShipModule;
-        LargeHardpoint4?: IAPIShipModule;
-        LargeHardpoint5?: IAPIShipModule;
-        LargeHardpoint6?: IAPIShipModule;
-        LargeHardpoint7?: IAPIShipModule;
-        LargeHardpoint8?: IAPIShipModule;
-        LargeHardpoint9?: IAPIShipModule;
-        LargeHardpoint10?: IAPIShipModule;
-
-        HugeHardpoint1?: IAPIShipModule;
-        HugeHardpoint2?: IAPIShipModule;
-        HugeHardpoint3?: IAPIShipModule;
-        HugeHardpoint4?: IAPIShipModule;
-        HugeHardpoint5?: IAPIShipModule;
-        HugeHardpoint6?: IAPIShipModule;
-        HugeHardpoint7?: IAPIShipModule;
-        HugeHardpoint8?: IAPIShipModule;
-        HugeHardpoint9?: IAPIShipModule;
-        HugeHardpoint10?: IAPIShipModule;
-
-        Bobble1?: IAPIShipModule;
-        Bobble2?: IAPIShipModule;
-        Bobble3?: IAPIShipModule;
-        Bobble4?: IAPIShipModule;
-        Bobble5?: IAPIShipModule;
-        Bobble6?: IAPIShipModule;
-        Bobble7?: IAPIShipModule;
-        Bobble8?: IAPIShipModule;
-        Bobble9?: IAPIShipModule;
-        Bobble10?: IAPIShipModule;
-
-        ShipKitSpoiler?: IAPIShipModule;
-        ShipKitWings?: IAPIShipModule;
-        ShipKitTail?: IAPIShipModule;
-        ShipKitBumper?: IAPIShipModule;
-        WeaponColour?: IAPIShipModule; // Can be empty array, I bet this is PHP
-        EngineColour?: IAPIShipModule;
-
-        Armour: IAPIShipModule;
-        Paintjob: IAPIShipModule;
-        PowerPlant: IAPIShipModule;
-        MainEngines: IAPIShipModule;
-        FrameShiftDrive: IAPIShipModule;
-        LifeSupport: IAPIShipModule;
-        PowerDistributor: IAPIShipModule;
-        Radar: IAPIShipModule;
-        FuelTank: IAPIShipModule;
-        PlanetaryApproachSuite: IAPIShipModule;
-
-        // Module slots...
-        [name: string]: IAPIShipModule;
+        [name in OptionalSlots]?: IAPIShipModule;
+    } & {
+        [name in MandatorySlots]: IAPIShipModule;
     };
     value: {
         hull: number;
