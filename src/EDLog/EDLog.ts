@@ -42,6 +42,13 @@ import {
     IShipyardSell,
     IShipyardSwap,
     IShipyardTransfer,
+    IEjectCargo,
+    IHeatWarning,
+    IScreenshot,
+    IRedeemVoucher,
+    IPayLegacyFines,
+    IRebootRepair,
+    IMaterialDiscovered,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -114,6 +121,14 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:ShipyardSell', cb: (event: IShipyardSell) => void): this;
     public on(event: 'event:ShipyardSwap', cb: (event: IShipyardSwap) => void): this;
     public on(event: 'event:ShipyardTransfer', cb: (event: IShipyardTransfer) => void): this;
+    public on(event: 'event:EjectCargo', cb: (event: IEjectCargo) => void): this;
+    public on(event: 'event:HeatWarning', cb: (event: IHeatWarning) => void): this;
+    public on(event: 'event:Screenshot', cb: (event: IScreenshot) => void): this;
+    public on(event: 'event:RedeemVoucher', cb: (event: IRedeemVoucher) => void): this;
+    public on(event: 'event:PayLegacyFines', cb: (event: IPayLegacyFines) => void): this;
+    public on(event: 'event:RebootRepair', cb: (event: IRebootRepair) => void): this;
+    public on(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
+
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -164,6 +179,13 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:ShipyardSell', cb: (event: IShipyardSell) => void): this;
     public once(event: 'event:ShipyardSwap', cb: (event: IShipyardSwap) => void): this;
     public once(event: 'event:ShipyardTransfer', cb: (event: IShipyardTransfer) => void): this;
+    public once(event: 'event:EjectCargo', cb: (event: IEjectCargo) => void): this;
+    public once(event: 'event:HeatWarning', cb: (event: IHeatWarning) => void): this;
+    public once(event: 'event:Screenshot', cb: (event: IScreenshot) => void): this;
+    public once(event: 'event:RedeemVoucher', cb: (event: IRedeemVoucher) => void): this;
+    public once(event: 'event:PayLegacyFines', cb: (event: IPayLegacyFines) => void): this;
+    public once(event: 'event:RebootRepair', cb: (event: IRebootRepair) => void): this;
+    public once(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

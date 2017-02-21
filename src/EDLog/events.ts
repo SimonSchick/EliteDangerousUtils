@@ -8,7 +8,9 @@ export interface IEventBase {
 export type Allegiance = 'None' | 'Independant' | 'Empire' | 'Alliance' | 'Federation';
 export type FactionState = 'None' | 'Retreat' | 'Lockdown' | 'CivilUnrest' | 'CivilWar' | 'Boom' | 'Expansion' | 'Bust' | 'Famine' | 'Election' | 'Investment' | 'Outbreak'| 'War';
 export type Economy = '$economy_None;'
-export type Securty = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
+export type Security = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
+export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null';
+export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
 
 export interface IBaseLocation extends IEventBase {
     StarSystem: string;
@@ -34,11 +36,11 @@ export interface IFSDJump extends IBaseLocation {
 export interface ILocation extends IBaseLocation {
     Docked: boolean;
     Body?: string;
-    BodyType?: 'Star';
+    BodyType?: BodyType;
 }
 
 export interface IReceivedText extends IEventBase {
-    Channel: 'local' | 'npc' | 'direct' | 'player';
+    Channel: 'local' | 'npc' | 'direct' | 'player' | 'wing';
     // If Channel is player, this will be prefixed with a `&`
     From?: string;
     Message: string;
@@ -50,7 +52,8 @@ export interface IReceivedText extends IEventBase {
 
 export interface ISendText extends IEventBase {
     Message: string;
-    To: 'local' | string;
+    To: 'local' | 'wing' | string;
+    To_Localised: string;
 }
 
 export interface IBounty extends IEventBase {
@@ -93,7 +96,7 @@ export interface IRankProgress extends IEventBase {
 export interface ISupercruiseExit extends IEventBase {
     StarSystem: string;
     Body: string;
-    BodyType: 'Star' | 'Planet';
+    BodyType: BodyType;
 }
 
 export interface ISupercruiseEntry extends IEventBase {
@@ -101,14 +104,15 @@ export interface ISupercruiseEntry extends IEventBase {
 }
 
 export interface ICommitCrime extends IEventBase {
-    CrimeType: 'assault';
+    CrimeType: 'assault' | 'murder' | 'dockingMinorTresspass' | 'fireInNoFireZone' | 'collidedAtSpeedInNoFireZone';
     Faction: string;
     Victim: string;
-    Bounty: number;
+    Bounty?: number;
+    Fine?: number;
 }
 
 export interface IMaterialEvent {
-    Category: 'Encoded';
+    Category: MaterialType;
     Name: string;
     Count: number;
 }
@@ -193,7 +197,7 @@ export interface IMarketSell extends IMarketEvent {
 
 export interface IDockBase extends IEventBase {
     StationName: string;
-    StationType: 'Orbis' | 'Coriolis';
+    StationType: 'Orbis' | 'Coriolis' | 'Bernal' | 'Outpost';
 }
 
 export interface IDocked extends IDockBase {
@@ -210,7 +214,16 @@ export interface IDocked extends IDockBase {
 export interface IUndocked extends IDockBase {}
 
 export interface IUSSDrop extends IEventBase {
-    USSType: '$USS_Type_Aftermath' | '$USS_Type_VeryValuableSalvage;' | '$USS_Type_Salvage;';
+    USSType:
+        '$USS_Type_Aftermath;' |
+        '$USS_Type_VeryValuableSalvage;' |
+        '$USS_Type_Salvage;' |
+        '$USS_Type_WeaponsFire;' |
+        '$USS_Type_Convoy;' |
+        '$USS_Type_DistressSignal;' |
+        '$USS_Type_MissionTarget;' |
+        '$USS_Type_ValuableSalvage;' |
+        '$USS_Type_Ceremonial;';
     USSType_Localised: string;
     USSThreat: number;
 }
@@ -257,7 +270,7 @@ export interface IInterdicted extends IEventBase {
 }
 
 export interface ILaunchFighter extends IEventBase {
-    Loadout: 'zero';
+    Loadout: 'zero' | 'two';
     PlayerControlled: boolean;
 }
 
@@ -275,7 +288,6 @@ export interface IFileheader extends IEventBase {
 export interface IRepairAll extends IEventBase {
     Cost: number;
 }
-
 
 export interface IShipyardSell extends IEventBase {
     ShipType: string;
@@ -298,4 +310,40 @@ export interface IShipyardTransfer extends IEventBase {
     System: string;
     Distance: number;
     TransferPrice: number;
+}
+
+export interface IEjectCargo extends IEventBase {
+    Type: string;
+    Count: number;
+    Adandoned: boolean;
+}
+
+export interface IHeatWarning extends IEventBase {}
+
+export interface IScreenshot extends IEventBase {
+    Filename: string;
+    Width: number;
+    Height: number;
+    System: string;
+    Body: string;
+}
+
+export interface IRedeemVoucher extends IEventBase {
+    Type: 'bounty' | 'settlement' | 'scannable' | 'CombatBond';
+    Amount: number;
+}
+
+export interface IPayLegacyFines extends IEventBase {
+    Amount: number;
+    BrokerPercentage: number;
+}
+
+export interface IRebootRepair extends IEventBase {
+    Modules: any[]; // TODO
+}
+
+export interface IMaterialDiscovered extends IEventBase {
+    Category: MaterialType;
+    Name: string;
+    DiscoveryNumber: number;
 }

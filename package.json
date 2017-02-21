@@ -11,6 +11,7 @@
     "request": "^2.79.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.52",
     "@types/node": "^7.0.5",
     "@types/request": "0.0.39",
     "rimraf": "^2.6.0",

@@ -44,3 +44,25 @@
     - `ShipyardTransfer`
 - Added unknown event logging to demo:
 - Fixed backlog incorrect ordering.
+
+# 1.4.0
+- Added events:
+    - `EjectCargo`
+    - `HeatWarning`
+    - `Screenshot`
+    - `RedeemVoucher`
+    - `PayLegacyFines`
+    - `RebootRepair`
+    - `Materialdiscovered`
+- Fixed typo in `Security` type export.
+- Completed body types and moved them into own type.
+- Added `wing` to `ReceiveText` and `SendText` channels.
+- Added `To_Localised` to `SendText`
+- Completed `CrimeType` in `CommitCrime` and added `Fine` parameter, made `Bounty` optional
+- Completed `StationType`.
+- Completed `USSType`.
+- Added another fighter loadout string.
+
+## Demo
+- Randomized material selection for large material sets.
+- Removed hard-coded list for events, pulls from source instead.

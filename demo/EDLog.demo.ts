@@ -1,9 +1,11 @@
 import * as fs from 'fs';
+import { join } from 'path';
 import { EventEmitter } from 'events';
 import { locations, starSystemDistance } from '../src/EDLog/locations';
 import { EDLog } from '../src/EDLog/EDLog';
 import { speak } from 'say';
 import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
+import { sampleSize } from 'lodash';
 
 let blocklist: string[];
 try {
@@ -73,7 +75,7 @@ log.on('event:FSDJump', event => {
         if (materials.length > 0) {
             if (materials.length > 5) {
                 const origLength = materials.length;
-                materials = materials.slice(0, 5);
+                materials = sampleSize(materials, 5);
                 materials.push(`and ${origLength - 5} more materials`);
             }
             info.push(`Materials: ${materials.join(', ')}`);
@@ -129,49 +131,12 @@ log.on('event:Bounty', event => {
 });
 log.on('file', ev => console.log(ev.file));
 
-const knownEvents = [
-    'FSDJump',
-    'ReceiveText',
-    'SendText',
-    'Bounty',
-    'FuelScoop',
-    'LaunchSRV',
-    'LoadGame',
-    'Rank',
-    'Progress',
-    'SupercruiseExit',
-    'SupercruiseEntry',
-    'CommitCrime',
-    'MaterialCollected',
-    'MaterialDiscarded',
-    'MissionAccepted',
-    'MissionCompleted',
-    'ModuleBuy',
-    'SellExplorationData',
-    'RefuelAll',
-    'BuyAmmo',
-    'ShieldState',
-    'DockingRequested',
-    'DockingGranted',
-    'MarketBuy',
-    'MarketSell',
-    'Docked',
-    'Undocked',
-    'USSDrop',
-    'Touchdown',
-    'Liftoff',
-    'EngineerCraft',
-    'EngineerApply',
-    'EngineerProgress',
-    'HullDamage',
-    'Interdicted',
-    'LaunchFighter',
-    'RepairAll',
-    'Location',
-    'Fileheader',
-    'ShipyardSell',
-    'ShipyardTransfer',
-]
+const knownEvents = fs.readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
+.trim()
+.split('\n')
+.map(line => line.match(/public once\(event:\ 'event:(.*?)', cb\: \(event\: I(.*?)\) => void\): this;/))
+.filter(match => match)
+.map(match => match[1]);
 
 log.on('event', ev => {
     if (!(<any>knownEvents).includes(ev.event)) {
