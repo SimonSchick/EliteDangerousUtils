@@ -14,6 +14,7 @@
     "@types/lodash": "^4.14.52",
     "@types/node": "^7.0.5",
     "@types/request": "0.0.39",
+    "lodash": "^4.17.4",
     "rimraf": "^2.6.0",
     "say": "^0.11.0",
     "tough-cookie-filestore": "0.0.1",
