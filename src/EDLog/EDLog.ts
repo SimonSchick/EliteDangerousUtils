@@ -49,6 +49,11 @@ import {
     IPayLegacyFines,
     IRebootRepair,
     IMaterialDiscovered,
+    IDockingCancelled,
+    IDockingDenied,
+    IDockingTimeout,
+    INewCommander,
+    IClearSavedGame,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -102,6 +107,9 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
     public on(event: 'event:DockingRequested', cb: (event: IDockingRequested) => void): this;
     public on(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
+    public on(event: 'event:DockingCancelled', cb: (event: IDockingCancelled) => void): this;
+    public on(event: 'event:DockingDenied', cb: (event: IDockingDenied) => void): this;
+    public on(event: 'event:DockingTimeout', cb: (event: IDockingTimeout) => void): this;
     public on(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
     public on(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
     public on(event: 'event:Docked', cb: (event: IDocked) => void): this;
@@ -128,7 +136,8 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:PayLegacyFines', cb: (event: IPayLegacyFines) => void): this;
     public on(event: 'event:RebootRepair', cb: (event: IRebootRepair) => void): this;
     public on(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
-
+    public on(event: 'event:NewCommander', cb: (event: INewCommander) => void): this;
+    public on(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -160,6 +169,9 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:ShieldState', cb: (event: IShieldState) => void): this;
     public once(event: 'event:DockingRequested', cb: (event: IDockingRequested) => void): this;
     public once(event: 'event:DockingGranted', cb: (event: IDockingGranted) => void): this;
+    public once(event: 'event:DockingCancelled', cb: (event: IDockingCancelled) => void): this;
+    public once(event: 'event:DockingDenied', cb: (event: IDockingDenied) => void): this;
+    public once(event: 'event:DockingTimeout', cb: (event: IDockingTimeout) => void): this;
     public once(event: 'event:MarketBuy', cb: (event: IMarketBuy) => void): this;
     public once(event: 'event:MarketSell', cb: (event: IMarketSell) => void): this;
     public once(event: 'event:Docked', cb: (event: IDocked) => void): this;
@@ -186,6 +198,8 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:PayLegacyFines', cb: (event: IPayLegacyFines) => void): this;
     public once(event: 'event:RebootRepair', cb: (event: IRebootRepair) => void): this;
     public once(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
+    public once(event: 'event:NewCommander', cb: (event: INewCommander) => void): this;
+    public once(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

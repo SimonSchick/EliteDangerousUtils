@@ -168,13 +168,22 @@ export interface ISellExplorationData extends IEventBase {
     Bonus: number;
 }
 
-export interface IDockingGranted extends IEventBase {
-    LandingPad: number;
+export interface IDockingEvent extends IEventBase {
     StationName: string;
 }
 
-export interface IDockingRequested extends IEventBase {
-    StationName: string;
+export interface IDockingGranted extends IDockingEvent {
+    LandingPad: number;
+}
+
+export interface IDockingRequested extends IDockingEvent {}
+
+export interface IDockingCancelled extends IDockingEvent {}
+
+export interface IDockingTimeout extends IDockingEvent {}
+
+export interface IDockingDenied extends IDockingEvent {
+    Reason: 'NoSpace' | 'TooLarge' | 'Hostile' |  'Offences' | 'Distance' | 'ActiveFighter' | 'NoReason';
 }
 
 export interface IMarketEvent extends IEventBase {
@@ -347,4 +356,13 @@ export interface IMaterialDiscovered extends IEventBase {
     Category: MaterialType;
     Name: string;
     DiscoveryNumber: number;
+}
+
+export interface IClearSavedGame extends IEventBase {
+    Name: string;
+}
+
+export interface INewCommander extends IEventBase {
+    Name: string;
+    Package: string;
 }

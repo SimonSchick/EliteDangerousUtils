@@ -77,3 +77,13 @@
 # 1.7.0
 - Fixed corrupted build.
 - Added missing lodash dev dependency
+
+# 1.8.0
+- Added events:
+    - `DockingCancelled`
+    - `DockingDenied`
+    - `DockingTimeout`
+    - `NewCommander`
+    - `ClearSavedGame`
+    - `DockingCancelled`
+- Simplied some interface for docking related events
