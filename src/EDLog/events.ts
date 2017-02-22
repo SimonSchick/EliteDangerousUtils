@@ -1,5 +1,5 @@
 import { EDPosition } from './locations';
-import { AllModules } from '../common';
+import { AllSlots } from '../common';
 
 export interface IEventBase {
     timestamp: Date;
@@ -340,7 +340,7 @@ export interface IPayLegacyFines extends IEventBase {
 }
 
 export interface IRebootRepair extends IEventBase {
-    Modules: AllModules[];
+    Modules: AllSlots[];
 }
 
 export interface IMaterialDiscovered extends IEventBase {
