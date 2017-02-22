@@ -86,4 +86,6 @@
     - `NewCommander`
     - `ClearSavedGame`
     - `DockingCancelled`
+    - `Syntheses`
+    - `DockSRV`
 - Simplied some interface for docking related events

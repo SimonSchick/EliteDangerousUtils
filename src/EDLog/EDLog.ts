@@ -54,6 +54,8 @@ import {
     IDockingTimeout,
     INewCommander,
     IClearSavedGame,
+    ISynthesis,
+    IDockSRV,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -138,6 +140,8 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
     public on(event: 'event:NewCommander', cb: (event: INewCommander) => void): this;
     public on(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
+    public on(event: 'event:Synthesis', cb: (event: ISynthesis) => void): this;
+    public on(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -200,6 +204,8 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:MaterialDiscovered', cb: (event: IMaterialDiscovered) => void): this;
     public once(event: 'event:NewCommander', cb: (event: INewCommander) => void): this;
     public once(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
+    public once(event: 'event:Synthesis', cb: (event: ISynthesis) => void): this;
+    public once(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

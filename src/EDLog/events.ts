@@ -366,3 +366,12 @@ export interface INewCommander extends IEventBase {
     Name: string;
     Package: string;
 }
+
+export interface ISynthesis extends IEventBase {
+    Name: string;
+    Materials: {
+        [materialName: string]: number;
+    }
+}
+
+export interface IDockSRV extends IEventBase {}
