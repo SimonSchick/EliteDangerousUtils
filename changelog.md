@@ -74,6 +74,6 @@
 - Added powers list type.
 - Completed module list in EDCompanionApp and module type through common definitions file.
 
-# 1.6.1
+# 1.7.0
 - Fixed corrupted build.
 - Added missing lodash dev dependency
