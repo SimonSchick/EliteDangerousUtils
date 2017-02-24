@@ -5,7 +5,7 @@
     "url": "https://github.com/SimonSchick"
   },
   "name": "elite-dangerous-utils",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
   "dependencies": {
     "request": "^2.79.0"
