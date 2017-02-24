@@ -34,8 +34,7 @@
     "win32"
   ],
   "scripts": {
-    "start": "ts-node EDLog.demo.ts",
-    "tsnode": "ts-node",
+    "start-demo-log": "ts-node demo/EDLog.demo.ts",
     "build": "rimraf dist && tsc",
     "prepublishOnly": "npm run build"
   },
