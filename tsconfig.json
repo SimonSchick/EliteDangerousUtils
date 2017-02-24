@@ -23,7 +23,8 @@
         "typeRoots": [
             "node_modules/@types"
         ],
-        "alwaysStrict": true
+        "alwaysStrict": true,
+        "skipLibCheck": true
     },
     "include": [
         "src/**/*"
