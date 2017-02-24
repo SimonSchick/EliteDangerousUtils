@@ -98,7 +98,7 @@ log.on('event:ReceiveText', event => {
             break;
         case 'local':
             if (event.From_Localised.startsWith('CMDR')) {
-                sayQ(`Message from ${event.From_Localised.replace('Commander ', '')}: ${event.Message}`);
+                sayQ(`Message from ${event.From_Localised.replace('CMDR ', 'Commander')}: ${event.Message}`);
                 break;
             }
             sayQ(`Message from ${event.From.substr(1)}: ${event.Message}`);
