@@ -6,12 +6,15 @@ export interface IEventBase {
     readonly event: string;
 }
 
-export type Allegiance = 'None' | 'Independant' | 'Empire' | 'Alliance' | 'Federation';
+export type Faction = 'Empire' | 'Alliance' | 'Federation';
+export type Allegiance = 'None' | 'Independant' | Faction;
 export type FactionState = 'None' | 'Retreat' | 'Lockdown' | 'CivilUnrest' | 'CivilWar' | 'Boom' | 'Expansion' | 'Bust' | 'Famine' | 'Election' | 'Investment' | 'Outbreak'| 'War';
 export type Economy = '$economy_None;'
 export type Security = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
 export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null';
 export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
+export type Power = 'Li Yong-Rui' | 'Felicia Winters' | 'Edmund Mahon' | 'Denton Patreus' | 'Zachary Hudson' | 'Zermina Torval' | 'Archon Delaine' | 'Aisling Duval' | 'A. Lavigny-Duval' | 'Pranav Antal' | 'Yuri Grom';
+export type FighterLoadout = 'zero' | 'two';
 
 export interface IBaseLocation extends IEventBase {
     StarSystem: string;
@@ -30,7 +33,7 @@ export interface IFSDJump extends IBaseLocation {
     JumpDist: number;
     FuelUsed: number;
     FuelLevel: number;
-    Powers?: ('Li Yong-Rui' | 'Felicia Winters' | 'Edmund Mahon' | 'Denton Patreus' | 'Zachary Hudson' | 'Zermina Torval' | 'Archon Delaine' | 'Aisling Duval' | 'A. Lavigny-Duval' | 'Pranav Antal' | 'Yuri Grom')[];
+    Powers?: Power[];
     PowerplayState?: 'Exploited' | 'Controlled';
 }
 
@@ -140,13 +143,22 @@ export interface IMissionCompleted extends IMission {
     Reward: number;
 }
 
-export interface IModuleBuy extends IEventBase {
-    Slot: string; // TODO: Possibly enum
+export interface IModuleEvent extends IEventBase {
+    Slot: AllSlots;
+    Ship: string; // TODO: possible enum
+    ShipID: number;
+}
+
+export interface IModuleBuy extends IModuleEvent {
     BuyItem: string;
     BuyItem_Localised: string;
     BuyPrice: number;
-    Ship: string; // TODO: possible enum
-    ShipID: number;
+}
+
+export interface IModuleSell extends IModuleEvent {
+    SellItem: string;
+    SellItem_Localised: string;
+    SellPrice: number;
 }
 
 export interface IShieldState extends IEventBase {
@@ -280,7 +292,7 @@ export interface IInterdicted extends IEventBase {
 }
 
 export interface ILaunchFighter extends IEventBase {
-    Loadout: 'zero' | 'two';
+    Loadout: FighterLoadout;
     PlayerControlled: boolean;
 }
 
@@ -375,3 +387,71 @@ export interface ISynthesis extends IEventBase {
 }
 
 export interface IDockSRV extends IEventBase {}
+
+export interface IDied extends IEventBase {
+    KillerName: string;
+    KillerShip: string; // TODO: seriously enums
+    KillerRank: 'Harmless' | 'Mostly Harmless' | 'Competent' | 'Master' | 'Elite';
+}
+
+export interface IResurrect extends IEventBase {
+    Option: 'rebuy';
+    Cost: number;
+    Bankrupt: boolean;
+}
+
+export interface IJoinPower extends IEventBase {
+    Power: Power;
+}
+
+export interface IDatalinkScan extends IEventBase {
+    Message: string;
+    Message_Localised: string;
+}
+
+export interface IDatalinkVoucher extends IEventBase {
+    Reward: number;
+    VictimFaction: Faction;
+    PayeeFaction: Faction;
+}
+
+export interface IWingJoin extends IEventBase {
+    Others: string[];
+}
+
+export interface IWingAdd extends IEventBase {
+    Name: string;
+}
+
+export interface IWingLeave extends IEventBase {
+    Name: string;
+}
+
+export interface IPowerplaySalary extends IEventBase {
+    Power: Power;
+    Amount: number;
+}
+
+export interface ICrewAssign extends IEventBase {
+    Name: string;
+    Role: 'Active'; // TODO: More
+}
+
+export interface IModuleSellRemote extends IModuleSell {
+    StorageSlot: number;
+    ServerId: string;
+    // TODO: rm slot
+}
+
+export interface IDockFighter extends IEventBase {}
+
+export interface IVehicleSwitch extends IEventBase {
+    To: 'Mothership' | 'Fighter';
+}
+
+export interface IRestockVehicle extends IEventBase {
+    Type: 'independent_fighter' | 'federation_fighter' | 'imperial_fighter';
+    Loadout: FighterLoadout;
+    Cost: number;
+    Count: number;
+}

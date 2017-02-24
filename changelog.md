@@ -88,4 +88,21 @@
     - `DockingCancelled`
     - `Syntheses`
     - `DockSRV`
+    - `Died`
+    - `Resurrect`
+    - `JoinPower`
+    - `DatalinkScan`
+    - `DatalinkVoucher`
+    - `ModuleSell`
+    - `WingAdd`
+    - `WingJoin`
+    - `WingLeave`
+    - `CrewAssign`
+    - `ModuleSellRemote`
+    - `DockFighter`
+    - `VehicleSwitch`
+    - `RestockVehicle`
 - Simplied some interface for docking related events
+- Fixed demo startup script
+- Fixed `CMDR` not being replaced
+- Moved some event member types to dedicated types

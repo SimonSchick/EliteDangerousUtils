@@ -56,6 +56,20 @@ import {
     IClearSavedGame,
     ISynthesis,
     IDockSRV,
+    IDied,
+    IResurrect,
+    IJoinPower,
+    IDatalinkScan,
+    IDatalinkVoucher,
+    IModuleSell,
+    IWingAdd,
+    IWingJoin,
+    IWingLeave,
+    ICrewAssign,
+    IModuleSellRemote,
+    IDockFighter,
+    IVehicleSwitch,
+    IRestockVehicle,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -142,6 +156,20 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
     public on(event: 'event:Synthesis', cb: (event: ISynthesis) => void): this;
     public on(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
+    public on(event: 'event:Died', cb: (event: IDied) => void): this;
+    public on(event: 'event:Resurrect', cb: (event: IResurrect) => void): this;
+    public on(event: 'event:JoinPower', cb: (event: IJoinPower) => void): this;
+    public on(event: 'event:DatalinkScan', cb: (event: IDatalinkScan) => void): this;
+    public on(event: 'event:DatalinkVoucher', cb: (event: IDatalinkVoucher) => void): this;
+    public on(event: 'event:ModuleSell', cb: (event: IModuleSell) => void): this;
+    public on(event: 'event:WingAdd', cb: (event: IWingAdd) => void): this;
+    public on(event: 'event:WingJoin', cb: (event: IWingJoin) => void): this;
+    public on(event: 'event:WingLeave', cb: (event: IWingLeave) => void): this;
+    public on(event: 'event:CrewAssign', cb: (event: ICrewAssign) => void): this;
+    public on(event: 'event:ModuleSellRemote', cb: (event: IModuleSellRemote) => void): this;
+    public on(event: 'event:DockFighter', cb: (event: IDockFighter) => void): this;
+    public on(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
+    public on(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -206,6 +234,20 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:ClearSavedGame', cb: (event: IClearSavedGame) => void): this;
     public once(event: 'event:Synthesis', cb: (event: ISynthesis) => void): this;
     public once(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
+    public once(event: 'event:Died', cb: (event: IDied) => void): this;
+    public once(event: 'event:Resurrect', cb: (event: IResurrect) => void): this;
+    public once(event: 'event:JoinPower', cb: (event: IJoinPower) => void): this;
+    public once(event: 'event:DatalinkScan', cb: (event: IDatalinkScan) => void): this;
+    public once(event: 'event:DatalinkVoucher', cb: (event: IDatalinkVoucher) => void): this;
+    public once(event: 'event:ModuleSell', cb: (event: IModuleSell) => void): this;
+    public once(event: 'event:WingAdd', cb: (event: IWingAdd) => void): this;
+    public once(event: 'event:WingJoin', cb: (event: IWingJoin) => void): this;
+    public once(event: 'event:WingLeave', cb: (event: IWingLeave) => void): this;
+    public once(event: 'event:CrewAssign', cb: (event: ICrewAssign) => void): this;
+    public once(event: 'event:ModuleSellRemote', cb: (event: IModuleSellRemote) => void): this;
+    public once(event: 'event:DockFighter', cb: (event: IDockFighter) => void): this;
+    public once(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
+    public once(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;
