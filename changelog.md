@@ -106,3 +106,7 @@
 - Fixed demo startup script
 - Fixed `CMDR` not being replaced
 - Moved some event member types to dedicated types
+
+# 1.9.0
+- Added events:
+    - `FetchRemoteModule`

@@ -70,6 +70,7 @@ import {
     IDockFighter,
     IVehicleSwitch,
     IRestockVehicle,
+    IFetchRemoteModule
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -170,6 +171,7 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:DockFighter', cb: (event: IDockFighter) => void): this;
     public on(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
     public on(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
+    public on(event: 'event:FetchRemoteModule', cb: (event: IFetchRemoteModule) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -248,6 +250,7 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:DockFighter', cb: (event: IDockFighter) => void): this;
     public once(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
     public once(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
+    public once(event: 'event:FetchRemoteModule', cb: (event: IFetchRemoteModule) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

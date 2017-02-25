@@ -455,3 +455,13 @@ export interface IRestockVehicle extends IEventBase {
     Cost: number;
     Count: number;
 }
+
+export interface IFetchRemoteModule extends IEventBase {
+    StorageSlot: number;
+    StorageItem: string;
+    StorageItem_Localised: string;
+    ServerId: number;
+    TransferCost: number
+    Ship: string;
+    ShipID: number;
+}
