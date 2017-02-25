@@ -94,7 +94,12 @@ log.on('event:ReceiveText', event => {
             sayQ(`Message from: ${event.From_Localised || event.From}: ${event.Message_Localised}`);
             break;
         case 'player':
-            sayQ(`Direct message from: ${event.From.substr(1)}: ${event.Message}`);
+            if (event.From.startsWith('&')) {
+                sayQ(`Direct message from: ${event.From.substring(1)}: ${event.Message}`);
+                return;
+            }
+            const matcher = /^\$cmdr_decorate:#name=(.*?);$/;
+            sayQ(`Direct message from: ${event.From.match(matcher)[1]}: ${event.Message}`);
             break;
         case 'local':
             if (event.From_Localised.startsWith('CMDR')) {

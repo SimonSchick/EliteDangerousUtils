@@ -110,3 +110,5 @@
 # 1.9.0
 - Added events:
     - `FetchRemoteModule`
+
+- Fixed handling of different commander messages in ReceiveText in demo.
