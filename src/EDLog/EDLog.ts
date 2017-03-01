@@ -310,7 +310,6 @@ export class EDLog extends EventEmitter {
                 return;
             }
             if (!fileName.match(fileMatcher)) {
-                this.emit('warn', new Error(`Unknown file in log folder ${fileName}`));
                 return;
             }
             this.listenToFile(fileName);
@@ -318,11 +317,10 @@ export class EDLog extends EventEmitter {
 
 
         const files = fs.readdirSync(this.directory)
-        .sort((a, b) => {
-            const aDate = fileMatcher.exec(a);
-            const bDate = fileMatcher.exec(b);
-            return Number(aDate[1]) - Number(bDate[1]);
-        });
+        .map(fileName => fileMatcher.exec(fileName))
+        .filter(match => !!match)
+        .sort((a, b) => Number(a[1]) - Number(b[1]))
+        .map(matcher => matcher[0]);
 
         const bl: EDEvent[] = [];
         if (processBacklog) {

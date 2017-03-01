@@ -110,5 +110,6 @@
 # 1.9.0
 - Added events:
     - `FetchRemoteModule`
-
 - Fixed handling of different commander messages in ReceiveText in demo.
+- Made log file directory reader/watcher more resilient against invalid files.
+- Removed warning about unknown files in watcher.
