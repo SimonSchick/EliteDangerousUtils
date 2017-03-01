@@ -113,3 +113,22 @@
 - Fixed handling of different commander messages in ReceiveText in demo.
 - Made log file directory reader/watcher more resilient against invalid files.
 - Removed warning about unknown files in watcher.
+
+# 1.10.0
+- Added events:
+    - `IEscapeInterdiction`
+    - `IFetchRemoteModule`
+    - `IPowerplayJoin`
+    - `IPowerplaySalary`
+    - `IFactionKillBond`
+    - `IInterdiction`
+    - `IApproachSettlement`
+    - `IDataScanned`
+    - `IPromotion`
+    - `ICollectCargo`
+    - `IModuleRetrieve`
+    - `IModuleStore`
+    - `IMissionFailed`
+    - `IRepair`
+Removed event:
+    - `IJoinPower` as it was incorrectly added

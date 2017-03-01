@@ -35,6 +35,7 @@ import {
     IEngineerProgress,
     IHullDamage,
     IInterdicted,
+    IEscapeInterdiction,
     ILaunchFighter,
     IRepairAll,
     ILocation,
@@ -58,7 +59,6 @@ import {
     IDockSRV,
     IDied,
     IResurrect,
-    IJoinPower,
     IDatalinkScan,
     IDatalinkVoucher,
     IModuleSell,
@@ -70,7 +70,19 @@ import {
     IDockFighter,
     IVehicleSwitch,
     IRestockVehicle,
-    IFetchRemoteModule
+    IFetchRemoteModule,
+    IPowerplayJoin,
+    IPowerplaySalary,
+    IFactionKillBond,
+    IInterdiction,
+    IApproachSettlement,
+    IDataScanned,
+    IPromotion,
+    ICollectCargo,
+    IModuleRetrieve,
+    IModuleStore,
+    IMissionFailed,
+    IRepair,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -139,6 +151,7 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:EngineerProgress', cb: (event: IEngineerProgress) => void): this;
     public on(event: 'event:HullDamage', cb: (event: IHullDamage) => void): this;
     public on(event: 'event:Interdicted', cb: (event: IInterdicted) => void): this;
+    public on(event: 'event:EscapeInterdiction', cb: (event: IEscapeInterdiction) => void): this;
     public on(event: 'event:LaunchFighter', cb: (event: ILaunchFighter) => void): this;
     public on(event: 'event:RepairAll', cb: (event: IRepairAll) => void): this;
     public on(event: 'event:Location', cb: (event: ILocation) => void): this;
@@ -159,7 +172,6 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
     public on(event: 'event:Died', cb: (event: IDied) => void): this;
     public on(event: 'event:Resurrect', cb: (event: IResurrect) => void): this;
-    public on(event: 'event:JoinPower', cb: (event: IJoinPower) => void): this;
     public on(event: 'event:DatalinkScan', cb: (event: IDatalinkScan) => void): this;
     public on(event: 'event:DatalinkVoucher', cb: (event: IDatalinkVoucher) => void): this;
     public on(event: 'event:ModuleSell', cb: (event: IModuleSell) => void): this;
@@ -172,6 +184,18 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
     public on(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
     public on(event: 'event:FetchRemoteModule', cb: (event: IFetchRemoteModule) => void): this;
+    public on(event: 'event:PowerplayJoin', cb: (event: IPowerplayJoin) => void): this;
+    public on(event: 'event:PowerplaySalary', cb: (event: IPowerplaySalary) => void): this;
+    public on(event: 'event:FactionKillBond', cb: (event: IFactionKillBond) => void): this;
+    public on(event: 'event:Interdiction', cb: (event: IInterdiction) => void): this;
+    public on(event: 'event:ApproachSettlement', cb: (event: IApproachSettlement) => void): this;
+    public on(event: 'event:DataScanned', cb: (event: IDataScanned) => void): this;
+    public on(event: 'event:Promotion', cb: (event: IPromotion) => void): this;
+    public on(event: 'event:CollectCargo', cb: (event: ICollectCargo) => void): this;
+    public on(event: 'event:ModuleRetrieve', cb: (event: IModuleRetrieve) => void): this;
+    public on(event: 'event:ModuleStore', cb: (event: IModuleStore) => void): this;
+    public on(event: 'event:MissionFailed', cb: (event: IMissionFailed) => void): this;
+    public on(event: 'event:Repair', cb: (event: IRepair) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -218,6 +242,7 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:EngineerProgress', cb: (event: IEngineerProgress) => void): this;
     public once(event: 'event:HullDamage', cb: (event: IHullDamage) => void): this;
     public once(event: 'event:Interdicted', cb: (event: IInterdicted) => void): this;
+    public once(event: 'event:EscapeInterdiction', cb: (event: IEscapeInterdiction) => void): this;
     public once(event: 'event:LaunchFighter', cb: (event: ILaunchFighter) => void): this;
     public once(event: 'event:RepairAll', cb: (event: IRepairAll) => void): this;
     public once(event: 'event:Location', cb: (event: ILocation) => void): this;
@@ -238,7 +263,6 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:DockSRV', cb: (event: IDockSRV) => void): this;
     public once(event: 'event:Died', cb: (event: IDied) => void): this;
     public once(event: 'event:Resurrect', cb: (event: IResurrect) => void): this;
-    public once(event: 'event:JoinPower', cb: (event: IJoinPower) => void): this;
     public once(event: 'event:DatalinkScan', cb: (event: IDatalinkScan) => void): this;
     public once(event: 'event:DatalinkVoucher', cb: (event: IDatalinkVoucher) => void): this;
     public once(event: 'event:ModuleSell', cb: (event: IModuleSell) => void): this;
@@ -251,6 +275,18 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:VehicleSwitch', cb: (event: IVehicleSwitch) => void): this;
     public once(event: 'event:RestockVehicle', cb: (event: IRestockVehicle) => void): this;
     public once(event: 'event:FetchRemoteModule', cb: (event: IFetchRemoteModule) => void): this;
+    public once(event: 'event:PowerplayJoin', cb: (event: IPowerplayJoin) => void): this;
+    public once(event: 'event:PowerplaySalary', cb: (event: IPowerplaySalary) => void): this;
+    public once(event: 'event:FactionKillBond', cb: (event: IFactionKillBond) => void): this;
+    public once(event: 'event:Interdiction', cb: (event: IInterdiction) => void): this;
+    public once(event: 'event:ApproachSettlement', cb: (event: IApproachSettlement) => void): this;
+    public once(event: 'event:DataScanned', cb: (event: IDataScanned) => void): this;
+    public once(event: 'event:Promotion', cb: (event: IPromotion) => void): this;
+    public once(event: 'event:CollectCargo', cb: (event: ICollectCargo) => void): this;
+    public once(event: 'event:ModuleRetrieve', cb: (event: IModuleRetrieve) => void): this;
+    public once(event: 'event:ModuleStore', cb: (event: IModuleStore) => void): this;
+    public once(event: 'event:MissionFailed', cb: (event: IMissionFailed) => void): this;
+    public once(event: 'event:Repair', cb: (event: IRepair) => void): this;
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

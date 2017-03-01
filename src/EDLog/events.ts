@@ -149,6 +149,20 @@ export interface IModuleEvent extends IEventBase {
     ShipID: number;
 }
 
+export interface IModuleStoreEvent extends IModuleEvent {
+    EngineerModification: string;
+}
+
+export interface IModuleRetrieve extends IModuleStoreEvent {
+    RetrievedItem: string;
+    RetrievedItem_Localised: string;
+}
+
+export interface IModuleStore extends IModuleStoreEvent {
+    StoredItem: string;
+    StoredItem_Localised: string;
+}
+
 export interface IModuleBuy extends IModuleEvent {
     BuyItem: string;
     BuyItem_Localised: string;
@@ -283,12 +297,20 @@ export interface IHullDamage extends IEventBase {
     Fighter: boolean;
 }
 
-export interface IInterdicted extends IEventBase {
-    Submitted: boolean;
+export interface IInterdictionBase extends IEventBase {
     Interdictor: string;
-    Interdictor_Localised: string;
     IsPlayer: boolean;
+}
+
+export interface IInterdicted extends IInterdictionBase {
+    Submitted: boolean;
+    Interdictor_Localised: string;
     Faction: string;
+}
+
+export interface IEscapeInterdiction extends IInterdictionBase {
+    Interdictor: string;
+    IsPlayer: boolean;
 }
 
 export interface ILaunchFighter extends IEventBase {
@@ -400,7 +422,7 @@ export interface IResurrect extends IEventBase {
     Bankrupt: boolean;
 }
 
-export interface IJoinPower extends IEventBase {
+export interface IPowerplayJoin extends IEventBase {
     Power: Power;
 }
 
@@ -464,4 +486,46 @@ export interface IFetchRemoteModule extends IEventBase {
     TransferCost: number
     Ship: string;
     ShipID: number;
+}
+
+export interface IFactionKillBond extends IEventBase {
+    Reward: number;
+    AwardingFaction: string;
+    VictimFaction: string;
+}
+
+export interface IInterdiction extends IEventBase {
+    Success: boolean;
+    IsPlayer: boolean;
+    Faction: string;
+}
+
+export interface IApproachSettlement extends IEventBase {
+    Name: string;
+    Name_Localised: string;
+}
+
+export interface IDataScanned extends IEventBase {
+    Type: 'DataPoint';
+}
+
+export interface IPromotion extends IEventBase {
+    Combat?: number;
+    Trade?: number;
+    Explorer?: number;
+}
+
+export interface ICollectCargo extends IEventBase {
+    Type: string;
+    Stolen: boolean;
+}
+
+export interface IMissionFailed extends IEventBase {
+    Name: string;
+    MissionID: number;
+}
+
+export interface IRepair extends IEventBase {
+    Item: string;
+    Cost: number;
 }
