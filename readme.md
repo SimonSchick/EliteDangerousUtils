@@ -31,9 +31,6 @@ const log = new EDLog();
 log.on('event:ReceiveText', event => {
     switch (event.Channel) {
         case 'npc':
-            if (blocklist.some(entry => (event.From_Localised || event.From).includes(entry))) {
-                return;
-            }
             console.log(`Message from: ${event.From_Localised || event.From}: ${event.Message_Localised}`);
             break;
         case 'player':
