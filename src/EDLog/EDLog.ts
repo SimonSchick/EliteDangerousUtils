@@ -83,6 +83,23 @@ import {
     IModuleStore,
     IMissionFailed,
     IRepair,
+    IPVPKill,
+    ICommunityGoalJoin,
+    ICommunityGoalReward,
+    IPayFines,
+    IJetConeBoost,
+    IShipyardBuy,
+    IShipyardNew,
+    IBuyExplorationData,
+    ICockpitBreached,
+
+    // Future
+    ICargo,
+    ILoadout,
+    IMaterials,
+    ISetUserShipName,
+    IStartJump,
+    IScanned,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -196,6 +213,23 @@ export class EDLog extends EventEmitter {
     public on(event: 'event:ModuleStore', cb: (event: IModuleStore) => void): this;
     public on(event: 'event:MissionFailed', cb: (event: IMissionFailed) => void): this;
     public on(event: 'event:Repair', cb: (event: IRepair) => void): this;
+    public on(event: 'event:PVPKill', cb: (event: IPVPKill) => void): this;
+    public on(event: 'event:CommunityGoalJoin', cb: (event: ICommunityGoalJoin) => void): this;
+    public on(event: 'event:CommunityGoalReward', cb: (event: ICommunityGoalReward) => void): this;
+    public on(event: 'event:PayFines', cb: (event: IPayFines) => void): this;
+    public on(event: 'event:JetConeBoost', cb: (event: IJetConeBoost) => void): this;
+    public on(event: 'event:ShipyardBuy', cb: (event: IShipyardBuy) => void): this;
+    public on(event: 'event:ShipyardNew', cb: (event: IShipyardNew) => void): this;
+    public on(event: 'event:BuyExplorationData', cb: (event: IBuyExplorationData) => void): this;
+    public on(event: 'event:CockpitBreached', cb: (event: ICockpitBreached) => void): this;
+
+    // Future
+    public on(event: 'event:Cargo', cb: (event: ICargo) => void): this;
+    public on(event: 'event:Loudout', cb: (event: ILoadout) => void): this;
+    public on(event: 'event:Materials', cb: (event: IMaterials) => void): this;
+    public on(event: 'event:SetUserShipName', cb: (event: ISetUserShipName) => void): this;
+    public on(event: 'event:StartJump', cb: (event: IStartJump) => void): this;
+    public on(event: 'event:Scanned', cb: (event: IScanned) => void): this;
     public on(event: 'event', cb: (event: EDEvent) => void): this;
     public on(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public on(event: 'warn', cb: (event: Error) => void): this;
@@ -287,6 +321,23 @@ export class EDLog extends EventEmitter {
     public once(event: 'event:ModuleStore', cb: (event: IModuleStore) => void): this;
     public once(event: 'event:MissionFailed', cb: (event: IMissionFailed) => void): this;
     public once(event: 'event:Repair', cb: (event: IRepair) => void): this;
+    public once(event: 'event:PVPKill', cb: (event: IPVPKill) => void): this;
+    public once(event: 'event:CommunityGoalJoin', cb: (event: ICommunityGoalJoin) => void): this;
+    public once(event: 'event:CommunityGoalReward', cb: (event: ICommunityGoalReward) => void): this;
+    public once(event: 'event:PayFines', cb: (event: IPayFines) => void): this;
+    public once(event: 'event:JetConeBoost', cb: (event: IJetConeBoost) => void): this;
+    public once(event: 'event:ShipyardBuy', cb: (event: IShipyardBuy) => void): this;
+    public once(event: 'event:ShipyardNew', cb: (event: IShipyardNew) => void): this;
+    public once(event: 'event:BuyExplorationData', cb: (event: IBuyExplorationData) => void): this;
+    public once(event: 'event:CockpitBreached', cb: (event: ICockpitBreached) => void): this;
+     // Future
+    public once(event: 'event:Cargo', cb: (event: ICargo) => void): this;
+    public once(event: 'event:Loadout', cb: (event: ILoadout) => void): this;
+    public once(event: 'event:Materials', cb: (event: IMaterials) => void): this;
+    public once(event: 'event:SetUserShipName', cb: (event: ISetUserShipName) => void): this;
+    public once(event: 'event:StartJump', cb: (event: IStartJump) => void): this;
+    public once(event: 'event:Scanned', cb: (event: IScanned) => void): this;
+
     public once(event: 'event', cb: (event: EDEvent) => void): this;
     public once(event: 'file', cb: (event: ILogFileSwap) => void): this;
     public once(event: 'warn', cb: (event: Error) => void): this;

@@ -116,19 +116,20 @@
 
 # 1.10.0
 - Added events:
-    - `IEscapeInterdiction`
-    - `IFetchRemoteModule`
-    - `IPowerplayJoin`
-    - `IPowerplaySalary`
-    - `IFactionKillBond`
-    - `IInterdiction`
-    - `IApproachSettlement`
-    - `IDataScanned`
-    - `IPromotion`
-    - `ICollectCargo`
-    - `IModuleRetrieve`
-    - `IModuleStore`
-    - `IMissionFailed`
-    - `IRepair`
+    - `EscapeInterdiction`
+    - `FetchRemoteModule`
+    - `PowerplayJoin`
+    - `PowerplaySalary`
+    - `FactionKillBond`
+    - `Interdiction`
+    - `ApproachSettlement`
+    - `DataScanned`
+    - `Promotion`
+    - `CollectCargo`
+    - `ModuleRetrieve`
+    - `ModuleStore`
+    - `MissionFailed`
+    - `Repair`
+
 Removed event:
     - `IJoinPower` as it was incorrectly added
