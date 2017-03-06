@@ -139,7 +139,7 @@ log.on('file', ev => console.log(ev.file));
 const knownEvents = fs.readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
 .trim()
 .split('\n')
-.map(line => line.match(/public once\(event:\ 'event:(.*?)', cb\: \(event\: I(.*?)\) => void\): this;/))
+.map(line => line.match(/'event:(.*?)': (.*?),/))
 .filter(match => match)
 .map(match => match[1]);
 
