@@ -11,7 +11,7 @@ export type Allegiance = 'None' | 'Independant' | Faction;
 export type FactionState = 'None' | 'Retreat' | 'Lockdown' | 'CivilUnrest' | 'CivilWar' | 'Boom' | 'Expansion' | 'Bust' | 'Famine' | 'Election' | 'Investment' | 'Outbreak'| 'War';
 export type Economy = '$economy_None;'
 export type Security = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
-export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null';
+export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null' | 'AsteroidCluster';
 export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
 export type Power = 'Li Yong-Rui' | 'Felicia Winters' | 'Edmund Mahon' | 'Denton Patreus' | 'Zachary Hudson' | 'Zermina Torval' | 'Archon Delaine' | 'Aisling Duval' | 'A. Lavigny-Duval' | 'Pranav Antal' | 'Yuri Grom';
 export type FighterLoadout = 'zero' | 'two';
@@ -43,8 +43,8 @@ export interface ILocation extends IBaseLocation {
     BodyType?: BodyType;
 }
 
-export interface IReceivedText extends IEventBase {
-    Channel: 'local' | 'npc' | 'direct' | 'player' | 'wing';
+export interface IReceiveText extends IEventBase {
+    Channel: 'local' | 'npc' | 'direct' | 'player' | 'wing' | 'voicechat';
     // If Channel is player, this will be prefixed with a `&`
     From?: string;
     Message: string;
@@ -111,9 +111,27 @@ export interface ISupercruiseEntry extends IEventBase {
 }
 
 export interface ICommitCrime extends IEventBase {
-    CrimeType: 'assault' | 'murder' | 'dockingMinorTresspass' | 'fireInNoFireZone' | 'collidedAtSpeedInNoFireZone';
+    CrimeType:
+        'assault' |
+        'collidedAtSpeedInNoFireZone' |
+        'collidedAtSpeedInNoFireZoneHullDamage' |
+        'disobeyPolice' |
+        'dockingMajorBlockingAirlock' |
+        'dockingMajorBlockingLandingPad' |
+        'dockingMajorTresspass' |
+        'dockingMinorBlockingAirlock' |
+        'dockingMinorBlockingLandingPad' |
+        'dockingMinorTresspass' |
+        'dumpingDangerous' |
+        'dumpingNearStation' |
+        'fireInNoFireZone' |
+        'fireInStation' |
+        'illegalCargo' |
+        'interdiction'|
+        'murder' |
+        'piracy';
     Faction: string;
-    Victim: string;
+    Victim?: string;
     Bounty?: number;
     Fine?: number;
 }
@@ -346,6 +364,7 @@ export interface IShipyardSell extends IEventBase {
     ShipType: string;
     SellShipId: number;
     ShipPrice: number;
+    System?: string;
 }
 
 
@@ -353,8 +372,10 @@ export interface IShipyardSwap extends IEventBase {
     ShipType: string;
     ShipId: number;
     ShipPrice: number;
-    StoreOldShip: string,
-    StoreShipID: number;
+    StoreOldShip?: string,
+    StoreShipID?: number;
+    SellOldShip?: string;
+    SellShipID?: number;
 }
 
 export interface IShipyardTransfer extends IEventBase {
@@ -533,11 +554,7 @@ export interface IDataScanned extends IEventBase {
     Type: 'DataPoint' | 'DataLink' | 'ListenigPost' | 'AdandonedDataLog' | 'WreckedShip';
 }
 
-export interface IPromotion extends IEventBase {
-    Combat?: number;
-    Trade?: number;
-    Explorer?: number;
-}
+export type IPromotion = Partial<IRankProgress>;
 
 export interface ICollectCargo extends IEventBase {
     Type: string;
@@ -579,6 +596,10 @@ export interface IJetConeBoost extends IEventBase {
     BoostValue: number;
 }
 
+export interface IJetConeDamage extends IEventBase {
+    Module: string;
+}
+
 export interface IShipyardBuy extends IEventBase {
     ShipType: string;
     ShipPrice: number;
@@ -591,8 +612,7 @@ export interface IShipyardNew extends IEventBase {
     NewShipID: number;
 }
 
-export interface ICapShipBond extends IFactionKillBond {
-}
+export interface ICapShipBond extends IFactionKillBond {}
 
 export interface IRing {
     Name: string;
@@ -659,6 +679,23 @@ export interface IMiningRefined extends IEventBase {
 }
 
 export interface ICockpitBreached extends IEventBase {}
+
+export interface IDronesEvent extends IEventBase {
+    Type: "Drones";
+    Count: number;
+}
+
+export interface IBuyDrones extends IDronesEvent {
+    BuyPrice: number;
+    TotalCost: number;
+}
+
+export interface ISellDrones extends IDronesEvent {
+    SellPrice: number;
+    TotalSale: number;
+}
+
+export interface ISelfDestruct extends IEventBase {}
 
 //Future
 export interface ICargo extends IEventBase {

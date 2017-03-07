@@ -133,3 +133,24 @@
 
 Removed event:
     - `IJoinPower` as it was incorrectly added
+- Added new events:
+    Unfortunately the changelog for these got lost and I cba to write them again.
+
+# 1.11.0
+- Fixed error in readme.md sample
+- Deduplicated events into single type (looks weird in autocompletion tho)
+- Sorted some defintions.
+- Fixed `ReceiveText` event spelling.
+- Added events:
+    - `BuyDrones`
+    - `SellDrones`
+    - `SelfDestruct`
+    - `BuyTradeData`
+    - `CapShipBond`
+    - `MiningRefined`
+    - `Scan`
+    - `JetConeDamage`
+- Completed `Channel` in `IReceiveText`
+- Completed `CrimeType` in `ICommitCrime` and made `Victim` optional
+- Added `System` to `IShipyardSell`
+- Added various fields to `IShipyardSwap`
