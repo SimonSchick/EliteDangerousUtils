@@ -255,6 +255,7 @@ export type Events = {
     'event:CrewMemberJoins': ICrewMemberJoins,
     'event:CrewMemberRoleChange': ICrewMemberRoleChange,
     'event:CrewMemberQuits': ICrewMemberQuits,
+    'event:CrewLaunchFighter': ICrewLaunchFighter,
     'event:CrewHire': ICrewHire,
     'event:KickCrewMember': IKickCrewMember,
     'event:CommunityGoalDiscard': ICommunityGoalDiscard,
