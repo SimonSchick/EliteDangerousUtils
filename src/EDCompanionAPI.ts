@@ -213,8 +213,8 @@ export interface ICookie {
 export interface ICookieStore {
     findCookie(domain: string, path: string, key: string, cb: (error: Error, data?: ICookie) => void): void;
     findCookies(domain: string, path: string, cb: (error: Error, data?: ICookie[]) => void): void;
-    putCookie(domain: string, cb: (error?: Error) => void): void;
-    updateCookie(domain: string, cb: (error?: Error) => void): void;
+    putCookie(cookie: ICookie, cb: (error?: Error) => void): void;
+    updateCookie(cookie: ICookie, newCookie: ICookie, cb: (error?: Error) => void): void;
     removeCookie(domain: string, path: string, key: string, cb: (error?: Error) => void): void;
     removeCookies(domain: string, path: string, cb: (error?: Error) => void): void;
 }

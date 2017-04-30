@@ -41,6 +41,13 @@ export interface ILocation extends IBaseLocation {
     Docked: boolean;
     Body?: string;
     BodyType?: BodyType;
+    Factions: {
+        Name: string;
+        FactionState: FactionState;
+        Government: string;
+        Influence: number;
+        Allegiance: Allegiance;
+    }[]
 }
 
 export interface IReceiveText extends IEventBase {
@@ -194,6 +201,18 @@ export interface IModuleSell extends IModuleEvent {
     SellItem: string;
     SellItem_Localised: string;
     SellPrice: number;
+}
+
+export interface IModuleSwap extends IEventBase {
+    FromSlot: AllSlots;
+    ToSlot: AllSlots;
+    FromItem: string;
+    FromItem_Localised: string;
+    ToItem: string | 'Null';
+    ToItem_Localised?: string;
+    Ship: string; // TODO: possible enum
+    ShipID: number;
+
 }
 
 export interface IShieldState extends IEventBase {
@@ -394,6 +413,8 @@ export interface IEjectCargo extends IEventBase {
 }
 
 export interface IHeatWarning extends IEventBase {}
+
+export interface IHeatDamage extends IEventBase {}
 
 export interface IScreenshot extends IEventBase {
     Filename: string;
@@ -697,7 +718,6 @@ export interface ISellDrones extends IDronesEvent {
 
 export interface ISelfDestruct extends IEventBase {}
 
-//Future
 export interface ICargo extends IEventBase {
     Inventory: any[]; // TODO
 }
@@ -755,3 +775,50 @@ export type IStartJump = ISuperCruiseJump | IHyperspaceJump;
 export interface IScanned extends IEventBase {
     ScanType: 'Cargo';
 }
+
+export interface ICrewEvent extends IEventBase {
+    Crew: string;
+}
+
+export interface ICrewMemberJoins extends ICrewEvent {}
+
+export interface ICrewLaunchFighter extends ICrewEvent {}
+
+export interface ICrewMemberRoleChange extends ICrewEvent {
+    Role: 'Idle' | 'FireCon';
+}
+
+export interface ICrewMemberQuits extends ICrewEvent {}
+
+export interface ICrewHire {
+    name: string;
+    Faction: string;
+    Cost: number;
+    CombatRank: number;
+}
+
+export interface IKickCrewMember {
+    Crew: string;
+}
+
+export interface ICommunityGoalDiscard {
+    name: string;
+    system: string;
+}
+
+export interface IEndCrewSession {
+    OnCrime: boolean;
+}
+
+export interface IJoinACrew {
+    Captain: string;
+}
+
+export interface IChangeCrewRole {
+    Role: string;
+}
+
+export interface IQuitACrew {
+    Captain: string;
+}
+

@@ -144,9 +144,9 @@ const knownEvents = fs.readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'u
 .map(match => match[1]);
 
 log.on('event', ev => {
+    console.log(ev);
     if (!(<any>knownEvents).includes(ev.event)) {
         sayQ(`Unknown event discovered: ${ev.event}`);
-        console.log(ev);
     }
 });
 const backLog = log.start(true);
