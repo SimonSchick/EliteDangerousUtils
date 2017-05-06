@@ -5,6 +5,7 @@ import { locations, starSystemDistance } from '../src/EDLog/locations';
 import { EDLog } from '../src/EDLog/EDLog';
 import { speak } from 'say';
 import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
+import { IHyperspaceJump } from '../src/EDLog/events';
 import { sampleSize } from 'lodash';
 
 let blocklist: string[];
@@ -49,8 +50,10 @@ function sayQ(text: string) {
     queue.push(((cb: (error: Error) => void) => speak(text, '', 1, cb)));
 }
 log.on('event:FSDJump', event => {
-    const info = [`Arrived in ${event.StarSystem}`, `Distance to Sol: ${starSystemDistance(event.StarPos, locations.Sol).toFixed(1)} Light Years`];
-    if (event.SystemAllegiance) {
+    const solDistance = starSystemDistance(event.StarPos, locations.Sol);
+    const info = [];
+    if (event.SystemAllegiance && solDistance < 400) {
+        info.push(`Arrived in ${event.StarSystem}`, `Distance to Sol: ${solDistance.toFixed(1)} Light Years`);
         info.push(`Allegiance: ${event.SystemAllegiance}`);
         info.push(`Economy: ${event.SystemEconomy_Localised}`);
         info.push(`Security: ${(event.SystemSecurity_Localised).replace('Security', '')}`);
@@ -80,8 +83,12 @@ log.on('event:FSDJump', event => {
             }
             info.push(`Materials: ${materials.join(', ')}`);
         }
-    } else {
-        info.push(`System is uninhabited.`);
+    }
+    if(event.FuelLevel < 8) {
+        info.push(`Warning: Fuel at ${event.FuelLevel.toFixed(1)} last jump consumed ${event.FuelUsed}!`);
+    }
+    if (info.length === 0) {
+        return;
     }
     sayQ(info.join('\n'));
 });
@@ -134,6 +141,12 @@ log.on('event:SendText', event => {
 log.on('event:Bounty', event => {
     sayQ(`Killed ${event.Target} for ${event.TotalReward} `);
 });
+log.on('event:StartJump', (ev: IHyperspaceJump) => {
+    sayQ(`Jumping to ${ev.StarClass} class star.`);
+    if (ev.StarClass === 'H') {
+        sayQ('Warning, potential hazard.');
+    }
+})
 log.on('file', ev => console.log(ev.file));
 
 const knownEvents = fs.readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
