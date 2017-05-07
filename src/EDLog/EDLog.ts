@@ -125,6 +125,7 @@ import { EventEmitter } from 'events';
 import { join } from 'path';
 import { homedir } from 'os';
 import { ReadLine, createInterface } from 'readline';
+import { findLast } from '../util/findLast';
 
 export interface RawLog {
     timestamp: string;
@@ -143,7 +144,7 @@ export class EDEvent implements EDEvent {
     }
 }
 
-export type Events = {
+export type GameEvents = {
     'event:ApproachSettlement': IApproachSettlement,
     'event:Bounty': IBounty,
     'event:BuyAmmo': IBuyAmmo,
@@ -263,18 +264,22 @@ export type Events = {
     'event:JoinACrew': IJoinACrew,
     'event:ChangeCrewRole': IChangeCrewRole,
     'event:QuitACrew': IQuitACrew,
+}
 
+export type Events = {
     // Unscoped
     'event': EDEvent,
     'file': ILogFileSwap,
     'warn': Error,
-}
+    'error': Error,
+} & GameEvents;
 
 export class EDLog extends EventEmitter {
     private directory = join(homedir(), '/Saved Games/Frontier Developments/Elite Dangerous'); // TODO: OSX Support
     private fileStream: ContinuesReadStream;
     private fileName: string;
     private lineStream: ReadLine;
+    private backlog: EDEvent[];
 
     public emit<K extends keyof Events>(event: K, value: Events[K]): boolean {
         return super.emit(event, value);
@@ -336,7 +341,7 @@ export class EDLog extends EventEmitter {
      * Launches the log reader.
      * @param If true the method will return an array of event logs, otherwise empty.
      */
-    public start (processBacklog: boolean = false): EDEvent[] {
+    public start (backlog: { process: boolean; store: boolean; }): EDEvent[] {
         const fileMatcher = /Journal\.(\d+)\.\d+.log$/;
 
         fs.watch(this.directory, (eventType, fileName) => {
@@ -360,7 +365,7 @@ export class EDLog extends EventEmitter {
         .map(matcher => matcher[0]);
 
         const bl: EDEvent[] = [];
-        if (processBacklog) {
+        if (backlog.process) {
             files.forEach(fileName => {
                 fs.readFileSync(join(this.directory, fileName), 'utf8')
                 .split('\n')
@@ -374,6 +379,18 @@ export class EDLog extends EventEmitter {
         }
 
         this.listenToFile(files[files.length - 1], true);
+        if (backlog.store) {
+            this.backlog = bl;
+        }
         return bl;
+    }
+
+    public getLastEvent<K extends keyof GameEvents>(event: K): GameEvents[K] {
+        // TODO: This isn't great but works
+        if (!this.backlog) {
+            throw new Error('No backlog');
+        }
+        const realEvent = event.replace('event:', '');
+        return findLast(this.backlog, ev => ev.event === realEvent);
     }
 }

@@ -1,6 +1,7 @@
 import { HTTPClient, Options } from '../util/HTTPClient';
+import { EDPosition } from '../EDLog/locations';
 
-export interface ICoordiante {
+export interface ICoordinate {
     x: number;
     y: number;
     z: number;
@@ -14,13 +15,17 @@ export interface ICommandMapPage {
 
 export interface ICommanderMapEntry {
     user: string;
-    coordinates: ICoordiante;
+    coordinates: ICoordinate;
     cmdrUrl: string;
     cmdrName: string;
     systemName: string;
 }
 
 export class Client {
+    public static convertEDSMToEDVector (coord: ICoordinate): EDPosition {
+        return [coord.x, coord.y, coord.z];
+    }
+
     constructor (private httpClient: HTTPClient, private apiKey?: string) {
 
     }
