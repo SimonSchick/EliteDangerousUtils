@@ -2,6 +2,7 @@ import { EDCompanionAPI } from '../src/EDCompanionAPI';
 import { CookieFileStore } from './CookieFileStore';
 import { createInterface } from 'readline';
 import { join } from 'path';
+import { HTTPClient } from '../src/util/HTTPClient';
 
 function readLineAsync (prompt: string): Promise<string> {
     return new Promise<string>(resolve => {
@@ -22,7 +23,7 @@ function promiseSequence<T> (generators: (() => Promise<T>)[]): Promise<T[]> {
     return chain.then(() => results);
 }
 
-const api = new EDCompanionAPI(new CookieFileStore(join(__dirname, 'cookies.json')), {
+const api = new EDCompanionAPI(new HTTPClient(), new CookieFileStore(join(__dirname, 'cookies.json')), {
     getLogin () {
         return promiseSequence([
             () => readLineAsync('E-Mail: '),

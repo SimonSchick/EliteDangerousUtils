@@ -1,5 +1,5 @@
-import * as request from 'request';
 import { OptionalSlots, MandatorySlots } from './common';
+import { HTTPClient, Options, Response } from './util/HTTPClient';
 
 export interface Commander {
     id: number;
@@ -220,13 +220,13 @@ export interface ICookieStore {
 }
 
 export class InvalidCredentialsError extends Error {
-    constructor (public resp: request.RequestResponse) {
+    constructor (public resp: Response<any>) {
         super('Invalid credentials');
     }
 }
 
 export class VerificationError extends Error {
-    constructor (public resp: request.RequestResponse) {
+    constructor (public resp: Response<any>) {
         super('Invalid verification code');
     }
 }
@@ -248,7 +248,7 @@ const enum HTTPStatus {
  */
 export class EDCompanionAPI {
     private apiURL = 'https://companion.orerve.net/';
-    private requestOptions: Partial<request.CoreOptions> = {
+    private requestOptions: Partial<Options> = {
         followRedirect: false,
         headers: {
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B411',
@@ -258,24 +258,17 @@ export class EDCompanionAPI {
      * @param A cookie store used to avoid login in repetetly.
      * @param Asyncronously provides credentials.
      */
-    constructor (jar: ICookieStore | string, private credentialFetcher: ICredentialsFetcher) {
-        this.requestOptions.jar = (<any>request.jar)(jar);
+    constructor (private httpRequest: HTTPClient, jar: ICookieStore | string, private credentialFetcher: ICredentialsFetcher) {
+        this.requestOptions.jar = jar;
     }
 
     /**
      * Helper method to run a request on the API.
      */
-    private request<T>(opts: (request.CoreOptions & request.UriOptions)): Promise<request.RequestResponse & { body: T }> {
-        return new Promise((resolve, reject) => {
-            opts.uri = `${this.apiURL}${opts.uri}`;
-            request(Object.assign(opts, this.requestOptions), (error, response) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(response);
-            });
-        });
+    private request<T>(opts: Options): Promise<Response<T>> {
+        opts.uri = `${this.apiURL}${opts.uri}`;
+        Object.assign(opts, this.requestOptions);
+        return this.httpRequest.request<T>(opts);
     }
 
     /**
