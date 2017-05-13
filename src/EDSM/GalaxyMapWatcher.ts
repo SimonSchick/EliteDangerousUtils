@@ -1,6 +1,5 @@
 import { Client, ICommandMapPage, ICommanderMapEntry, ICoordinate } from './Client';
 import { EventEmitter } from 'events';
-import { EDPosition } from '../EDLog/locations';
 import { findMin } from '../util/findMin';
 
 
@@ -94,7 +93,6 @@ export class GalaxyMapWatcher extends EventEmitter {
         .then(() => {
             const baseDelay = this.options.delay + (this.fetchCycle > 0 ? this.options.additionalDelay || this.options.delay : 0);
             const cycleDelay = this.lastPage === 0 ? this.options.cycleDelay : 0;
-            console.log(baseDelay + cycleDelay);
             this.timer = setTimeout(() => this.next(), baseDelay + cycleDelay);
         });
     }
@@ -124,11 +122,48 @@ export class GalaxyMapWatcher extends EventEmitter {
         return this.registry;
     }
 
-    public findClosest(loc: EDPosition): [ICommanderMapEntry, number] {
-        const [closest, distanceSqrt] = findMin(this.registry, ({ coordinates }) =>
-            (coordinates.x - loc[0]) ** 2 + (coordinates.y - loc[1]) ** 2 + (coordinates.z - loc[2]) ** 2
-        );
+    private sqrtLocDistance (coordinates: ICoordinate, cooordinate2: ICoordinate): number {
+        return (coordinates.x - cooordinate2.x) ** 2 + (coordinates.y - cooordinate2.y) ** 2 + (coordinates.z - cooordinate2.z) ** 2
+    }
+
+    public findClosest(loc: ICoordinate): [ICommanderMapEntry, number] {
+        const [closest, distanceSqrt] = findMin(this.registry, ({ coordinates }) => this.sqrtLocDistance(coordinates, loc));
+        if (!closest) {
+            return undefined;
+        }
         return [closest, Math.sqrt(distanceSqrt)];
+    }
+
+    public findInSphere(loc: ICoordinate, radius: number): [ICommanderMapEntry, number][] {
+        const rSqrt = radius ** 2;
+        const ret: [ICommanderMapEntry, number][] = [];
+        for (const key in this.registry) {
+            const entry = this.registry[key];
+            const sqrtDist = this.sqrtLocDistance(entry.coordinates, loc)
+            if (sqrtDist <= rSqrt) {
+                ret.push([entry, Math.sqrt(sqrtDist)]);
+            }
+        }
+        return ret;
+    }
+
+    public findClosestAutoComplete (loc: ICoordinate): Promise<[ICommanderMapEntry, number]> {
+        const res = this.findClosest(loc);
+        const [closest] = res;
+        if (!closest) {
+            return Promise.reject(undefined);
+        }
+        if (closest.systemName) {
+            return Promise.resolve(res);
+        }
+        return this.client.locationToSystem(closest.coordinates)
+        .then(name => {
+            if (!name) {
+                return res;
+            }
+            closest.systemName = name;
+            return res;
+        });
     }
 
     public hasCycled (): boolean {

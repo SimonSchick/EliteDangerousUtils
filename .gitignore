@@ -6,3 +6,4 @@ demo/blocklist.json
 npm-debug.log
 /dist
 .npmrc
+/client/settings.json

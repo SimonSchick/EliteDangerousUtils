@@ -393,4 +393,13 @@ export class EDLog extends EventEmitter {
         const realEvent = event.replace('event:', '');
         return findLast(this.backlog, ev => ev.event === realEvent);
     }
+
+    public getAll<K extends keyof GameEvents>(event: K): GameEvents[K] {
+        // TODO: This isn't great but works
+        if (!this.backlog) {
+            throw new Error('No backlog');
+        }
+        const realEvent = event.replace('event:', '');
+        return this.backlog.filter(ev => ev.event === realEvent);
+    }
 }
