@@ -40,7 +40,7 @@ export class ContinuesReadStream extends Readable {
     /**
      * @override
      */
-    protected _read () {
+    public _read () {
         if (this.file) {
             return;
         }

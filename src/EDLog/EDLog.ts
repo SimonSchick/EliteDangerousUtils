@@ -119,6 +119,10 @@ import {
     IJoinACrew,
     IChangeCrewRole,
     IQuitACrew,
+    IMissionAbandoned,
+    IFriends,
+    IMusic,
+    IWingInvite,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -264,6 +268,10 @@ export type GameEvents = {
     'event:JoinACrew': IJoinACrew,
     'event:ChangeCrewRole': IChangeCrewRole,
     'event:QuitACrew': IQuitACrew,
+    'event:MissionAbandoned': IMissionAbandoned,
+    'event:Friends': IFriends,
+    'event:Music': IMusic,
+    'event:WingInvite': IWingInvite,
 }
 
 export type Events = {
@@ -305,7 +313,7 @@ export class EDLog extends EventEmitter {
      * Ends the log reader.
      */
     public end (): void {
-        delete this.fileName;
+        delete this.fileName;;
         if (this.fileStream) {
             this.fileStream.close();
         }
@@ -331,10 +339,14 @@ export class EDLog extends EventEmitter {
             input: this.fileStream,
         });
         this.lineStream.on('line', line => {
-            const ev = new EDEvent(JSON.parse(line));
+            const ev = new EDEvent(this.parseJSON(line));
             this.emit('event', ev);
             this.emit(<keyof Events>`event:${ev.event}`, ev);
         });
+    }
+
+    private parseJSON(str: string): any {
+        return JSON.parse(str.replace(/[\0-\25]/g, ''));
     }
 
     /**
@@ -373,7 +385,7 @@ export class EDLog extends EventEmitter {
                     if (line === '') {
                         return;
                     }
-                    bl.push(new EDEvent(JSON.parse(line)));
+                    bl.push(new EDEvent(this.parseJSON(line)));
                 });
             });
         }
@@ -400,6 +412,6 @@ export class EDLog extends EventEmitter {
             throw new Error('No backlog');
         }
         const realEvent = event.replace('event:', '');
-        return this.backlog.filter(ev => ev.event === realEvent);
+        return <GameEvents[K]> this.backlog.filter(ev => ev.event === realEvent);
     }
 }

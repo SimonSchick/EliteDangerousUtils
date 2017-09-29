@@ -37,16 +37,14 @@ export interface IRawSettings {
 
 class Client {
     private criticalFuelLevel: number = 10;
-    private galaxyMapWatcherMinSolDistance: number = 1000;
+    private galaxyMapWatcherMinPopDistance: number = 1000;
     private galaxyMapWatcherCommanderDistance: number = 1000;
     private materialTruncateLength: number = 5;
-    private galaxyMapWatcherBubbleDistance: number = 1000;
     private galaxyMapWatcherOptions = {
         delay: 250,
         cycleDelay: 20 * 1000,
         additionalDelay: 2500,
     };
-    private fsdJumpInfoDistance: number = 400;
     private cachedPosition: EDPosition;
     private trackList: string[] = [];
     private settings: {
@@ -103,7 +101,10 @@ class Client {
                 this.sayQ(`Unknown event discovered: ${ev.event}`);
             }
         })
-        .on('warn', error => this.sayQ(`Warn: ${error.message}`))
+        .on('warn', error => {
+            this.sayQ(`Warn: ${error.message}`);
+            console.log(error);
+        })
         .on('error', error => this.sayQ(`Error: ${error.message}`));
 
         this.watcher
@@ -126,16 +127,20 @@ class Client {
             .then(system => {
                 event.entry.systemName = system;
                 this.sayQ(`Tracked commander moved to system: ${event.entry.systemName}`);
-            })
+            });
         }
         const pos = this.getPosition();
-        if (distance(this.getPosition(), locations.Sol) < this.galaxyMapWatcherMinSolDistance) {
+        if (!this.isDeepSpace()) {
             return;
         }
 
         const dist = distance(EDSMClient.convertEDSMToEDVector(event.entry.coordinates), pos);
         if (dist < this.galaxyMapWatcherCommanderDistance) {
-            this.sayQ(`Nearby Commander ${this.formatCommanderInfo(event.entry, dist)}`)
+            this.edsm.locationToSystem(event.entry.coordinates)
+            .then(system => {
+                event.entry.systemName = system;
+                this.sayQ(`Nearby Commander ${this.formatCommanderInfo(event.entry, dist)}`);
+            });
         }
     }
 
@@ -175,8 +180,11 @@ class Client {
 
     private checkAndStartGalaxyWatcher () {
         const running = this.watcher.isRunning();
-        if (running && distance(this.getPosition(), locations.Sol) < this.galaxyMapWatcherBubbleDistance) {
+        if (running && !this.isDeepSpace()) {
             this.watcher.stop();
+            return;
+        }
+        if (!this.isDeepSpace()) {
             return;
         }
         if (!running) {
@@ -210,11 +218,18 @@ class Client {
         this.cachedPosition = event.StarPos;
     }
 
+    private isDeepSpace (): boolean {
+        const minDist = this.galaxyMapWatcherMinPopDistance;
+        const pos = this.getPosition();
+        return distance(pos, locations.Sol) > minDist && distance(pos, locations.Colonia) > minDist
+    }
+
     private onFSDJump (event: IFSDJump) {
         this.onLocation(event);
+        this.checkAndStartGalaxyWatcher();
         const solDistance = distance(event.StarPos, locations.Sol);
         const info = [];
-        if (event.SystemAllegiance && solDistance < this.fsdJumpInfoDistance) {
+        if (event.SystemAllegiance && !this.isDeepSpace()) {
             info.push(`Arrived in ${event.StarSystem}`, `Distance to Sol: ${solDistance.toFixed(1)} Light Years`);
             info.push(`Allegiance: ${event.SystemAllegiance}`);
             info.push(`Economy: ${event.SystemEconomy_Localised}`);
@@ -269,15 +284,21 @@ class Client {
                     this.sayQ(`Direct message from: ${event.From.substring(1)}: ${event.Message}`);
                     return;
                 }
-                const matcher = /^\$cmdr_decorate:#name=(.*?);$/;
-                this.sayQ(`Direct message from: ${event.From.match(matcher)[1]}: ${event.Message}`);
+                let name: string;
+                try {
+                    const matcher = /^\$cmdr_decorate:#name=(.*?);$/;
+                    [name] = event.From.match(matcher);
+                } catch (e) {
+                    name = event.From;
+                }
+                this.sayQ(`Direct message from: ${name}: ${event.Message}`);
                 break;
             case 'local':
-                if (event.From_Localised.startsWith('CMDR')) {
+                if (event.From_Localised && event.From_Localised.startsWith('CMDR')) {
                     this.sayQ(`Message from ${event.From_Localised.replace('CMDR ', 'Commander')}: ${event.Message}`);
                     break;
                 }
-                this.sayQ(`Message from ${event.From.substr(1)}: ${event.Message}`);
+                this.sayQ(`Message from ${event.From}: ${event.Message}`);
                 break;
         }
     }

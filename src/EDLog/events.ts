@@ -280,6 +280,11 @@ export interface IDockBase extends IEventBase {
     StationType: 'Orbis' | 'Coriolis' | 'Bernal' | 'Outpost';
 }
 
+export interface IMissionAbandoned extends IEventBase {
+    Name: string;
+    MissionID: number;
+}
+
 export interface IDocked extends IDockBase {
     StarSystem: string;
     StationFaction: string;
@@ -510,6 +515,10 @@ export interface IWingAdd extends IEventBase {
 }
 
 export interface IWingLeave extends IEventBase {
+    Name: string;
+}
+
+export interface IWingInvite extends IEventBase {
     Name: string;
 }
 
@@ -790,35 +799,43 @@ export interface ICrewMemberRoleChange extends ICrewEvent {
 
 export interface ICrewMemberQuits extends ICrewEvent {}
 
-export interface ICrewHire {
+export interface ICrewHire extends ICrewEvent {
     name: string;
     Faction: string;
     Cost: number;
     CombatRank: number;
 }
 
-export interface IKickCrewMember {
+export interface IKickCrewMember extends ICrewEvent {
     Crew: string;
 }
 
-export interface ICommunityGoalDiscard {
+export interface ICommunityGoalDiscard extends ICrewEvent {
     name: string;
     system: string;
 }
 
-export interface IEndCrewSession {
+export interface IEndCrewSession extends ICrewEvent {
     OnCrime: boolean;
 }
 
-export interface IJoinACrew {
+export interface IJoinACrew extends ICrewEvent {
     Captain: string;
 }
 
-export interface IChangeCrewRole {
+export interface IChangeCrewRole extends ICrewEvent {
     Role: string;
 }
 
-export interface IQuitACrew {
+export interface IQuitACrew extends ICrewEvent {
     Captain: string;
 }
 
+export interface IFriends {
+    Status: 'Online' | 'Offline';
+    Name: string;
+}
+
+export interface IMusic extends ICrewEvent {
+    MusicTrack: 'NoTrack' | 'MainMenu' | 'Starport' | 'SystemMap' | 'Supercruise' | 'DestinationFromSupercruise' | 'Exploration' | 'GalaxyMap' | 'Combat_Dogfight' | 'DestinationFromHyperspace' | 'Unknown_Encounter' | 'Combat_Unknown';
+}

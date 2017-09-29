@@ -3,6 +3,7 @@ export type EDPosition = [number, number, number];
 export const locations = {
     Sol: <EDPosition>[0, 0, 0],
     Core: <EDPosition>[25.21875, -20.90625, 25899.96875],
+    Colonia: <EDPosition>[-9530, -911, 19810],
 }
 
 /**
