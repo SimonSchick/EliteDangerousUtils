@@ -253,12 +253,12 @@ class Client {
                 materials.push(...byAllegiance[event.SystemAllegiance]!);
                 hasAllegiance = true;
             }
-            if (event.FactionState !== 'None' && byState[event.FactionState]) {
-                materials.push(...byState[event.FactionState]!);
+            if (event.FactionState !== 'None' && byState[event.FactionState!]) {
+                materials.push(...byState[event.FactionState!]!);
                 hasState = true;
             }
             if (hasAllegiance && hasState) {
-                materials.push(...(byStateAllegiance![event.FactionState]![event.SystemAllegiance] || []));
+                materials.push(...(byStateAllegiance![event.FactionState!]![event.SystemAllegiance] || []));
             }
             if (materials.length > 0) {
                 const trunc = this.materialTruncateLength;

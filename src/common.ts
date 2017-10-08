@@ -161,6 +161,11 @@ export type Slots =
     'Slot20_Size8';
 
 export type OptionalSlots =
+    'Military01' |
+    'Military02' |
+    'Military03' |
+    'Military04' |
+
     'TinyHardpoint1' |
     'TinyHardpoint2' |
     'TinyHardpoint3' |

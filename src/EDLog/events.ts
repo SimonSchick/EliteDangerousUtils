@@ -89,9 +89,13 @@ export interface ISendText extends IEventBase {
 export interface IBounty extends IEventBase {
     Target: string;
     VictimFaction: string;
+    VictimFaction_Localised?: string;
     TotalReward: number;
     SharedWithOthers?: number;
-    Reward: number;
+    Rewards?: {
+        Faction: string;
+        Reward: number;
+    }[];
 }
 
 export interface IFuelScoop extends IEventBase {
@@ -184,24 +188,33 @@ export interface IMaterialDiscarded extends IMaterialEvent {}
 export interface IMission extends IEventBase {
     Faction: string;
     Name: string;
-    DestinationSystem: string;
+    DestinationSystem?: string;
     DestinationStation?: string;
     Expiry?: string; // TODO autoconvert to date?
     MissionID: number;
-    Commodity: string,
-    Commodity_Localised: string,
+    Count?: number;
+
+    Commodity?: string,
+    Commodity_Localised?: string,
+    Reward?: number;
 }
 
 export interface IMissionAccepted extends IMission {
     Influence: string;
     TargetType?: string;
+    TargetFaction?: string;
+    KillCount?: number;
     TargetType_Localised?: string;
     LocalisedName: string;
-    PassengerType?: string;
+    PassengerCount?: number,
+    PassengerVIPs?: boolean,
+    PassengerWanted?: boolean,
+    PassengerType?: 'Terrorist' | 'Tourist' | 'AidWorker',
+    Reputation: string;
 }
 
 export interface IMissionCompleted extends IMission {
-    Reward: number;
+    Donation?: number;
 }
 
 export interface IModuleEvent extends IEventBase {
@@ -211,7 +224,7 @@ export interface IModuleEvent extends IEventBase {
 }
 
 export interface IModuleStoreEvent extends IModuleEvent {
-    EngineerModifications: string;
+    EngineerModifications?: string;
 }
 
 export interface IModuleRetrieve extends IModuleStoreEvent {
@@ -219,7 +232,7 @@ export interface IModuleRetrieve extends IModuleStoreEvent {
     RetrievedItem_Localised: string;
     SwapOutItem?: string;
     SwapOutItem_Localised?: string;
-    Cost: number;
+    Cost?: number;
 }
 
 export interface IModuleStoreBase {
@@ -234,7 +247,7 @@ export interface IMassModuleStore extends IModuleEvent {
     Items: {
         Slot: string;
         Name: string;
-        EngineerModifications: string;
+        EngineerModifications?: string;
     }[];
 }
 
@@ -471,6 +484,7 @@ export interface IShipyardTransfer extends IEventBase {
     System: string;
     Distance: number;
     TransferPrice: number;
+    TransferTime: number;
 }
 
 export interface IEjectCargo extends IEventBase {
@@ -493,13 +507,16 @@ export interface IScreenshot extends IEventBase {
 }
 
 export interface IRedeemVoucher extends IEventBase {
-    Type: 'bounty' | 'settlement' | 'scannable' | 'CombatBond';
+    Type: 'bounty' | 'settlement' | 'scannable' | 'CombatBond' | 'trade';
     Amount: number;
+    Faction?: string;
+    Factions?: { Faction: string, Amount: number }[];
+    BrokerPercentage?: number;
 }
 
 export interface IPayLegacyFines extends IEventBase {
     Amount: number;
-    BrokerPercentage: number;
+    BrokerPercentage?: number;
 }
 
 export interface IRebootRepair extends IEventBase {
@@ -579,7 +596,7 @@ export interface IWingAdd extends IEventBase {
 }
 
 export interface IWingLeave extends IEventBase {
-    Name: string;
+    Name?: string;
 }
 
 export interface IWingInvite extends IEventBase {
@@ -617,17 +634,21 @@ export interface IRestockVehicle extends IEventBase {
 
 export interface IFetchRemoteModule extends IEventBase {
     StorageSlot: number;
-    StorageItem: string;
-    StorageItem_Localised: string;
+    StorageItem?: string;
+    StorageItem_Localised?: string;
+    StoredItem?: string;
+    StoredItem_Localised?: string;
     ServerId: number;
     TransferCost: number
     Ship: string;
     ShipID: number;
+    TransferTime: number;
 }
 
 export interface IFactionKillBond extends IEventBase {
     Reward: number;
     AwardingFaction: string;
+    AwardingFaction_Localised?: string;
     VictimFaction: string;
 }
 
@@ -644,7 +665,7 @@ export interface IApproachSettlement extends IEventBase {
 }
 
 export interface IDataScanned extends IEventBase {
-    Type: 'DataPoint' | 'DataLink' | 'ListenigPost' | 'AdandonedDataLog' | 'WreckedShip' | 'Unknown_Uplink' | 'ShipUplink';
+    Type: 'DataPoint' | 'DataLink' | 'ListenigPost' | 'AdandonedDataLog' | 'WreckedShip' | 'Unknown_Uplink' | 'ShipUplink' | 'ListeningPost';
 }
 
 export type IPromotion = Partial<IRank>;
@@ -847,7 +868,7 @@ export interface IHyperspaceJump extends IEventBase {
 export type IStartJump = ISuperCruiseJump | IHyperspaceJump;
 
 export interface IScanned extends IEventBase {
-    ScanType: 'Cargo' | 'Data';
+    ScanType: 'Cargo' | 'Data' | 'Crime';
 }
 
 export interface ICrewEvent extends IEventBase {
@@ -897,7 +918,7 @@ export interface IQuitACrew extends ICrewEvent {
 }
 
 export interface IFriends extends IEventBase {
-    Status: 'Online' | 'Offline' | 'Requested';
+    Status: 'Online' | 'Offline' | 'Requested' | 'Added';
     Name: string;
 }
 
@@ -914,7 +935,7 @@ export interface IMusic extends IEventBase {
     'DestinationFromHyperspace' |
     'Unknown_Encounter' |
     'Combat_Unknown' |
-    'Unknown_Settlement' | 'Interdiction';
+    'Unknown_Settlement' | 'Interdiction' | 'Unknown_Exploration';
 }
 
 export interface IPassengerManifest {

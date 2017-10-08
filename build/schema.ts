@@ -1,5 +1,4 @@
 import { EDLogReader } from './../src/EDLog/EDLogReader';
-import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { Validator } from 'jsonschema';
 

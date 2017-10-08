@@ -1,5 +1,5 @@
+import { RawLog } from './EDLog';
 import { homedir } from 'os';
-import { RawLog } from './../../dist/src/EDLog/EDLog.d';
 import { join } from 'path';
 import { readdirSync, readFileSync } from "fs";
 
