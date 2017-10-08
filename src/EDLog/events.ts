@@ -1,3 +1,4 @@
+import { IEventBase } from './../../dist/EDLog/events.d';
 import { EDPosition } from './locations';
 import { AllSlots } from '../common';
 
@@ -23,10 +24,12 @@ export interface IBaseLocation extends IEventBase {
     SystemFaction: string;
     FactionState: FactionState;
     StarPos: EDPosition;
+    Population: number;
 
     SystemEconomy_Localised?: string;
     SystemGovernment_Localised: string;
     SystemSecurity_Localised: string;
+    Factions: any[];
 }
 
 export interface IFSDJump extends IBaseLocation {
@@ -191,6 +194,14 @@ export interface IModuleStore extends IModuleStoreEvent {
     StoredItem_Localised: string;
 }
 
+export interface IMassModuleStore extends IModuleEvent {
+    Items: {
+        Slot: string;
+        Name: string;
+        EngineerModifications: string;
+    }[];
+}
+
 export interface IModuleBuy extends IModuleEvent {
     BuyItem: string;
     BuyItem_Localised: string;
@@ -224,6 +235,11 @@ export interface IRefuelBase extends IEventBase {
 }
 
 export interface IRefuelAll extends IRefuelBase {}
+
+export interface IRefuelPartial extends IRefuelBase {
+    Amount: number;
+}
+
 
 export interface IBuyAmmo extends IRefuelBase {}
 
@@ -838,4 +854,27 @@ export interface IFriends {
 
 export interface IMusic extends ICrewEvent {
     MusicTrack: 'NoTrack' | 'MainMenu' | 'Starport' | 'SystemMap' | 'Supercruise' | 'DestinationFromSupercruise' | 'Exploration' | 'GalaxyMap' | 'Combat_Dogfight' | 'DestinationFromHyperspace' | 'Unknown_Encounter' | 'Combat_Unknown';
+}
+
+export interface IPassengerManifest {
+    MissionID: number;
+    Type: string;
+    VIP: boolean;
+    Wanted: boolean;
+    Count: number;
+}
+
+export interface IPassengers extends IEventBase {
+    Manifest: IPassengerManifest[];
+}
+
+export interface IAfmuRepairs extends IEventBase {
+    Module: string;
+    Module_Localised: string;
+    FullyRepaired: boolean;
+    Health: number;
+}
+
+export interface IRepairDrone extends IEventBase {
+    HullRepaired: number;
 }

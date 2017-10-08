@@ -201,6 +201,14 @@ class Client {
             store: true,
         });
         this.listUnknownEvents(backLog);
+        /** console.log(minBy(backLog, e => {
+            if (e.event === 'FSDJump') {
+                const bEv = <IBaseLocation> e;
+                if (distance(bEv.StarPos, [800, 133, 7400]) < 750) {
+                    console.log(bEv.StarSystem, distance(bEv.StarPos, [800, 133, 7400]));
+                }
+            }
+        }));*/
 
         this.attachEventListeners();
         this.checkAndStartGalaxyWatcher();
@@ -367,8 +375,8 @@ class Client {
         if (event.JumpType === 'Supercruise') {
             return;
         }
-        this.sayQ(`Jumping to ${event.StarClass} class star.`);
         if (event.StarClass === 'H' || event.StarClass === 'N' || event.StarClass.startsWith('D')) {
+            this.sayQ(`Jumping to ${event.StarClass} class star.`);
             this.sayQ('Warning, potential hazard.');
         }
     }
