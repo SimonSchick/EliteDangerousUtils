@@ -1,4 +1,3 @@
-import { IEventBase } from './../../dist/EDLog/events.d';
 import { EDPosition } from './locations';
 import { AllSlots } from '../common';
 
@@ -7,10 +6,11 @@ export interface IEventBase {
     readonly event: string;
 }
 
-export type Faction = 'Empire' | 'Alliance' | 'Federation';
-export type Allegiance = 'None' | 'Independant' | Faction;
+export type StationType = 'Orbis' | 'Coriolis' | 'Bernal' | 'Outpost' | 'SurfaceStation' | 'AsteroidBase';
+export type Faction = 'Empire' | 'Alliance' | 'Federation' | 'PilotsFederation';
+export type Allegiance = 'None' | 'Independent' | Faction;
 export type FactionState = 'None' | 'Retreat' | 'Lockdown' | 'CivilUnrest' | 'CivilWar' | 'Boom' | 'Expansion' | 'Bust' | 'Famine' | 'Election' | 'Investment' | 'Outbreak'| 'War';
-export type Economy = '$economy_None;'
+export type Economy = '$economy_None;' | '$economy_Colony;' | '$economy_Agri;' | '$economy_HighTech;' | '$economy_Extraction;' | '$economy_Industrial;' | '$economy_Military;' | '$economy_Refinery;' |'$economy_Terraforming;' | '$economy_Service;';
 export type Security = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
 export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null' | 'AsteroidCluster';
 export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
@@ -19,38 +19,54 @@ export type FighterLoadout = 'zero' | 'two';
 
 export interface IBaseLocation extends IEventBase {
     StarSystem: string;
-    SystemAllegiance?: Allegiance;
+    SystemAllegiance?: Allegiance | '';
     SystemEconomy: Economy;
-    SystemFaction: string;
-    FactionState: FactionState;
+    SystemFaction?: string;
+    FactionState?: FactionState;
     StarPos: EDPosition;
-    Population: number;
+    Population?: number;
+
+    SystemSecurity: string;
+    SystemGovernment: string;
 
     SystemEconomy_Localised?: string;
     SystemGovernment_Localised: string;
     SystemSecurity_Localised: string;
-    Factions: any[];
+    Factions?: any[];
+    Powers?: Power[];
+    PowerplayState?: 'Exploited' | 'Controlled' | 'InPrepareRadius' | 'Prepared' | 'Contested' | 'Turmoil' | 'HomeSystem';
 }
 
 export interface IFSDJump extends IBaseLocation {
     JumpDist: number;
     FuelUsed: number;
     FuelLevel: number;
-    Powers?: Power[];
-    PowerplayState?: 'Exploited' | 'Controlled' | 'InPrepareRadius' | 'Prepared' | 'Contested' | 'Turmoil' | 'HomeSystem';
 }
 
 export interface ILocation extends IBaseLocation {
+    Latitude?: number;
+    Longitude?: number;
+    StationName?: string;
+    StationType?: StationType;
     Docked: boolean;
     Body?: string;
     BodyType?: BodyType;
-    Factions: {
+    FactionState?: FactionState;
+    Factions?: {
         Name: string;
+        PendingStates?: {
+            State: FactionState;
+            Trend: number;
+        }[];
+        RecoveringStates?: {
+            State: FactionState;
+            Trend: number;
+        }[];
         FactionState: FactionState;
         Government: string;
         Influence: number;
         Allegiance: Allegiance;
-    }[]
+    }[];
 }
 
 export interface IReceiveText extends IEventBase {
@@ -67,7 +83,7 @@ export interface IReceiveText extends IEventBase {
 export interface ISendText extends IEventBase {
     Message: string;
     To: 'local' | 'wing' | string;
-    To_Localised: string;
+    To_Localised?: string;
 }
 
 export interface IBounty extends IEventBase {
@@ -75,6 +91,7 @@ export interface IBounty extends IEventBase {
     VictimFaction: string;
     TotalReward: number;
     SharedWithOthers?: number;
+    Reward: number;
 }
 
 export interface IFuelScoop extends IEventBase {
@@ -84,31 +101,37 @@ export interface IFuelScoop extends IEventBase {
 
 export interface ILaunchSRV extends IEventBase {
     Loadout: 'starter';
-    PlayerController: boolean;
+    PlayerControlled: boolean;
 }
 
 export interface ILoadGame extends IEventBase {
     Commander: string;
     Ship: string;
     ShipID: number;
+    ShipIdent: string;
+    ShipName: string;
     StartLanded?: true;
     StartDead?: true;
+    FuelCapacity: number;
+    FuelLevel: number;
     GameMode: 'Solo' | 'Group' | 'Open';
     Credits: number;
-    Loan: 0;
+    Loan: number;
 }
 
 /**
  * Used once as a rank index progression and once as Rank progress update.
  */
-export interface IRankProgress extends IEventBase {
+export interface IRank extends IEventBase {
     Combat: number;
     Trade: number;
-    Explorer: number;
+    Explore: number;
     Empire: number;
     Federation: number;
     CQC: number;
 }
+
+export interface IProgress extends IRank {}
 
 export interface ISupercruiseExit extends IEventBase {
     StarSystem: string;
@@ -140,13 +163,15 @@ export interface ICommitCrime extends IEventBase {
         'interdiction'|
         'murder' |
         'piracy';
+    // deprecated
+    Victim_Localised?: string;
     Faction: string;
     Victim?: string;
     Bounty?: number;
     Fine?: number;
 }
 
-export interface IMaterialEvent {
+export interface IMaterialEvent extends IEventBase {
     Category: MaterialType;
     Name: string;
     Count: number;
@@ -160,14 +185,19 @@ export interface IMission extends IEventBase {
     Faction: string;
     Name: string;
     DestinationSystem: string;
-    DestinationStation: string;
+    DestinationStation?: string;
     Expiry?: string; // TODO autoconvert to date?
     MissionID: number;
+    Commodity: string,
+    Commodity_Localised: string,
 }
 
 export interface IMissionAccepted extends IMission {
-    TargetType: string;
-    TargetType_Localised: string;
+    Influence: string;
+    TargetType?: string;
+    TargetType_Localised?: string;
+    LocalisedName: string;
+    PassengerType?: string;
 }
 
 export interface IMissionCompleted extends IMission {
@@ -175,23 +205,29 @@ export interface IMissionCompleted extends IMission {
 }
 
 export interface IModuleEvent extends IEventBase {
-    Slot: AllSlots;
+    Slot?: AllSlots;
     Ship: string; // TODO: possible enum
     ShipID: number;
 }
 
 export interface IModuleStoreEvent extends IModuleEvent {
-    EngineerModification: string;
+    EngineerModifications: string;
 }
 
 export interface IModuleRetrieve extends IModuleStoreEvent {
     RetrievedItem: string;
     RetrievedItem_Localised: string;
+    SwapOutItem?: string;
+    SwapOutItem_Localised?: string;
+    Cost: number;
 }
 
-export interface IModuleStore extends IModuleStoreEvent {
+export interface IModuleStoreBase {
     StoredItem: string;
     StoredItem_Localised: string;
+}
+
+export interface IModuleStore extends IModuleStoreEvent, IModuleStoreBase {
 }
 
 export interface IMassModuleStore extends IModuleEvent {
@@ -202,16 +238,19 @@ export interface IMassModuleStore extends IModuleEvent {
     }[];
 }
 
-export interface IModuleBuy extends IModuleEvent {
+export interface IBaseBaseSell {
+    SellItem: string;
+    SellItem_Localised: string;
+    SellPrice: number;
+}
+
+export interface IModuleBuy extends IModuleEvent, Partial<IBaseBaseSell>, Partial<IModuleStoreBase> {
     BuyItem: string;
     BuyItem_Localised: string;
     BuyPrice: number;
 }
 
-export interface IModuleSell extends IModuleEvent {
-    SellItem: string;
-    SellItem_Localised: string;
-    SellPrice: number;
+export interface IModuleSell extends IModuleEvent, IBaseBaseSell {
 }
 
 export interface IModuleSwap extends IEventBase {
@@ -234,12 +273,13 @@ export interface IRefuelBase extends IEventBase {
     Cost: number;
 }
 
-export interface IRefuelAll extends IRefuelBase {}
+export interface IRefuelAll extends IRefuelBase {
+    Amount: number;
+}
 
 export interface IRefuelPartial extends IRefuelBase {
     Amount: number;
 }
-
 
 export interface IBuyAmmo extends IRefuelBase {}
 
@@ -293,7 +333,7 @@ export interface IMarketSell extends IMarketEvent {
 
 export interface IDockBase extends IEventBase {
     StationName: string;
-    StationType: 'Orbis' | 'Coriolis' | 'Bernal' | 'Outpost';
+    StationType: StationType;
 }
 
 export interface IMissionAbandoned extends IEventBase {
@@ -302,15 +342,18 @@ export interface IMissionAbandoned extends IEventBase {
 }
 
 export interface IDocked extends IDockBase {
+    FactionState?: FactionState;
+    StationServices?: string[];
     StarSystem: string;
     StationFaction: string;
-    FactionStation: FactionState;
+    FactionStation?: FactionState;
     StationGovernment: string; // TODO: type
     StationGovernment_Localised: string;
-    StationAllegiance: Allegiance;
+    StationAllegiance?: Allegiance;
     StationEconomy: string; // TODO: type
     StationEconomy_Localised: string;
     CockpitBreach?: true;
+    DistFromStarLS: number;
 }
 
 export interface IUndocked extends IDockBase {}
@@ -325,7 +368,8 @@ export interface IUSSDrop extends IEventBase {
         '$USS_Type_DistressSignal;' |
         '$USS_Type_MissionTarget;' |
         '$USS_Type_ValuableSalvage;' |
-        '$USS_Type_Ceremonial;';
+        '$USS_Type_Ceremonial;' |
+        '$USS_Type_NonHuman;';
     USSType_Localised: string;
     USSThreat: number;
 }
@@ -335,8 +379,12 @@ export interface IGeoEvent extends IEventBase {
     Longitude: number;
 }
 
-export interface ITouchdown extends IGeoEvent {}
-export interface ILiftoff extends IGeoEvent {}
+export interface IPlayerController {
+    PlayerControlled: boolean;
+}
+
+export interface ITouchdown extends Partial<IGeoEvent>, IPlayerController {}
+export interface ILiftoff extends Partial<IGeoEvent>, IPlayerController {}
 
 export interface IEngineerEvent extends IEventBase {
     Engineer: string;
@@ -345,7 +393,7 @@ export interface IEngineerEvent extends IEventBase {
 }
 
 export interface IEngineerCraft extends IEngineerEvent {
-    Ingredients: { [material: string]: number }
+    Ingredients: { Name: string; Count: number; }[]
 }
 
 export interface IEngineerApply extends IEngineerEvent {
@@ -360,7 +408,7 @@ export interface IEngineerProgress extends IEventBase {
 export interface IHullDamage extends IEventBase {
     Health: number;
     PlayerPilot: boolean;
-    Fighter: boolean;
+    Fighter?: boolean;
 }
 
 export interface IInterdictionBase extends IEventBase {
@@ -370,9 +418,8 @@ export interface IInterdictionBase extends IEventBase {
 
 export interface IInterdicted extends IInterdictionBase {
     Submitted: boolean;
-    Interdictor_Localised: string;
     Faction: string;
-    Power: Power;
+    Power?: Power;
 }
 
 export interface IEscapeInterdiction extends IInterdictionBase {
@@ -402,7 +449,7 @@ export interface IRepairAll extends IEventBase {
 
 export interface IShipyardSell extends IEventBase {
     ShipType: string;
-    SellShipId: number;
+    SellShipID: number;
     ShipPrice: number;
     System?: string;
 }
@@ -410,8 +457,8 @@ export interface IShipyardSell extends IEventBase {
 
 export interface IShipyardSwap extends IEventBase {
     ShipType: string;
-    ShipId: number;
-    ShipPrice: number;
+    ShipID: number;
+    ShipPrice?: number;
     StoreOldShip?: string,
     StoreShipID?: number;
     SellOldShip?: string;
@@ -429,7 +476,7 @@ export interface IShipyardTransfer extends IEventBase {
 export interface IEjectCargo extends IEventBase {
     Type: string;
     Count: number;
-    Adandoned: boolean;
+    Abandoned: boolean;
     PowerplayOrigin?: string;
 }
 
@@ -477,8 +524,9 @@ export interface INewCommander extends IEventBase {
 export interface ISynthesis extends IEventBase {
     Name: string;
     Materials: {
-        [materialName: string]: number;
-    }
+        Name: string;
+        Count: number;
+    }[];
 }
 
 export interface IDockSRV extends IEventBase {}
@@ -548,16 +596,16 @@ export interface ICrewAssign extends IEventBase {
     Role: 'Active'; // TODO: More
 }
 
-export interface IModuleSellRemote extends IModuleSell {
+export interface IModuleSellRemote extends IModuleEvent, IBaseBaseSell {
     StorageSlot: number;
-    ServerId: string;
-    // TODO: rm slot
+    ServerId: number;
 }
 
 export interface IDockFighter extends IEventBase {}
 
 export interface IVehicleSwitch extends IEventBase {
-    To: 'Mothership' | 'Fighter';
+    // Apparently nothing when it's the SRV
+    To?: 'Mothership' | 'Fighter';
 }
 
 export interface IRestockVehicle extends IEventBase {
@@ -593,14 +641,13 @@ export interface IInterdiction extends IEventBase {
 
 export interface IApproachSettlement extends IEventBase {
     Name: string;
-    Name_Localised: string;
 }
 
 export interface IDataScanned extends IEventBase {
-    Type: 'DataPoint' | 'DataLink' | 'ListenigPost' | 'AdandonedDataLog' | 'WreckedShip';
+    Type: 'DataPoint' | 'DataLink' | 'ListenigPost' | 'AdandonedDataLog' | 'WreckedShip' | 'Unknown_Uplink' | 'ShipUplink';
 }
 
-export type IPromotion = Partial<IRankProgress>;
+export type IPromotion = Partial<IRank>;
 
 export interface ICollectCargo extends IEventBase {
     Type: string;
@@ -616,7 +663,6 @@ export interface IRepair extends IEventBase {
     Item: string;
     Cost: number;
 }
-
 
 export interface IPVPKill extends IEventBase {
     Victim: string;
@@ -669,7 +715,7 @@ export interface IRing {
 }
 
 export interface IScanBase extends IEventBase {
-    Bodyname: string;
+    BodyName: string;
     DistanceFromArrivalLS: number;
     SurfaceTemperature: number;
     RotationPeriod: number;
@@ -685,12 +731,15 @@ export interface IStar extends IScanBase {
 }
 
 export interface IBody extends IScanBase {
+    AxialTilt: number;
     TidalLock?: 1;
-    TerraformState: 'Terraformable' | 'Terraforming' | null;
+    TerraformState: 'Terraformable' | 'Terraforming' | '' | null;
     PlanetClass: string;
     Atmosphere: string;
     AtmosphereType: string;
+    AtmosphereComposition?: { Name: string; Percent: number }[];
     Volcanism: string;
+    MassEM: number;
     SurfaceGravity: number;
     SurfacePressure: number;
     Landable?: true;
@@ -754,8 +803,8 @@ export interface IBaseModule {
     Priority: number;
     Health: number;
     Value: number;
-    EngineerBlueprint: string;
-    EngineeringLevel: number;
+    EngineerBlueprint?: string;
+    EngineeringLevel?: number;
 }
 
 export interface IAmmoWeaponModule extends IBaseModule {
@@ -798,7 +847,7 @@ export interface IHyperspaceJump extends IEventBase {
 export type IStartJump = ISuperCruiseJump | IHyperspaceJump;
 
 export interface IScanned extends IEventBase {
-    ScanType: 'Cargo';
+    ScanType: 'Cargo' | 'Data';
 }
 
 export interface ICrewEvent extends IEventBase {
@@ -847,13 +896,25 @@ export interface IQuitACrew extends ICrewEvent {
     Captain: string;
 }
 
-export interface IFriends {
-    Status: 'Online' | 'Offline';
+export interface IFriends extends IEventBase {
+    Status: 'Online' | 'Offline' | 'Requested';
     Name: string;
 }
 
-export interface IMusic extends ICrewEvent {
-    MusicTrack: 'NoTrack' | 'MainMenu' | 'Starport' | 'SystemMap' | 'Supercruise' | 'DestinationFromSupercruise' | 'Exploration' | 'GalaxyMap' | 'Combat_Dogfight' | 'DestinationFromHyperspace' | 'Unknown_Encounter' | 'Combat_Unknown';
+export interface IMusic extends IEventBase {
+    MusicTrack: 'NoTrack' |
+    'MainMenu' |
+    'Starport' |
+    'SystemMap' |
+    'Supercruise' |
+    'DestinationFromSupercruise' |
+    'Exploration' |
+    'GalaxyMap' |
+    'Combat_Dogfight' |
+    'DestinationFromHyperspace' |
+    'Unknown_Encounter' |
+    'Combat_Unknown' |
+    'Unknown_Settlement' | 'Interdiction';
 }
 
 export interface IPassengerManifest {

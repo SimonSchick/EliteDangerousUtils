@@ -216,16 +216,32 @@ export type OptionalSlots =
     'HugeHardpoint9' |
     'HugeHardpoint10' |
 
-    'Bobble1' |
-    'Bobble2' |
-    'Bobble3' |
-    'Bobble4' |
-    'Bobble5' |
-    'Bobble6' |
-    'Bobble7' |
-    'Bobble8' |
-    'Bobble9' |
+    'Bobble01' |
+    'Bobble02' |
+    'Bobble03' |
+    'Bobble04' |
+    'Bobble05' |
+    'Bobble06' |
+    'Bobble07' |
+    'Bobble08' |
+    'Bobble09' |
     'Bobble10' |
+
+
+    'ShipName0' |
+    'ShipName1' |
+    'ShipName2' |
+    'ShipName3' |
+
+    'ShipID0' |
+    'ShipID1' |
+    'ShipID2' |
+    'ShipID3' |
+
+    'Decal0' |
+    'Decal1' |
+    'Decal2' |
+    'Decal3' |
 
     'ShipKitSpoiler' |
     'ShipKitWings' |

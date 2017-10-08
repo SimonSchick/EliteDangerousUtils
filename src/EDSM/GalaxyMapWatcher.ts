@@ -126,7 +126,7 @@ export class GalaxyMapWatcher extends EventEmitter {
         return (coordinates.x - cooordinate2.x) ** 2 + (coordinates.y - cooordinate2.y) ** 2 + (coordinates.z - cooordinate2.z) ** 2
     }
 
-    public findClosest(loc: ICoordinate): [ICommanderMapEntry, number] {
+    public findClosest(loc: ICoordinate): [ICommanderMapEntry, number] | void {
         const [closest, distanceSqrt] = findMin(this.registry, ({ coordinates }) => this.sqrtLocDistance(coordinates, loc));
         if (!closest) {
             return undefined;
@@ -149,6 +149,9 @@ export class GalaxyMapWatcher extends EventEmitter {
 
     public findClosestAutoComplete (loc: ICoordinate): Promise<[ICommanderMapEntry, number]> {
         const res = this.findClosest(loc);
+        if (!res) {
+            return Promise.reject(undefined);
+        }
         const [closest] = res;
         if (!closest) {
             return Promise.reject(undefined);

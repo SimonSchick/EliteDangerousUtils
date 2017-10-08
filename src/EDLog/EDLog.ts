@@ -1,3 +1,4 @@
+import { EDLogReader } from './EDLogReader';
 import { ContinuesReadStream } from './ContinousReadStream';
 import {
     IApproachSettlement,
@@ -90,7 +91,7 @@ import {
     IPowerplaySalary,
     IPromotion,
     IQuitACrew,
-    IRankProgress,
+    IRank,
     IRebootRepair,
     IReceiveText,
     IRedeemVoucher,
@@ -128,11 +129,11 @@ import {
     IRefuelPartial,
     IAfmuRepairs,
     IRepairDrone,
+    IProgress,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
 import { join } from 'path';
-import { homedir } from 'os';
 import { ReadLine, createInterface } from 'readline';
 import { findLast } from '../util/findLast';
 
@@ -241,10 +242,10 @@ export type GameEvents = {
     'event:PayLegacyFines': IPayLegacyFines,
     'event:PowerplayJoin': IPowerplayJoin,
     'event:PowerplaySalary': IPowerplaySalary,
-    'event:Progress': IRankProgress,
+    'event:Progress': IProgress,
     'event:Promotion': IPromotion,
     'event:QuitACrew': IQuitACrew,
-    'event:Rank': IRankProgress,
+    'event:Rank': IRank,
     'event:RebootRepair': IRebootRepair,
     'event:ReceiveText': IReceiveText,
     'event:RedeemVoucher': IRedeemVoucher,
@@ -293,11 +294,11 @@ export type Events = {
 } & GameEvents;
 
 export class EDLog extends EventEmitter {
-    private directory = join(homedir(), '/Saved Games/Frontier Developments/Elite Dangerous'); // TODO: OSX Support
     private fileStream: ContinuesReadStream;
     private fileName: string;
     private lineStream: ReadLine;
     private backlog: EDEvent[];
+    private logReader = new EDLogReader();
 
     public emit<K extends keyof Events>(event: K, value: Events[K]): boolean {
         return super.emit(event, value);
@@ -333,7 +334,7 @@ export class EDLog extends EventEmitter {
     }
 
     private listenToFile (file: string, skip: boolean = false) {
-        file = join(this.directory, file);
+        file = join(this.logReader.getDir(), file);
         this.end();
         this.emit('file', {
             file,
@@ -349,14 +350,10 @@ export class EDLog extends EventEmitter {
             input: this.fileStream,
         });
         this.lineStream.on('line', line => {
-            const ev = new EDEvent(this.parseJSON(line));
+            const ev = new EDEvent(this.logReader.parseJSON(line));
             this.emit('event', ev);
             this.emit(<keyof Events>`event:${ev.event}`, ev);
         });
-    }
-
-    private parseJSON(str: string): any {
-        return JSON.parse(str.replace(/[\0-\25]/g, ''));
     }
 
     /**
@@ -364,40 +361,24 @@ export class EDLog extends EventEmitter {
      * @param If true the method will return an array of event logs, otherwise empty.
      */
     public start (backlog: { process: boolean; store: boolean; }): EDEvent[] {
-        const fileMatcher = /Journal\.(\d+)\.\d+.log$/;
-
-        fs.watch(this.directory, (eventType, fileName) => {
+        fs.watch(this.logReader.getDir(), (eventType, fileName) => {
             if (eventType === 'change') {
                 return;
             }
             if (fileName === this.fileName) {
                 return;
             }
-            if (!fileName.match(fileMatcher)) {
+            if (!fileName.match(EDLogReader.fileMatcher)) {
                 return;
             }
             this.listenToFile(fileName);
         });
 
+        const files = this.logReader.fetchFiles();
 
-        const files = fs.readdirSync(this.directory)
-        .map(fileName => fileMatcher.exec(fileName))
-        .filter(match => !!match)
-        .sort((a, b) => Number(a[1]) - Number(b[1]))
-        .map(matcher => matcher[0]);
-
-        const bl: EDEvent[] = [];
+        let bl: EDEvent[] = [];
         if (backlog.process) {
-            files.forEach(fileName => {
-                fs.readFileSync(join(this.directory, fileName), 'utf8')
-                .split('\n')
-                .forEach(line => {
-                    if (line === '') {
-                        return;
-                    }
-                    bl.push(new EDEvent(this.parseJSON(line)));
-                });
-            });
+            bl = this.logReader.read().map(raw => new EDEvent(raw));
         }
 
         this.listenToFile(files[files.length - 1], true);
@@ -407,7 +388,7 @@ export class EDLog extends EventEmitter {
         return bl;
     }
 
-    public getLastEvent<K extends keyof GameEvents>(event: K): GameEvents[K] {
+    public getLastEvent<K extends keyof GameEvents>(event: K): GameEvents[K] | undefined {
         // TODO: This isn't great but works
         if (!this.backlog) {
             throw new Error('No backlog');

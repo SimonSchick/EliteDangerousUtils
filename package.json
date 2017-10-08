@@ -8,17 +8,19 @@
   "version": "1.10.0",
   "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
   "dependencies": {
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "typescript-json-schema": "^0.17.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.52",
     "@types/node": "^7.0.5",
-    "@types/request": "0.0.39",
+    "@types/request": "^2.0.4",
+    "jsonschema": "^1.2.0",
     "lodash": "^4.17.4",
     "rimraf": "^2.6.0",
     "say": "^0.11.0",
     "ts-node": "^2.0.0",
-    "typescript": "^2.1.5"
+    "typescript": "^2.5.3"
   },
   "engines": {
     "node": "^6.0.0"

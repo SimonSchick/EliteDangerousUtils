@@ -24,8 +24,11 @@ export class HTTPClient {
     public static Jar() {
         return request.jar();
     }
-    private generateError (response: Response<any>): HTTPError {
+    private generateError (response: Response<any>): HTTPError | void {
         const { statusCode } = response;
+        if (!statusCode) {
+            throw new Error('Failed with no status code');
+        }
         if (statusCode < 200 || statusCode >= 300) {
             switch(statusCode) {
                 case 400:

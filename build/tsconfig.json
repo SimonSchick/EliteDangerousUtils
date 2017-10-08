@@ -13,29 +13,17 @@
         "module": "commonjs",
         "sourceMap": true,
         "target": "es2017",
-        "outDir": "dist",
         "strict": true,
+        "noEmit": true,
         "noStrictGenericChecks": false,
         "baseUrl": ".",
         "lib": [
             "es2017",
             "es2015.iterable"
         ],
-        "paths": {
-            "*": [
-                "./demo/types/*"
-            ]
-        },
-        "typeRoots": [
-            "node_modules/@types"
-        ],
         "alwaysStrict": true
     },
     "include": [
-        "src/**/*",
-        "client/**/*"
-    ],
-    "exclude": [
-        "node_modules"
+        "./schema.ts"
     ]
 }

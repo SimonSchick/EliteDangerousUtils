@@ -151,7 +151,7 @@ class Client {
         .split('\n')
         .map(line => line.match(/'event:(.*?)': (.*?),/))
         .filter(match => match)
-        .map(match => match[1]);
+        .map(match => match![1]);
 
         let unknown: string[] = [];
         backLog.forEach(ev => {
@@ -170,9 +170,9 @@ class Client {
         if (this.cachedPosition) {
             return this.cachedPosition;
         }
-        const lastLocation: IBaseLocation = this.log.getLastEvent('event:FSDJump') || this.log.getLastEvent('event:Location');
+        const lastLocation = this.log.getLastEvent('event:FSDJump') || this.log.getLastEvent('event:Location');
         if (!lastLocation) {
-            return undefined;
+            throw new Error('position unavailable');
         } else {
             return this.cachedPosition = lastLocation.StarPos;
         }
@@ -250,15 +250,15 @@ class Client {
             let hasAllegiance = false;
             let hasState = false;
             if (event.SystemAllegiance !== 'None' && byAllegiance[event.SystemAllegiance]) {
-                materials.push(...byAllegiance[event.SystemAllegiance]);
+                materials.push(...byAllegiance[event.SystemAllegiance]!);
                 hasAllegiance = true;
             }
             if (event.FactionState !== 'None' && byState[event.FactionState]) {
-                materials.push(...byState[event.FactionState]);
+                materials.push(...byState[event.FactionState]!);
                 hasState = true;
             }
             if (hasAllegiance && hasState) {
-                materials.push(...(byStateAllegiance[event.FactionState][event.SystemAllegiance] || []));
+                materials.push(...(byStateAllegiance![event.FactionState]![event.SystemAllegiance] || []));
             }
             if (materials.length > 0) {
                 const trunc = this.materialTruncateLength;
@@ -282,22 +282,22 @@ class Client {
     private onReceiveText(event: IReceiveText) {
         switch (event.Channel) {
             case 'npc':
-                if ([...this.settings.blocked].some(entry => (event.From_Localised || event.From).includes(entry))) {
+                if ([...this.settings.blocked].some(entry => (event.From_Localised || event.From || '').includes(entry))) {
                     return;
                 }
                 this.sayQ(`Message from: ${event.From_Localised || event.From}: ${event.Message_Localised}`);
                 break;
             case 'player':
-                if (event.From.startsWith('&')) {
+                if (event.From && event.From.startsWith('&')) {
                     this.sayQ(`Direct message from: ${event.From.substring(1)}: ${event.Message}`);
                     return;
                 }
                 let name: string;
                 try {
                     const matcher = /^\$cmdr_decorate:#name=(.*?);$/;
-                    [name] = event.From.match(matcher);
+                    [name] = event.From!.match(matcher)!;
                 } catch (e) {
-                    name = event.From;
+                    name = event.From!;
                 }
                 this.sayQ(`Direct message from: ${name}: ${event.Message}`);
                 break;
