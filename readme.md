@@ -24,7 +24,8 @@ Please mind that events may be delayed by about 100ms as the log is polled.
 
 ### Simple demo
 ```typescript
-import { locations, starSystemDistance } from '../elite-dangerous-utils/dist/EDLog/EDLog';
+import { EDLog } from 'elite-dangerous-utils/dist/EDLog/EDLog';
+import { locations } from 'elite-dangerous-utils/dist/EDLog/locations';
 
 const log = new EDLog();
 
