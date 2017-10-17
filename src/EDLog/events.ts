@@ -333,7 +333,7 @@ export interface IMarketBuy extends IMarketEvent {
 
 export interface IMarketSell extends IMarketEvent {
     SellPrice: number;
-    TotalPrice: number;
+    TotalSale: number;
     /**
      * Per unit.
      */
@@ -550,6 +550,9 @@ export interface IDockSRV extends IEventBase {}
 
 export type CombatRank = 'Harmless' | 'Mostly Harmless' | 'Novice' | 'Competent' | 'Expert' | 'Dangerous' | 'Master' | 'Deadly' | 'Elite'
 
+export interface ISuicide extends IEventBase  {
+}
+
 export interface ISingleDeath extends IEventBase  {
     KillerName: string;
     KillerShip: string;
@@ -564,7 +567,7 @@ export interface IWingDeath extends IEventBase  {
     }[];
 }
 
-export type IDied = ISingleDeath | IWingDeath;
+export type IDied = ISingleDeath | IWingDeath | ISuicide;
 
 export interface IResurrect extends IEventBase {
     Option: 'rebuy';
@@ -918,7 +921,7 @@ export interface IQuitACrew extends ICrewEvent {
 }
 
 export interface IFriends extends IEventBase {
-    Status: 'Online' | 'Offline' | 'Requested' | 'Added';
+    Status: 'Online' | 'Offline' | 'Requested' | 'Added' | 'Lost';
     Name: string;
 }
 
