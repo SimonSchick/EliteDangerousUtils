@@ -24,8 +24,6 @@ Please mind that events may be delayed by about 100ms as the log is polled.
 
 ### Simple demo
 ```typescript
-import { locations, starSystemDistance } from '../elite-dangerous-utils/dist/EDLog/EDLog';
-
 const log = new EDLog();
 
 log.on('event:ReceiveText', event => {
@@ -79,7 +77,7 @@ Please use this with care, avoid too many requests to Frontiers API and avoid lo
 ### Simple demo
 
 ```typescript
-import { EDCompanionAPI } from 'elite-dangerous-utils/dist/EDCompanionAPI';
+import { EDCompanionAPI } from 'elite-dangerous-utils';
 import * as FileCookieStore from 'tough-cookie-filestore';
 import { createInterface } from 'readline';
 
