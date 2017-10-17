@@ -19,7 +19,7 @@ export interface IPage {
     page: ICommandMapPage;
 }
 
-export type Events = {
+export type MapEvents = {
     registered: ICommanderMapEntry,
     moved: IMove,
     page: IPage,
@@ -42,17 +42,17 @@ export class GalaxyMapWatcher extends EventEmitter {
         return a.x === b.x && a.y === b.y && a.z === b.z;
     }
 
-    public emit<K extends keyof Events>(event: K, value: Events[K]): boolean {
+    public emit<K extends keyof MapEvents>(event: K, value: MapEvents[K]): boolean {
         return super.emit(event, value);
     }
 
-    public on<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
+    public on<K extends keyof MapEvents>(event: K, cb: (event: MapEvents[K]) => void): this;
     public on<T>(event: string, cb: (event: T) => void): this;
     public on(event: string | symbol, cb: (event: any) => void): this {
         return super.on(event, cb);
     }
 
-    public once<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
+    public once<K extends keyof MapEvents>(event: K, cb: (event: MapEvents[K]) => void): this;
     public once<T>(event: string, cb: (event: T) => void): this;
     public once(event: string | symbol, cb: (event: any) => void): this {
         return super.once(event, cb);

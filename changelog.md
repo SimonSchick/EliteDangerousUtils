@@ -154,3 +154,13 @@ Removed event:
 - Completed `CrimeType` in `ICommitCrime` and made `Victim` optional
 - Added `System` to `IShipyardSell`
 - Added various fields to `IShipyardSwap`
+
+# 2.0.0
+ - Simplify event definitions in EDLog client
+ - Demo fixes
+ - General code cleanup
+ - Added EDSM API classes
+ - Add missing 2.4 events
+ - Fixed dozens of event definitions using auto generated JSON schemas.
+ - enable strict mode
+ - update `say`

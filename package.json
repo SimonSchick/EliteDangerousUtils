@@ -4,6 +4,8 @@
     "email": "demwizzy@gmail.com",
     "url": "https://github.com/SimonSchick"
   },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "name": "elite-dangerous-utils",
   "version": "1.10.0",
   "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
