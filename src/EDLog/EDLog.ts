@@ -354,8 +354,8 @@ export class EDLog extends EventEmitter {
             this.emit('event', ev);
             this.emit(<keyof Events>`event:${ev.event}`, ev);
         });
-    }  
-        
+    }
+
     /**
      * Launches the log reader.
      * 
