@@ -354,14 +354,17 @@ export class EDLog extends EventEmitter {
             this.emit('event', ev);
             this.emit(<keyof Events>`event:${ev.event}`, ev);
         });
-    }
-
+    }  
+        
     /**
      * Launches the log reader.
-     * @param If true the method will return an array of event logs, otherwise empty.
+     * 
+     * @param {IBacklogOptions} [backlog={}] Optional configuration settings.
+     * @returns {EDEvent[]} The processed backlog events.
+     * @memberof EDLog 
      */
-    public start (backlog: { process: boolean; store: boolean; }): EDEvent[] {
-        fs.watch(this.logReader.getDir(), (eventType, fileName) => {
+    public start(backlog: IBacklogOptions = {}): EDEvent[] {
+        fs.watch(this.logReader.getDir(), (eventType: string, fileName: string) => {
             if (eventType === 'change') {
                 return;
             }
@@ -405,4 +408,22 @@ export class EDLog extends EventEmitter {
         const realEvent = event.replace('event:', '');
         return <GameEvents[K]> this.backlog.filter(ev => ev.event === realEvent);
     }
+}
+
+export interface IBacklogOptions {
+    /**
+     * If true the method will return an array of event logs, otherwise empty.
+     * 
+     * @type {boolean}
+     * @memberof IBacklogOptions
+     */
+    process?: boolean;
+
+    /**
+     * If true the method will keep the backlog loaded.
+     * 
+     * @type {boolean}
+     * @memberof IBacklogOptions
+     */
+    store?: boolean;
 }
