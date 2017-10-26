@@ -359,7 +359,7 @@ export class EDLog extends EventEmitter {
     /**
      * Launches the log reader.
      * 
-     * @param {IBacklogOptions} [backlog={}] Optional configuration settings.
+     * @param backlog Optional configuration settings.
      * @returns {EDEvent[]} The processed backlog events.
      * @memberof EDLog 
      */
@@ -414,7 +414,6 @@ export interface IBacklogOptions {
     /**
      * If true the method will return an array of event logs, otherwise empty.
      * 
-     * @type {boolean}
      * @memberof IBacklogOptions
      */
     process?: boolean;
@@ -422,7 +421,6 @@ export interface IBacklogOptions {
     /**
      * If true the method will keep the backlog loaded.
      * 
-     * @type {boolean}
      * @memberof IBacklogOptions
      */
     store?: boolean;
