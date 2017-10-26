@@ -360,8 +360,6 @@ export class EDLog extends EventEmitter {
      * Launches the log reader.
      * 
      * @param backlog Optional configuration settings.
-     * @returns {EDEvent[]} The processed backlog events.
-     * @memberof EDLog 
      */
     public start(backlog: IBacklogOptions = {}): EDEvent[] {
         fs.watch(this.logReader.getDir(), (eventType: string, fileName: string) => {
@@ -413,15 +411,11 @@ export class EDLog extends EventEmitter {
 export interface IBacklogOptions {
     /**
      * If true the method will return an array of event logs, otherwise empty.
-     * 
-     * @memberof IBacklogOptions
      */
     process?: boolean;
 
     /**
      * If true the method will keep the backlog loaded.
-     * 
-     * @memberof IBacklogOptions
      */
     store?: boolean;
 }
