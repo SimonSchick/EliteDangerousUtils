@@ -55,7 +55,7 @@ log.on('event', ev => console.log(ev));
 log.start();
 ```
 ./
-For a more complex demo see [demo folder](./demo).
+For a more complex demo see [demo folder](demo).
 
 ### Events
 
