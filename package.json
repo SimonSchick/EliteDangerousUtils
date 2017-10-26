@@ -4,12 +4,13 @@
     "email": "demwizzy@gmail.com",
     "url": "https://github.com/SimonSchick"
   },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "name": "elite-dangerous-utils",
-  "version": "1.10.0",
+  "version": "2.0.0",
   "description": "Collection of utilities to interactive with the Elite: Dangerous game client and the 'Companion' App API",
   "dependencies": {
-    "request": "^2.79.0",
-    "typescript-json-schema": "^0.17.0"
+    "request": "^2.79.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.52",
@@ -18,9 +19,10 @@
     "jsonschema": "^1.2.0",
     "lodash": "^4.17.4",
     "rimraf": "^2.6.0",
-    "say": "^0.11.0",
+    "say": "^0.13.1",
     "ts-node": "^3.3.0",
-    "typescript": "^2.5.3"
+    "typescript": "^2.5.3",
+    "typescript-json-schema": "^0.17.0"
   },
   "engines": {
     "node": "^6.0.0"

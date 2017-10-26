@@ -80,7 +80,7 @@ Please use this with care, avoid too many requests to Frontiers API and avoid lo
 ### Simple demo
 
 ```typescript
-import { EDCompanionAPI } from 'elite-dangerous-utils/dist/EDCompanionAPI';
+import { EDCompanionAPI } from 'elite-dangerous-utils';
 import * as FileCookieStore from 'tough-cookie-filestore';
 import { createInterface } from 'readline';
 

@@ -215,7 +215,9 @@ class Client {
     }
 
     private sayQ(text: string, extra?: object) {
-        this.queue.push(((cb: (error: Error) => void) => speak(text, '', 1, cb)));
+        this.queue.push(
+            (cb: (error: Error | undefined) => void) => speak(text, '', 1, err => cb(err ? new Error(err) : undefined))
+        );
         console.log(text);
         if (extra) {
             console.log(extra);
