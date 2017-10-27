@@ -362,7 +362,7 @@ export class EDLog extends EventEmitter {
      * @param backlog Optional configuration settings.
      */
     public start(backlog: IBacklogOptions = {}): EDEvent[] {
-        fs.watch(this.logReader.getDir(), (eventType: string, fileName: string) => {
+        fs.watch(this.logReader.getDir(), (eventType, fileName) => {
             if (eventType === 'change') {
                 return;
             }
