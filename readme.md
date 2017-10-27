@@ -24,6 +24,8 @@ Please mind that events may be delayed by about 100ms as the log is polled.
 
 ### Simple demo
 ```typescript
+import { EDLog, locations } from 'elite-dangerous-utils';
+
 const log = new EDLog();
 
 log.on('event:ReceiveText', event => {
@@ -51,8 +53,8 @@ log.on('file', ev => console.log(ev.file))
 log.on('event', ev => console.log(ev));
 log.start();
 ```
-
-For a more complex demo see [demo folder](demo/EDLog.demo.ts).
+./
+For a more complex demo see [demo folder](demo).
 
 ### Events
 
@@ -107,7 +109,7 @@ api.getProfile()
 .catch(console.error);
 ```
 
-For a _slighty_ more complex demo see [demo folder](demo/EDLog.demo.ts).
+For a _slighty_ more complex demo see [demo folder](demo).
 
 ### Docs
 
