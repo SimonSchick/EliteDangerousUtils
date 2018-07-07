@@ -130,36 +130,39 @@ import {
     IAfmuRepairs,
     IRepairDrone,
     IProgress,
-    IModuleInfo,
     IMissions,
     ICommander,
     IReputation,
     IStatistics,
     INpcCrewPaidWage,
+    IMarket,
+    IShipyard,
+    IOutfitting,
+    IStatus,
+    IModuleInfo,
+    IModulesInfo,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
 import { join } from 'path';
 import { ReadLine, createInterface } from 'readline';
 import { findLast } from '../util/findLast';
+import { directory } from './directory';
+import { FSWatcher, watch, readFileSync, statSync } from 'fs';
+import { EDEvent } from './EDEvent';
 
-export interface RawLog {
-    timestamp: string;
-    event: string;
+export interface IBacklogOptions {
+    /**
+     * If true the method will return an array of event logs, otherwise empty.
+     */
+    process?: boolean;
+
+    /**
+     * If true the method will keep the backlog loaded.
+     */
+    store?: boolean;
 }
 
-/**
- * Util wrapper for ED events.
- */
-export class EDEvent implements EDEvent {
-    public timestamp: Date;
-    public readonly event: string;
-    constructor (rawLog: RawLog) {
-        Object.assign(this, rawLog);
-        this.event = rawLog.event;
-        this.timestamp = new Date(rawLog.timestamp);
-    }
-}
 
 export type GameEvents = {
     'event:ApproachSettlement': IApproachSettlement,
@@ -281,6 +284,7 @@ export type GameEvents = {
     'event:Synthesis': ISynthesis,
     'event:Touchdown': ITouchdown,
     'event:USSDrop': IUSSDrop,
+    'event:ModuleInfo': IModuleInfo,
     'event:Undocked': IUndocked,
     'event:VehicleSwitch': IVehicleSwitch,
     'event:WingAdd': IWingAdd,
@@ -290,12 +294,16 @@ export type GameEvents = {
     'event:RefuelPartial': IRefuelPartial,
     'event:AfmuRepairs': IAfmuRepairs,
     'event:RepairDrone': IRepairDrone,
-    'event:ModuleInfo': IModuleInfo,
     'event:Missions': IMissions,
     'event:Commander': ICommander,
     'event:Reputation': IReputation,
     'event:Statistics': IStatistics,
     'event:NpcCrewPaidWage': INpcCrewPaidWage,
+    'event:Market': IMarket,
+    'event:Shipyard': IShipyard,
+    'event:Outfitting': IOutfitting,
+    'event:ModulesInfo': IModulesInfo,
+    'event:Status': IStatus,
 }
 
 export type Events = {
@@ -306,76 +314,30 @@ export type Events = {
     'error': Error,
 } & GameEvents;
 
+export interface EDLog {
+    on<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
+    once<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
+    listenerCount<K extends keyof Events>(event: K): number;
+    emit<K extends keyof Events>(event: K, value: Events[K]): boolean
+}
+
 export class EDLog extends EventEmitter {
     private fileStream?: ContinuesReadStream;
     private fileName?: string;
     private lineStream?: ReadLine;
     private backlog?: EDEvent[];
     private logReader = new EDLogReader();
-
-    public emit<K extends keyof Events>(event: K, value: Events[K]): boolean {
-        return super.emit(event, value);
-    }
-
-    public on<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
-    public on<T>(event: string, cb: (event: T) => void): this;
-    public on(event: string | symbol, cb: (event: any) => void): this {
-        return super.on(event, cb);
-    }
-
-    public once<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
-    public once<T>(event: string, cb: (event: T) => void): this;
-    public once(event: string | symbol, cb: (event: any) => void): this {
-        return super.once(event, cb);
-    }
-
-    public listenerCount<K extends keyof Events>(event: K): number {
-        return super.listenerCount(event);
-    }
-
-    /**
-     * Ends the log reader.
-     */
-    public end (): void {
-        delete this.fileName;;
-        if (this.fileStream) {
-            this.fileStream.close();
-        }
-        if (this.lineStream) {
-            this.lineStream.close();
-        }
-    }
-
-    private listenToFile (file: string, skip: boolean = false) {
-        file = join(this.logReader.getDir(), file);
-        this.end();
-        this.emit('file', {
-            file,
-        });
-
-        this.fileName = file;
-        this.fileStream = new ContinuesReadStream(file);
-        this.fileStream.on('error', error => this.emit('warn', error));
-        if (skip) {
-            this.fileStream.seekToEnd();
-        }
-        this.lineStream = createInterface({
-            input: this.fileStream,
-        });
-        this.lineStream.on('line', line => {
-            const ev = new EDEvent(this.logReader.parseJSON(line));
-            this.emit('event', ev);
-            this.emit(<keyof Events>`event:${ev.event}`, ev);
-        });
-    }
+    private watcher?: FSWatcher;
+    private watchers: FSWatcher[] = [];
 
     /**
      * Launches the log reader.
-     * 
+     *
      * @param backlog Optional configuration settings.
      */
     public start(backlog: IBacklogOptions = {}): EDEvent[] {
-        fs.watch(this.logReader.getDir(), (eventType, fileName) => {
+        const dir = directory();
+        this.watcher = fs.watch(dir, (eventType, fileName) => {
             if (eventType === 'change') {
                 return;
             }
@@ -388,14 +350,18 @@ export class EDLog extends EventEmitter {
             this.listenToFile(fileName);
         });
 
-        const files = this.logReader.fetchFiles();
+        const files = this.logReader.fetchFiles(dir);
 
         let bl: EDEvent[] = [];
         if (backlog.process) {
-            bl = this.logReader.read().map(raw => new EDEvent(raw));
+            bl = this.logReader.read(dir).map(raw => new EDEvent(raw));
         }
 
         this.listenToFile(files[files.length - 1], true);
+
+        for (const m of ['Market', 'Shipyard', 'Outfitting', 'ModulesInfo', 'Status']) {
+            this.makeWatcher(m);
+        }
         if (backlog.store) {
             this.backlog = bl;
         }
@@ -419,16 +385,71 @@ export class EDLog extends EventEmitter {
         const realEvent = event.replace('event:', '');
         return <GameEvents[K]> this.backlog.filter(ev => ev.event === realEvent);
     }
-}
-
-export interface IBacklogOptions {
-    /**
-     * If true the method will return an array of event logs, otherwise empty.
-     */
-    process?: boolean;
 
     /**
-     * If true the method will keep the backlog loaded.
+     * Ends the log reader.
      */
-    store?: boolean;
+    public end (): void {
+        delete this.fileName;
+        if (this.fileStream) {
+            this.fileStream.close();
+        }
+        if (this.lineStream) {
+            this.lineStream.close();
+        }
+        if (this.watcher) {
+            this.watcher.close();
+        }
+        for(const watcher of this.watchers) {
+            watcher.close();
+        }
+        this.removeAllListeners();
+    }
+
+    private emitEvent(event: EDEvent) {
+        this.emit('event', event);
+        this.emit(<keyof Events>`event:${event.event}`, event);
+        if (this.backlog) {
+            this.backlog.push(event);
+        }
+    }
+
+    private emitFileEvent(path: string): void {
+        this.emitEvent(new EDEvent(JSON.parse(readFileSync(path, 'utf8'))))
+    }
+
+    private makeWatcher(file: string) {
+        const fullFile = join(directory(), `${file}.json`);
+        this.watchers.push(watch(fullFile, event => {
+            if (event !== 'change' || statSync(fullFile).size === 0) {
+                return;
+            }
+            this.emitFileEvent(fullFile)
+        }));
+        setImmediate(() => {
+            this.emitFileEvent(fullFile);
+        });
+    }
+
+    private listenToFile (file: string, skip: boolean = false) {
+        file = join(directory(), file);
+        this.emit('file', {
+            file,
+        });
+
+        this.fileName = file;
+        this.fileStream = new ContinuesReadStream(file);
+        this.fileStream.on('error', error => this.emit('warn', error));
+        if (skip) {
+            this.fileStream.seekToEnd();
+        }
+        this.lineStream = createInterface({
+            input: this.fileStream,
+        });
+        this.lineStream.on('line', line => {
+            const ev = new EDEvent(JSON.parse(line));
+            this.emit('event', ev);
+            this.emit(<keyof Events>`event:${ev.event}`, ev);
+        });
+    }
 }

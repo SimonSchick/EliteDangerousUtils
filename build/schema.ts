@@ -3,6 +3,7 @@ import { join } from 'path';
 import { Validator } from 'jsonschema';
 
 import { buildGenerator, getProgramFromFiles } from 'typescript-json-schema';
+import { directory } from '../src/EDLog/directory';
 
 function run() {
     const file = join(__dirname, '../src/EDLog/events.ts');
@@ -18,7 +19,7 @@ function run() {
 
     const schema = generator!.getSchemaForSymbols(generator!.getMainFileSymbols(program));
 
-    const raw = new EDLogReader().read();
+    const raw = new EDLogReader().read(directory());
 
     const validator = new Validator();
     const known = new Set<string>();

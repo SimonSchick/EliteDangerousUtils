@@ -1,7 +1,7 @@
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { locations, distance, EDPosition } from '../src/EDLog/locations';
-import { EDLog, EDEvent } from '../src/EDLog/EDLog';
+import { EDLog } from '../src/EDLog/EDLog';
 import { speak } from 'say';
 import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
 import { IFSDJump, IReceiveText, IBounty, IStartJump, ISendText, IBaseLocation } from '../src/EDLog/events';
@@ -11,6 +11,7 @@ import { Client as EDSMClient, ICommanderMapEntry, ICoordinate } from '../src/ED
 import { HTTPClient } from '../src/util/HTTPClient';
 import { GalaxyMapWatcher, IMove } from '../src/EDSM/GalaxyMapWatcher';
 import { inspect } from 'util';
+import { EDEvent } from '../src/EDLog/EDEvent';
 
 function handler (error: Error) {
     console.log(inspect(error, {
@@ -100,6 +101,7 @@ class Client {
         .on('event:Location', event => this.onLocation(event))
         .on('file', ev => console.log(ev.file))
         .on('event', ev => {
+            console.log('event', ev.event);
             if (!this.knownEvents) {
                 throw new Error('Events not loaded');
             }
@@ -202,6 +204,7 @@ class Client {
     public start() {
         this.loadSettings();
 
+        this.attachEventListeners();
         const backLog = this.log.start({
             process: true,
             store: true,
@@ -216,7 +219,6 @@ class Client {
             }
         }));*/
 
-        this.attachEventListeners();
         this.checkAndStartGalaxyWatcher();
         this.sayQ('Ready');
     }

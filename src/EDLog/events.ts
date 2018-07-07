@@ -1124,3 +1124,113 @@ export interface IStatistics extends IEventBase {
     NpcCrewId: number;
     Amount: number;
 }
+
+
+
+
+
+// Stat events
+
+export interface IStatStationData {
+    MarketID: number;
+    StarSystem: string;
+    StationName: string;
+
+}
+
+
+export interface IMarket extends IEventBase, IStatStationData {
+    Items: {
+        name: string;
+        BuyPrice: number;
+        SellPrice: number;
+        MeanPrice: number;
+        DemandBracket: number;
+        Stock: number;
+        Demand: number;
+        Consumer: boolean;
+        Producer: boolean;
+        Rare: boolean;
+    }[];
+}
+
+export interface IShipyard extends IEventBase, IStatStationData {
+    Horizons: boolean;
+    AllowCobraMkIV: boolean;
+    PriceList: {
+        id: number;
+        ShipType: string;
+        ShipType_Localised: string;
+        ShipPrice: number;
+    }[];
+}
+
+export interface IOutfitting extends IEventBase, IStatStationData {
+    Horizons: boolean;
+    Items: {
+        id: number;
+        Name: string;
+        BuyPrice: number;
+    }[];
+}
+
+export interface IModulesInfo extends IEventBase {
+    Modules: {
+        Slot: AllSlots;
+        Item: string;
+        Power?: number;
+        Priority?: number;
+    };
+}
+
+export const enum StatusFlags {
+    Docked = 1,
+    Landed = 1 << 1,
+    LandingGear = 1 << 2,
+    Shields = 1 << 3,
+    Supercruise = 1 << 4,
+    FlightAssist = 1 << 5,
+    HardpointsDeployed = 1 << 6,
+    Winged = 1 << 7,
+    lIGHTS = 1 << 8,
+    CargoScoop = 1 << 9,
+    SilentRunning = 1 << 10,
+    FuelScooping = 1 << 11,
+    SrvHandbrake = 1 << 12,
+    SrvTurret = 1 << 13,
+    SrvUnderShip = 1 << 14,
+    SrvDriveAssist = 1 << 15,
+    FSDMassLocked = 1 << 16,
+    FSDCharging = 1 << 17,
+    FSDCooldown = 1 << 18,
+    LowFuel = 1 << 19,
+    OverHeating = 1 << 20,
+    HasLatLong = 1 << 21,
+    IsInDanger = 1 << 22,
+    Interdicted = 1 << 23,
+    InMainShip = 1 << 24,
+    InFighter = 1 << 25,
+    InSRV = 1 << 26,
+}
+
+export const enum GuiFocus {
+    NoFocus,
+    InternalPanel,
+    ExternalPanel,
+    CommsPanel,
+    RolePanel,
+    StationServices,
+    GalaxyMap,
+    SystemMap,
+}
+
+export interface IStatus extends IEventBase {
+    Flags: StatusFlags;
+    Pips: [number, number, number];
+    Firegroup: number;
+    GuiFocus: GuiFocus;
+    Latitude?: number;
+    Longitude?: number;
+    Altitude?: number;
+    Heading?: number;
+}

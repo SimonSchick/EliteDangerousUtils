@@ -1,21 +1,12 @@
-import { RawLog } from './EDLog';
-import { homedir } from 'os';
 import { join } from 'path';
 import { readdirSync, readFileSync } from "fs";
+import { RawLog } from './EDEvent';
 
 export class EDLogReader {
     public static readonly fileMatcher = /Journal\.(\d+)\.\d+.log$/;
     private files?: string[];
-    private home?: string;
 
-    public getDir(): string {
-        if (this.home) {
-            return this.home;
-        }
-        return this.home = join(homedir(), '/Saved Games/Frontier Developments/Elite Dangerous');
-    }
-
-    public fetchFiles (directory: string = this.getDir()) {
+    public fetchFiles (directory: string) {
         return this.files = readdirSync(directory)
         .map(fileName => EDLogReader.fileMatcher.exec(fileName))
         .filter(match => !!match)
@@ -23,11 +14,7 @@ export class EDLogReader {
         .map(matcher => matcher![0]);
     }
 
-    public parseJSON(str: string): any {
-        return JSON.parse(str.replace(/[\0-\25]/g, ''));
-    }
-
-    public read(directory: string = this.getDir(), useCachedFiles = true): RawLog[] {
+    public read(directory: string, useCachedFiles = true): RawLog[] {
         const out: RawLog[] = [];
         (useCachedFiles && this.files ? this.files : this.fetchFiles(directory))
         .forEach(fileName => {
@@ -37,7 +24,7 @@ export class EDLogReader {
                 if (line === '') {
                     return;
                 }
-                out.push(this.parseJSON(line));
+                out.push(JSON.parse(line));
             });
         });
         return out;
