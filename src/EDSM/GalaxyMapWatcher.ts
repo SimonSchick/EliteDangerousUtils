@@ -28,7 +28,7 @@ export type MapEvents = {
 }
 
 export class GalaxyMapWatcher extends EventEmitter {
-    private timer: NodeJS.Timer;
+    private timer?: NodeJS.Timer;
     private lastPage = 0;
     private registry: {
         [key: string]: ICommanderMapEntry;

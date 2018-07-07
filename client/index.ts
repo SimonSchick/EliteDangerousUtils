@@ -45,16 +45,16 @@ class Client {
         cycleDelay: 20 * 1000,
         additionalDelay: 2500,
     };
-    private cachedPosition: EDPosition;
+    private cachedPosition?: EDPosition;
     private trackList: string[] = [];
-    private settings: {
+    private settings?: {
         blocked: Set<string>;
         tracked: Set<string>;
     };
 
     private log = new EDLog();
     private queue = new AsyncQueue();
-    private knownEvents: string[];
+    private knownEvents?: string[];
     private edsm = new EDSMClient(new HTTPClient());
     private watcher = new GalaxyMapWatcher(this.edsm, this.galaxyMapWatcherOptions);
 
@@ -80,6 +80,9 @@ class Client {
     }
 
     private storeSettings () {
+        if (!this.settings) {
+            throw new Error('Setting not loaded');
+        }
         const { blocked, tracked } = this.settings;
         writeFileSync(join(__dirname, 'settings.json'), JSON.stringify({
             tracked: [...tracked.values()],
@@ -97,6 +100,9 @@ class Client {
         .on('event:Location', event => this.onLocation(event))
         .on('file', ev => console.log(ev.file))
         .on('event', ev => {
+            if (!this.knownEvents) {
+                throw new Error('Events not loaded');
+            }
             if (!this.knownEvents.includes(ev.event)) {
                 this.sayQ(`Unknown event discovered: ${ev.event}`);
             }
@@ -146,7 +152,7 @@ class Client {
 
     private listUnknownEvents (backLog: EDEvent[]) {
 
-        this.knownEvents = readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
+        const knownEvents = this.knownEvents = readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
         .trim()
         .split('\n')
         .map(line => line.match(/'event:(.*?)': (.*?),/))
@@ -155,7 +161,7 @@ class Client {
 
         let unknown: string[] = [];
         backLog.forEach(ev => {
-            if (!this.knownEvents.includes(ev.event) && !unknown.includes(ev.event)) {
+            if (!knownEvents.includes(ev.event) && !unknown.includes(ev.event)) {
                 unknown.push(ev.event);
             }
         });
@@ -212,6 +218,7 @@ class Client {
 
         this.attachEventListeners();
         this.checkAndStartGalaxyWatcher();
+        this.sayQ('Ready');
     }
 
     private sayQ(text: string, extra?: object) {
@@ -273,7 +280,7 @@ class Client {
             }
         }
         if(event.FuelLevel < this.criticalFuelLevel) {
-            info.push(`Warning: Fuel at ${event.FuelLevel.toFixed(1)} tons, last jump consumed ${event.FuelUsed.toFixed(1)} tons!`);
+            info.push(`Warning: Check fuel level!`);
         }
         if (info.length === 0) {
             return;
@@ -284,14 +291,18 @@ class Client {
     private onReceiveText(event: IReceiveText) {
         switch (event.Channel) {
             case 'npc':
-                if ([...this.settings.blocked].some(entry => (event.From_Localised || event.From || '').includes(entry))) {
+            const { settings } = this;
+                if (!settings) {
+                    throw new Error('Settings not loaded');
+                }
+                if ([...settings.blocked].some(entry => (event.From_Localised || event.From || '').includes(entry))) {
                     return;
                 }
-                this.sayQ(`Message from: ${event.From_Localised || event.From}: ${event.Message_Localised}`);
+                this.sayQ(`Message from ${event.From_Localised || event.From}: ${event.Message_Localised}`);
                 break;
             case 'player':
                 if (event.From && event.From.startsWith('&')) {
-                    this.sayQ(`Direct message from: ${event.From.substring(1)}: ${event.Message}`);
+                    this.sayQ(`Direct message from ${event.From.substring(1)}: ${event.Message}`);
                     return;
                 }
                 let name: string;
@@ -301,7 +312,7 @@ class Client {
                 } catch (e) {
                     name = event.From!;
                 }
-                this.sayQ(`Direct message from: ${name}: ${event.Message}`);
+                this.sayQ(`Direct message from ${name}: ${event.Message}`);
                 break;
             case 'local':
                 if (event.From_Localised && event.From_Localised.startsWith('CMDR')) {
@@ -318,13 +329,17 @@ class Client {
             this.sayQ('GODDAMNIT HARRY!');
         }
         if (event.Message.startsWith('/')) {
+            const { settings } = this;
+            if (!settings) {
+                throw new Error('Settings not loaded');
+            }
             const [cmd, ...payload] = event.Message.substr(1).split(' ');
             switch (cmd) {
                 case 'say':
                     this.sayQ('dijufghnodifjghiodufgjdoufghdoifghiods(/%&(&/%/');
                     break;
                 case 'block':
-                    this.settings.blocked.add(payload.join(' '));
+                    settings.blocked.add(payload.join(' '));
                     this.storeSettings();
                     this.sayQ(`Blocked ${payload.join(' ')} That motherfucker sure was annoying.`);
                     break;
@@ -357,12 +372,12 @@ class Client {
                     });
                     break;
                 case 'track':
-                    this.settings.tracked.add(payload[0]);
+                    settings.tracked.add(payload[0]);
                     this.storeSettings();
                     this.sayQ('Tracking');
                     break;
                 case 'untrack':
-                    this.settings.tracked.delete(payload[0]);
+                    settings.tracked.delete(payload[0]);
                     this.sayQ('UnTracking');
                     break;
             }

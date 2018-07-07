@@ -7,9 +7,9 @@ import * as fs from 'fs';
 export class ContinuesReadStream extends Readable {
     private closed = false;
     private offset = 0;
-    private file: number;
-    private poll: NodeJS.Timer;
-    private buffer: Buffer;
+    private file?: number;
+    private poll?: NodeJS.Timer;
+    private buffer?: Buffer;
     constructor (public readonly fileName: string, opts?: ReadableOptions, public readonly pollInterval: number = 100) {
         super(opts);
         this.closed = false;
@@ -33,7 +33,9 @@ export class ContinuesReadStream extends Readable {
             return;
         }
         fs.closeSync(this.file);
-        clearInterval(this.poll);
+        if (this.poll) {
+            clearInterval(this.poll);
+        }
         this.closed = true;
     }
 
@@ -48,9 +50,9 @@ export class ContinuesReadStream extends Readable {
         this.file = fs.openSync(this.fileName, 'r');
         this.poll = setInterval(() => {
             try {
-                const read = fs.readSync(this.file, this.buffer, 0, 0xFFFF, this.offset);
+                const read = fs.readSync(this.file!, this.buffer!, 0, 0xFFFF, this.offset);
                 this.offset += read;
-                if(!this.push(this.buffer.toString('utf8', 0, read))) {
+                if(!this.push(this.buffer!.toString('utf8', 0, read))) {
                     this.close();
                 }
             } catch (e) {

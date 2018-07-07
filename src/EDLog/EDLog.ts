@@ -130,6 +130,12 @@ import {
     IAfmuRepairs,
     IRepairDrone,
     IProgress,
+    IModuleInfo,
+    IMissions,
+    ICommander,
+    IReputation,
+    IStatistics,
+    INpcCrewPaidWage,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -150,7 +156,8 @@ export class EDEvent implements EDEvent {
     public readonly event: string;
     constructor (rawLog: RawLog) {
         Object.assign(this, rawLog);
-        this.timestamp = new Date(this.timestamp);
+        this.event = rawLog.event;
+        this.timestamp = new Date(rawLog.timestamp);
     }
 }
 
@@ -283,6 +290,12 @@ export type GameEvents = {
     'event:RefuelPartial': IRefuelPartial,
     'event:AfmuRepairs': IAfmuRepairs,
     'event:RepairDrone': IRepairDrone,
+    'event:ModuleInfo': IModuleInfo,
+    'event:Missions': IMissions,
+    'event:Commander': ICommander,
+    'event:Reputation': IReputation,
+    'event:Statistics': IStatistics,
+    'event:NpcCrewPaidWage': INpcCrewPaidWage,
 }
 
 export type Events = {
@@ -294,10 +307,10 @@ export type Events = {
 } & GameEvents;
 
 export class EDLog extends EventEmitter {
-    private fileStream: ContinuesReadStream;
-    private fileName: string;
-    private lineStream: ReadLine;
-    private backlog: EDEvent[];
+    private fileStream?: ContinuesReadStream;
+    private fileName?: string;
+    private lineStream?: ReadLine;
+    private backlog?: EDEvent[];
     private logReader = new EDLogReader();
 
     public emit<K extends keyof Events>(event: K, value: Events[K]): boolean {

@@ -5,9 +5,9 @@ import { Validator } from 'jsonschema';
 import { buildGenerator, getProgramFromFiles } from 'typescript-json-schema';
 
 function run() {
-
-    const program = getProgramFromFiles([join(__dirname, '../src/EDLog/events.ts')], {
-        strictNullChecks: true
+    const file = join(__dirname, '../src/EDLog/events.ts');
+    const program = getProgramFromFiles([file], {
+        strictNullChecks: true,
     });
 
     const generator = buildGenerator(program, {
@@ -16,15 +16,17 @@ function run() {
         // topRef: true,
     });
 
-    const schema = generator!.getSchemaForSymbols(generator!.getUserSymbols());
+    const schema = generator!.getSchemaForSymbols(generator!.getMainFileSymbols(program));
 
     const raw = new EDLogReader().read();
 
     const validator = new Validator();
+    const known = new Set<string>();
     validator.addSchema(schema, '/Events');
+    let errors = 0;
     raw.forEach(r => {
         // False positiv
-        if (r.event === 'Materials' || r.event === 'Loadout' || r.event === 'Scan') {
+        if (r.event === 'Scan') {
             return;
         }
         const interfaceName = `I${r.event}`;
@@ -32,8 +34,22 @@ function run() {
             allowUnknownAttributes: false,
         });
         if (!res.valid || res.errors.length > 0) {
-            console.log('Invalid schema', r, res.errors);
+            res.errors.forEach(e => {
+                if (known.has(e.message)) {
+                    return;
+                }
+                if (e.property.startsWith('instance.Modules[')) {
+                    return;
+                }
+                errors++;
+                console.log('Invalid schema', r, res.errors);
+                known.add(e.message)
+            });
+
+            if (res.errors.some(e => !known.has(e.message))) {
+            }
         }
     });
+    console.log('errors', errors);
 }
 run();

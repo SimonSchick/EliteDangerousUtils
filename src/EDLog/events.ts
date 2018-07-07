@@ -17,10 +17,16 @@ export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
 export type Power = 'Li Yong-Rui' | 'Felicia Winters' | 'Edmund Mahon' | 'Denton Patreus' | 'Zachary Hudson' | 'Zermina Torval' | 'Archon Delaine' | 'Aisling Duval' | 'A. Lavigny-Duval' | 'Pranav Antal' | 'Yuri Grom';
 export type FighterLoadout = 'zero' | 'two';
 
-export interface IBaseLocation extends IEventBase {
+export interface IVeryBaseLocation {
+    // TODO: Remove for 3.1
+    SystemAddress?: number;
     StarSystem: string;
+}
+
+export interface IBaseLocation extends IEventBase, IVeryBaseLocation {
     SystemAllegiance?: Allegiance | '';
     SystemEconomy: Economy;
+    SystemSecondEconomy?: Economy;
     SystemFaction?: string;
     FactionState?: FactionState;
     StarPos: EDPosition;
@@ -30,6 +36,7 @@ export interface IBaseLocation extends IEventBase {
     SystemGovernment: string;
 
     SystemEconomy_Localised?: string;
+    SystemSecondEconomy_Localised?: string;
     SystemGovernment_Localised: string;
     SystemSecurity_Localised: string;
     Factions?: any[];
@@ -67,6 +74,9 @@ export interface ILocation extends IBaseLocation {
         Influence: number;
         Allegiance: Allegiance;
     }[];
+    MarketID?: number;
+    // TODO: Remove this for 3.1
+    BodyID?: number;
 }
 
 export interface IReceiveText extends IEventBase {
@@ -121,6 +131,8 @@ export interface ILoadGame extends IEventBase {
     GameMode: 'Solo' | 'Group' | 'Open';
     Credits: number;
     Loan: number;
+    // TODO: Remove for 3.1
+    Horizons?: boolean;
 }
 
 /**
@@ -137,14 +149,13 @@ export interface IRank extends IEventBase {
 
 export interface IProgress extends IRank {}
 
-export interface ISupercruiseExit extends IEventBase {
-    StarSystem: string;
+export interface ISupercruiseExit extends IEventBase, IVeryBaseLocation {
     Body: string;
+    BodyID?: number;
     BodyType: BodyType;
 }
 
-export interface ISupercruiseEntry extends IEventBase {
-    StarSystem: string;
+export interface ISupercruiseEntry extends IEventBase, IVeryBaseLocation {
 }
 
 export interface ICommitCrime extends IEventBase {
@@ -305,6 +316,9 @@ export interface ISellExplorationData extends IEventBase {
 
 export interface IDockingEvent extends IEventBase {
     StationName: string;
+    // TODO: Remove for 3.1
+    StationType?: StationType;
+    MarketID?: number;
 }
 
 export interface IDockingGranted extends IDockingEvent {
@@ -347,6 +361,7 @@ export interface IMarketSell extends IMarketEvent {
 export interface IDockBase extends IEventBase {
     StationName: string;
     StationType: StationType;
+    MarketID?: number;
 }
 
 export interface IMissionAbandoned extends IEventBase {
@@ -354,10 +369,9 @@ export interface IMissionAbandoned extends IEventBase {
     MissionID: number;
 }
 
-export interface IDocked extends IDockBase {
+export interface IDocked extends IDockBase, IVeryBaseLocation {
     FactionState?: FactionState;
     StationServices?: string[];
-    StarSystem: string;
     StationFaction: string;
     FactionStation?: FactionState;
     StationGovernment: string; // TODO: type
@@ -367,6 +381,11 @@ export interface IDocked extends IDockBase {
     StationEconomy_Localised: string;
     CockpitBreach?: true;
     DistFromStarLS: number;
+    StationEconomies?: {
+        Name: string;
+        Name_Localised: string;
+        Proportion: number;
+    }[];
 }
 
 export interface IUndocked extends IDockBase {}
@@ -756,7 +775,7 @@ export interface IStar extends IScanBase {
 
 export interface IBody extends IScanBase {
     AxialTilt: number;
-    TidalLock?: 1;
+    TidalLock?: boolean;
     TerraformState: 'Terraformable' | 'Terraforming' | '' | null;
     PlanetClass: string;
     Atmosphere: string;
@@ -833,7 +852,7 @@ export interface IBaseModule {
 
 export interface IAmmoWeaponModule extends IBaseModule {
     AmmoInClip: number;
-    AmmoInHopper: number;
+    AmmoInHopper?: number;
 }
 
 export interface ILoadout extends IEventBase {
@@ -841,6 +860,9 @@ export interface ILoadout extends IEventBase {
     ShipID: number;
     ShipName: string;
     ShipIdent: string;
+    Rebuy?: number;
+    HullValue?: number;
+    ModulesValue?: number;
     Modules: (IBaseModule | IAmmoWeaponModule)[]
 }
 
@@ -848,7 +870,8 @@ export type IMaterials = {
     [K in MaterialType]: {
         Name: string;
         Count: number;
-    }
+        Name_Localised?: string;
+    }[];
 } & IEventBase;
 
 export interface ISetUserShipName extends IEventBase {
@@ -862,9 +885,8 @@ export interface ISuperCruiseJump extends IEventBase {
     JumpType: 'Supercruise';
 }
 
-export interface IHyperspaceJump extends IEventBase {
+export interface IHyperspaceJump extends IEventBase, IVeryBaseLocation {
     JumpType: 'Hyperspace';
-    StarSystem: string;
     StarClass: string;
 }
 
@@ -883,7 +905,7 @@ export interface ICrewMemberJoins extends ICrewEvent {}
 export interface ICrewLaunchFighter extends ICrewEvent {}
 
 export interface ICrewMemberRoleChange extends ICrewEvent {
-    Role: 'Idle' | 'FireCon';
+    Role: 'Idle' | 'FireCon' | 'FighterCon';
 }
 
 export interface ICrewMemberQuits extends ICrewEvent {}
@@ -962,4 +984,143 @@ export interface IAfmuRepairs extends IEventBase {
 
 export interface IRepairDrone extends IEventBase {
     HullRepaired: number;
+}
+
+export interface IModuleInfo extends IEventBase {
+
+}
+
+export interface IMissions extends IEventBase {
+    Active: any[];
+    Failed: any[];
+    Complete: any[];
+}
+
+export interface ICommander extends IEventBase {
+    Name: string;
+}
+
+export interface IReputation extends IEventBase {
+    Empire: number;
+    Federation: number;
+    Alliance: number;
+    Independent: number;
+}
+
+export interface IStatistics extends IEventBase {
+    Bank_Account:{
+       Current_Wealth: number;
+       Spent_On_Ships: number;
+       Spent_On_Outfitting: number;
+       Spent_On_Repairs: number;
+       Spent_On_Fuel: number;
+       Spent_On_Ammo_Consumables: number;
+       Insurance_Claims: number;
+       Spent_On_Insurance: number
+    };
+    Combat:{
+       Bounties_Claimed: number;
+       Bounty_Hunting_Profit: number;
+       Combat_Bonds: number;
+       Combat_Bond_Profits: number;
+       Assassinations: number;
+       Assassination_Profits: number;
+       Highest_Single_Reward: number;
+       Skimmers_Killed: number
+    };
+    Crime:{
+       Notoriety: number;
+       Fines: number;
+       Total_Fines: number;
+       Bounties_Received: number;
+       Total_Bounties: number;
+       Highest_Bounty: number
+    };
+    Smuggling:{
+       Black_Markets_Traded_With: number;
+       Black_Markets_Profits: number;
+       Resources_Smuggled: number;
+       Average_Profit: number;
+       Highest_Single_Transaction: number
+    };
+    Trading:{
+       Markets_Traded_With: number;
+       Market_Profits: number;
+       Resources_Traded: number;
+       Average_Profit: number;
+       Highest_Single_Transaction: number
+    };
+    Mining:{
+       Mining_Profits: number;
+       Quantity_Mined: number;
+       Materials_Collected: number
+    };
+    Exploration:{
+       Systems_Visited: number;
+       Exploration_Profits: number;
+       Planets_Scanned_To_Level_2: number;
+       Planets_Scanned_To_Level_3: number;
+       Highest_Payout: number;
+       Total_Hyperspace_Distance: number;
+       Total_Hyperspace_Jumps: number;
+       Greatest_Distance_From_Start: number;
+       Time_Played: number
+    };
+    Passengers:{
+       Passengers_Missions_Accepted: number;
+       Passengers_Missions_Disgruntled: number;
+       Passengers_Missions_Bulk: number;
+       Passengers_Missions_VIP: number;
+       Passengers_Missions_Delivered: number;
+       Passengers_Missions_Ejected: number
+    };
+    Search_And_Rescue:{
+       SearchRescue_Traded: number;
+       SearchRescue_Profit: number;
+       SearchRescue_Count: number
+    };
+    TG_ENCOUNTERS:{
+       TG_ENCOUNTER_TOTAL: number;
+       TG_ENCOUNTER_TOTAL_LAST_SYSTEM: string;
+       TG_ENCOUNTER_TOTAL_LAST_TIMESTAMP: string;
+       TG_ENCOUNTER_TOTAL_LAST_SHIP: string;
+       TG_SCOUT_COUNT: number
+    };
+    Crafting:{
+       Count_Of_Used_Engineers: number;
+       Recipes_Generated: number;
+       Recipes_Generated_Rank_1: number;
+       Recipes_Generated_Rank_2: number;
+       Recipes_Generated_Rank_3: number;
+       Recipes_Generated_Rank_4: number;
+       Recipes_Generated_Rank_5: number
+    };
+    Crew:{
+       NpcCrew_TotalWages: number;
+       NpcCrew_Hired: number
+    };
+    Multicrew:{
+       Multicrew_Time_Total: number;
+       Multicrew_Gunner_Time_Total: number;
+       Multicrew_Fighter_Time_Total: number;
+       Multicrew_Credits_Total: number;
+       Multicrew_Fines_Total: number
+    };
+    Material_Trader_Stats:{
+       Trades_Completed: number;
+       Materials_Traded: number
+    };
+    CQC:{
+       CQC_Credits_Earned: number;
+       CQC_Time_Played: number;
+       CQC_KD: number;
+       CQC_Kills: number;
+       CQC_WL: number
+    }
+ }
+
+ export interface INpcCrewPaidWage extends IEventBase {
+    NpcCrewName: string,
+    NpcCrewId: number;
+    Amount: number;
 }

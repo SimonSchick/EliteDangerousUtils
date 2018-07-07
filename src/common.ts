@@ -259,6 +259,8 @@ export type OptionalSlots =
     'Paintjob' | Slots;
 
 export type MandatorySlots =
+    'ShipCockpit' |
+    'CargoHatch' |
     'Armour' |
     'PowerPlant' |
     'MainEngines' |

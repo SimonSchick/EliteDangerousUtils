@@ -258,8 +258,8 @@ export class EDCompanionAPI {
      * @param A cookie store used to avoid login in repetetly.
      * @param Asyncronously provides credentials.
      */
-    constructor (private httpRequest: HTTPClient, jar: ICookieStore | string, private credentialFetcher: ICredentialsFetcher) {
-        this.requestOptions.jar = jar;
+    constructor (private httpRequest: HTTPClient, jar: ICookieStore, private credentialFetcher: ICredentialsFetcher) {
+        this.requestOptions.jar = <any> jar;
     }
 
     /**

@@ -5,8 +5,8 @@ import { readdirSync, readFileSync } from "fs";
 
 export class EDLogReader {
     public static readonly fileMatcher = /Journal\.(\d+)\.\d+.log$/;
-    private files: string[];
-    private home: string;
+    private files?: string[];
+    private home?: string;
 
     public getDir(): string {
         if (this.home) {
