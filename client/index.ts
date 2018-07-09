@@ -101,7 +101,6 @@ class Client {
         .on('event:Location', event => this.onLocation(event))
         .on('file', ev => console.log(ev.file))
         .on('event', ev => {
-            console.log('event', ev.event);
             if (!this.knownEvents) {
                 throw new Error('Events not loaded');
             }

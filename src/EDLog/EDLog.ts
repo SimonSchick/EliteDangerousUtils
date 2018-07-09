@@ -141,6 +141,15 @@ import {
     IStatus,
     IModuleInfo,
     IModulesInfo,
+    IStoredShips,
+    IStoredModules,
+    IShipTargeted,
+    IShutdown,
+    IUnderAttack,
+    IDiscoveryScan,
+    IApproachBody,
+    IFighterRebuilt,
+    ILeaveBody,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -299,6 +308,16 @@ export type GameEvents = {
     'event:Reputation': IReputation,
     'event:Statistics': IStatistics,
     'event:NpcCrewPaidWage': INpcCrewPaidWage,
+    'event:StoredShips': IStoredShips,
+    'event:StoredModules': IStoredModules,
+    'event:ShipTargeted': IShipTargeted,
+    'event:Shutdown': IShutdown,
+    'event:UnderAttack': IUnderAttack,
+    'event:DiscoveryScan': IDiscoveryScan,
+    'event:ApproachBody': IApproachBody,
+    'event:FighterRebuilt': IFighterRebuilt,
+    'event:LeaveBody': ILeaveBody,
+    // stuff
     'event:Market': IMarket,
     'event:Shipyard': IShipyard,
     'event:Outfitting': IOutfitting,
