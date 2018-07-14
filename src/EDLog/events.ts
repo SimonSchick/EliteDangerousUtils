@@ -10,7 +10,7 @@ export type StationType = 'Orbis' | 'Coriolis' | 'Bernal' | 'Outpost' | 'Surface
 export type Faction = 'Empire' | 'Alliance' | 'Federation' | 'PilotsFederation' | 'Guardian';
 export type Allegiance = 'None' | 'Independent' | Faction;
 export type FactionState = 'None' | 'Retreat' | 'Lockdown' | 'CivilUnrest' | 'CivilWar' | 'Boom' | 'Expansion' | 'Bust' | 'Famine' | 'Election' | 'Investment' | 'Outbreak'| 'War';
-export type Economy = '$economy_None;' | '$economy_Colony;' | '$economy_Agri;' | '$economy_HighTech;' | '$economy_Extraction;' | '$economy_Industrial;' | '$economy_Military;' | '$economy_Refinery;' |'$economy_Terraforming;' | '$economy_Service;';
+export type Economy = '$economy_None;' | '$economy_Colony;' | '$economy_Agri;' | '$economy_HighTech;' | '$economy_Extraction;' | '$economy_Industrial;' | '$economy_Military;' | '$economy_Refinery;' |'$economy_Terraforming;' | '$economy_Service;' | '$economy_Repair;';
 export type Security = '$SYSTEM_SECURITY_low;' | '$SYSTEM_SECURITY_medium;' | '$SYSTEM_SECURITY_high;';
 export type BodyType = 'Star' | 'Planet' | 'Station' | 'PlanetaryRing' | 'StellarRing' | 'Null' | 'AsteroidCluster';
 export type MaterialType = 'Encoded' | 'Manufactured' | 'Raw';
@@ -324,6 +324,7 @@ export interface ISellExplorationData extends IEventBase {
     Discovered: string[];
     BaseValue: number;
     Bonus: number;
+    TotalEarnings: number;
 }
 
 export interface IDockingEvent extends IEventBase {
@@ -374,6 +375,7 @@ export interface IMarketSell extends IMarketEvent {
 export interface IDockBase extends IEventBase {
     StationName: string;
     StationType: StationType;
+    StationState?: 'UnderRepairs';
     MarketID?: number;
 }
 
@@ -444,7 +446,7 @@ export interface IEngineerCraft extends IEngineerEvent {
         Name: string;
         Name_Localised?: string;
         Count: number;
-    }[]
+    }[];
     Modifiers: {
         Label: string;
         Value: number;
@@ -454,6 +456,9 @@ export interface IEngineerCraft extends IEngineerEvent {
     Quality: number;
     Module: string;
     Slot: string;
+    ApplyExperimentalEffect?: string;
+    ExperimentalEffect?: string;
+    ExperimentalEffect_Localised?: string;
 }
 
 export interface IEngineerApply extends IEngineerEvent {
@@ -667,6 +672,7 @@ export interface IPowerplaySalary extends IEventBase {
 }
 
 export interface ICrewAssign extends IEventBase {
+    CrewID?: number;
     Name: string;
     Role: 'Active'; // TODO: More
 }
@@ -763,6 +769,8 @@ export interface ICommunityGoalReward extends ICommunityEventbase {
 }
 
 export interface IPayFines extends IEventBase {
+    AllFines?: true;
+    ShipID: number;
     Amount: number;
 }
 
@@ -861,7 +869,7 @@ export interface IMiningRefined extends IEventBase {
 export interface ICockpitBreached extends IEventBase {}
 
 export interface IDronesEvent extends IEventBase {
-    Type: "Drones";
+    Type: 'Drones';
     Count: number;
 }
 
@@ -1001,9 +1009,10 @@ export interface IMusic extends IEventBase {
     'SystemMap' |
     'Supercruise' |
     'DestinationFromSupercruise' |
+    'GalacticPowers' |
     'Exploration' |
     'GalaxyMap' |
-    'Combat_Dogfight' | 'Combat_LargeDogFight' |
+    'Combat_Dogfight' | 'Combat_LargeDogFight' | 'Combat_SRV' |
     'DestinationFromHyperspace' |
     'Unknown_Encounter' | 'GuardianSites' |
     'Combat_Unknown' |
@@ -1164,7 +1173,9 @@ export interface IStatistics extends IEventBase {
        Trades_Completed: number;
        Materials_Traded: number;
        Encoded_Materials_Traded?: number;
+       Raw_Materials_Traded?: number;
        Grade_1_Materials_Traded?: number;
+       Grade_2_Materials_Traded?: number;
        Grade_3_Materials_Traded?: number;
        Grade_4_Materials_Traded?: number;
        Grade_5_Materials_Traded?: number;
@@ -1310,7 +1321,7 @@ export interface IFighterRebuilt extends IEventBase {
 
 export interface IMaterialExchange {
     Material: string;
-    Material_Localised: string;
+    Material_Localised?: string;
     Category: string;
     Category_Localised: string;
     Quantity: number;
@@ -1318,9 +1329,29 @@ export interface IMaterialExchange {
 
 export interface IMaterialTrade extends IEventBase {
     MarketID: number;
-    TraderType: 'encoded';
+    TraderType: 'encoded' | 'raw' | 'manufactured';
     Paid: IMaterialExchange;
     Received: IMaterialExchange;
+}
+
+export interface ITechnologyBroker extends IEventBase {
+    BrokerType: 'guardian' | 'human';
+    MarketID: number;
+    ItemsUnlocked: {
+        Name: string;
+        Name_Localised: string;
+    }[];
+    Commodities: {
+        Name: string;
+        Name_Localised?: string;
+        Count: number;
+     }[];
+    Materials: {
+        Name: string;
+        Name_Localised?: string;
+        Count: number;
+        Category: MaterialType;
+    }[];
 }
 
 // Stat events

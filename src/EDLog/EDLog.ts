@@ -150,6 +150,8 @@ import {
     IApproachBody,
     IFighterRebuilt,
     ILeaveBody,
+    ITechnologyBroker,
+    IMaterialTrade,
 } from './events';
 import * as fs from 'fs';
 import { EventEmitter } from 'events';
@@ -317,6 +319,8 @@ export type GameEvents = {
     'event:ApproachBody': IApproachBody,
     'event:FighterRebuilt': IFighterRebuilt,
     'event:LeaveBody': ILeaveBody,
+    'event:TechnologyBroker': ITechnologyBroker,
+    'event:MaterialTrade': IMaterialTrade,
     // stuff
     'event:Market': IMarket,
     'event:Shipyard': IShipyard,
