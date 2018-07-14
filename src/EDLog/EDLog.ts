@@ -1,168 +1,167 @@
-import { EDLogReader } from './EDLogReader';
-import { ContinuesReadStream } from './ContinousReadStream';
-import {
-    IApproachSettlement,
-    IBounty,
-    IBuyAmmo,
-    IBuyDrones,
-    IBuyExplorationData,
-    IBuyTradeData,
-    ICapShipBond,
-    ICargo,
-    IChangeCrewRole,
-    IClearSavedGame,
-    ICockpitBreached,
-    ICollectCargo,
-    ICommitCrime,
-    ICommunityGoalDiscard,
-    ICommunityGoalJoin,
-    ICommunityGoalReward,
-    ICrewAssign,
-    ICrewHire,
-    ICrewLaunchFighter,
-    ICrewMemberJoins,
-    ICrewMemberQuits,
-    ICrewMemberRoleChange,
-    IDataScanned,
-    IDatalinkScan,
-    IDatalinkVoucher,
-    IDied,
-    IDockFighter,
-    IDockSRV,
-    IDocked,
-    IDockingCancelled,
-    IDockingDenied,
-    IDockingGranted,
-    IDockingRequested,
-    IDockingTimeout,
-    IEjectCargo,
-    IEndCrewSession,
-    IEngineerApply,
-    IEngineerCraft,
-    IEngineerProgress,
-    IEscapeInterdiction,
-    IFSDJump,
-    IFactionKillBond,
-    IFetchRemoteModule,
-    IFileheader,
-    IFriends,
-    IFuelScoop,
-    IHeatDamage,
-    IHeatWarning,
-    IHullDamage,
-    IInterdicted,
-    IInterdiction,
-    IJetConeBoost,
-    IJetConeDamage,
-    IJoinACrew,
-    IKickCrewMember,
-    ILaunchFighter,
-    ILaunchSRV,
-    ILiftoff,
-    ILoadGame,
-    ILoadout,
-    ILocation,
-    ILogFileSwap,
-    IMarketBuy,
-    IMarketSell,
-    IMassModuleStore,
-    IMaterialCollected,
-    IMaterialDiscarded,
-    IMaterialDiscovered,
-    IMaterials,
-    IMiningRefined,
-    IMissionAbandoned,
-    IMissionAccepted,
-    IMissionCompleted,
-    IMissionFailed,
-    IModuleBuy,
-    IModuleRetrieve,
-    IModuleSell,
-    IModuleSellRemote,
-    IModuleStore,
-    IModuleSwap,
-    IMusic,
-    INewCommander,
-    IPVPKill,
-    IPassengers,
-    IPayFines,
-    IPayLegacyFines,
-    IPowerplayJoin,
-    IPowerplaySalary,
-    IPromotion,
-    IQuitACrew,
-    IRank,
-    IRebootRepair,
-    IReceiveText,
-    IRedeemVoucher,
-    IRefuelAll,
-    IRepair,
-    IRepairAll,
-    IRestockVehicle,
-    IResurrect,
-    IScan,
-    IScanned,
-    IScreenshot,
-    ISelfDestruct,
-    ISellDrones,
-    ISellExplorationData,
-    ISendText,
-    ISetUserShipName,
-    IShieldState,
-    IShipyardBuy,
-    IShipyardNew,
-    IShipyardSell,
-    IShipyardSwap,
-    IShipyardTransfer,
-    IStartJump,
-    ISupercruiseEntry,
-    ISupercruiseExit,
-    ISynthesis,
-    ITouchdown,
-    IUSSDrop,
-    IUndocked,
-    IVehicleSwitch,
-    IWingAdd,
-    IWingInvite,
-    IWingJoin,
-    IWingLeave,
-    IRefuelPartial,
-    IAfmuRepairs,
-    IRepairDrone,
-    IProgress,
-    IMissions,
-    ICommander,
-    IReputation,
-    IStatistics,
-    INpcCrewPaidWage,
-    IMarket,
-    IShipyard,
-    IOutfitting,
-    IStatus,
-    IModuleInfo,
-    IModulesInfo,
-    IStoredShips,
-    IStoredModules,
-    IShipTargeted,
-    IShutdown,
-    IUnderAttack,
-    IDiscoveryScan,
-    IApproachBody,
-    IFighterRebuilt,
-    ILeaveBody,
-    ITechnologyBroker,
-    IMaterialTrade,
-} from './events';
-import * as fs from 'fs';
 import { EventEmitter } from 'events';
+import { FSWatcher, readFileSync, statSync, watch } from 'fs';
 import { join } from 'path';
-import { ReadLine, createInterface } from 'readline';
+import { createInterface, ReadLine } from 'readline';
 import { findLast } from '../util/findLast';
+import { ContinuesReadStream } from './ContinousReadStream';
 import { directory } from './directory';
-import { FSWatcher, watch, readFileSync, statSync } from 'fs';
 import { EDEvent } from './EDEvent';
+import { EDLogReader } from './EDLogReader';
+import {
+    AfmuRepairs,
+    ApproachBody,
+    ApproachSettlement,
+    Bounty,
+    BuyAmmo,
+    BuyDrones,
+    BuyExplorationData,
+    BuyTradeData,
+    CapShipBond,
+    Cargo,
+    ChangeCrewRole,
+    ClearSavedGame,
+    CockpitBreached,
+    CollectCargo,
+    Commander,
+    CommitCrime,
+    CommunityGoalDiscard,
+    CommunityGoalJoin,
+    CommunityGoalReward,
+    CrewAssign,
+    CrewHire,
+    CrewLaunchFighter,
+    CrewMemberJoins,
+    CrewMemberQuits,
+    CrewMemberRoleChange,
+    DatalinkScan,
+    DatalinkVoucher,
+    DataScanned,
+    Died,
+    DiscoveryScan,
+    Docked,
+    DockFighter,
+    DockingCancelled,
+    DockingDenied,
+    DockingGranted,
+    DockingRequested,
+    DockingTimeout,
+    DockSRV,
+    EjectCargo,
+    EndCrewSession,
+    EngineerApply,
+    EngineerCraft,
+    EngineerProgress,
+    EscapeInterdiction,
+    FactionKillBond,
+    FetchRemoteModule,
+    FighterRebuilt,
+    Fileheader,
+    Friends,
+    FSDJump,
+    FuelScoop,
+    HeatDamage,
+    HeatWarning,
+    HullDamage,
+    Interdicted,
+    Interdiction,
+    JetConeBoost,
+    JetConeDamage,
+    JoinACrew,
+    KickCrewMember,
+    LaunchFighter,
+    LaunchSRV,
+    LeaveBody,
+    Liftoff,
+    LoadGame,
+    Loadout,
+    Location,
+    LogFileSwap,
+    Market,
+    MarketBuy,
+    MarketSell,
+    MassModuleStore,
+    MaterialCollected,
+    MaterialDiscarded,
+    MaterialDiscovered,
+    Materials,
+    MaterialTrade,
+    MiningRefined,
+    MissionAbandoned,
+    MissionAccepted,
+    MissionCompleted,
+    MissionFailed,
+    Missions,
+    ModuleBuy,
+    ModuleInfo,
+    ModuleRetrieve,
+    ModuleSell,
+    ModuleSellRemote,
+    ModulesInfo,
+    ModuleStore,
+    ModuleSwap,
+    Music,
+    NewCommander,
+    NpcCrewPaidWage,
+    Outfitting,
+    Passengers,
+    PayFines,
+    PayLegacyFines,
+    PowerplayJoin,
+    PowerplaySalary,
+    Progress,
+    Promotion,
+    PVPKill,
+    QuitACrew,
+    Rank,
+    RebootRepair,
+    ReceiveText,
+    RedeemVoucher,
+    RefuelAll,
+    RefuelPartial,
+    Repair,
+    RepairAll,
+    RepairDrone,
+    Reputation,
+    RestockVehicle,
+    Resurrect,
+    Scan,
+    Scanned,
+    Screenshot,
+    SelfDestruct,
+    SellDrones,
+    SellExplorationData,
+    SendText,
+    SetUserShipName,
+    ShieldState,
+    ShipTargeted,
+    Shipyard,
+    ShipyardBuy,
+    ShipyardNew,
+    ShipyardSell,
+    ShipyardSwap,
+    ShipyardTransfer,
+    Shutdown,
+    StartJump,
+    Statistics,
+    Status,
+    StoredModules,
+    StoredShips,
+    SupercruiseEntry,
+    SupercruiseExit,
+    Synthesis,
+    TechnologyBroker,
+    Touchdown,
+    UnderAttack,
+    Undocked,
+    USSDrop,
+    VehicleSwitch,
+    WingAdd,
+    WingInvite,
+    WingJoin,
+    WingLeave,
+} from './events';
 
-export interface IBacklogOptions {
+export interface BacklogOptions {
     /**
      * If true the method will return an array of event logs, otherwise empty.
      */
@@ -174,165 +173,164 @@ export interface IBacklogOptions {
     store?: boolean;
 }
 
-
-export type GameEvents = {
-    'event:ApproachSettlement': IApproachSettlement,
-    'event:Bounty': IBounty,
-    'event:BuyAmmo': IBuyAmmo,
-    'event:BuyDrones': IBuyDrones,
-    'event:BuyExplorationData': IBuyExplorationData,
-    'event:BuyTradeData': IBuyTradeData,
-    'event:CapShipBond': ICapShipBond,
-    'event:Cargo': ICargo,
-    'event:ChangeCrewRole': IChangeCrewRole,
-    'event:ClearSavedGame': IClearSavedGame,
-    'event:CockpitBreached': ICockpitBreached,
-    'event:CollectCargo': ICollectCargo,
-    'event:CommitCrime': ICommitCrime,
-    'event:CommunityGoalDiscard': ICommunityGoalDiscard,
-    'event:CommunityGoalJoin': ICommunityGoalJoin,
-    'event:CommunityGoalReward': ICommunityGoalReward,
-    'event:CrewAssign': ICrewAssign,
-    'event:CrewHire': ICrewHire,
-    'event:CrewLaunchFighter': ICrewLaunchFighter,
-    'event:CrewMemberJoins': ICrewMemberJoins,
-    'event:CrewMemberQuits': ICrewMemberQuits,
-    'event:CrewMemberRoleChange': ICrewMemberRoleChange,
-    'event:DataScanned': IDataScanned,
-    'event:DatalinkScan': IDatalinkScan,
-    'event:DatalinkVoucher': IDatalinkVoucher,
-    'event:Died': IDied,
-    'event:DockFighter': IDockFighter,
-    'event:DockSRV': IDockSRV,
-    'event:Docked': IDocked,
-    'event:DockingCancelled': IDockingCancelled,
-    'event:DockingDenied': IDockingDenied,
-    'event:DockingGranted': IDockingGranted,
-    'event:DockingRequested': IDockingRequested,
-    'event:DockingTimeout': IDockingTimeout,
-    'event:EjectCargo': IEjectCargo,
-    'event:EndCrewSession': IEndCrewSession,
-    'event:EngineerApply': IEngineerApply,
-    'event:EngineerCraft': IEngineerCraft,
-    'event:EngineerProgress': IEngineerProgress,
-    'event:EscapeInterdiction': IEscapeInterdiction,
-    'event:FSDJump': IFSDJump,
-    'event:FactionKillBond': IFactionKillBond,
-    'event:FetchRemoteModule': IFetchRemoteModule,
-    'event:Fileheader': IFileheader,
-    'event:Friends': IFriends,
-    'event:FuelScoop': IFuelScoop,
-    'event:HeatDamage': IHeatDamage,
-    'event:HeatWarning': IHeatWarning,
-    'event:HullDamage': IHullDamage,
-    'event:Interdicted': IInterdicted,
-    'event:Interdiction': IInterdiction,
-    'event:JetConeBoost': IJetConeBoost,
-    'event:JetConeDamage': IJetConeDamage,
-    'event:JoinACrew': IJoinACrew,
-    'event:KickCrewMember': IKickCrewMember,
-    'event:LaunchFighter': ILaunchFighter,
-    'event:LaunchSRV': ILaunchSRV,
-    'event:Liftoff': ILiftoff,
-    'event:LoadGame': ILoadGame,
-    'event:Loadout': ILoadout,
-    'event:Location': ILocation,
-    'event:MarketBuy': IMarketBuy,
-    'event:MarketSell': IMarketSell,
-    'event:MassModuleStore': IMassModuleStore,
-    'event:MaterialCollected': IMaterialCollected,
-    'event:MaterialDiscarded': IMaterialDiscarded,
-    'event:MaterialDiscovered': IMaterialDiscovered,
-    'event:Materials': IMaterials,
-    'event:MiningRefined': IMiningRefined,
-    'event:MissionAbandoned': IMissionAbandoned,
-    'event:MissionAccepted': IMissionAccepted,
-    'event:MissionCompleted': IMissionCompleted,
-    'event:MissionFailed': IMissionFailed,
-    'event:ModuleBuy': IModuleBuy,
-    'event:ModuleRetrieve': IModuleRetrieve,
-    'event:ModuleSell': IModuleSell,
-    'event:ModuleSellRemote': IModuleSellRemote,
-    'event:ModuleStore': IModuleStore,
-    'event:ModuleSwap': IModuleSwap,
-    'event:Music': IMusic,
-    'event:NewCommander': INewCommander,
-    'event:PVPKill': IPVPKill,
-    'event:Passengers': IPassengers,
-    'event:PayFines': IPayFines,
-    'event:PayLegacyFines': IPayLegacyFines,
-    'event:PowerplayJoin': IPowerplayJoin,
-    'event:PowerplaySalary': IPowerplaySalary,
-    'event:Progress': IProgress,
-    'event:Promotion': IPromotion,
-    'event:QuitACrew': IQuitACrew,
-    'event:Rank': IRank,
-    'event:RebootRepair': IRebootRepair,
-    'event:ReceiveText': IReceiveText,
-    'event:RedeemVoucher': IRedeemVoucher,
-    'event:RefuelAll': IRefuelAll,
-    'event:Repair': IRepair,
-    'event:RepairAll': IRepairAll,
-    'event:RestockVehicle': IRestockVehicle,
-    'event:Resurrect': IResurrect,
-    'event:Scan': IScan,
-    'event:Scanned': IScanned,
-    'event:Screenshot': IScreenshot,
-    'event:SelfDestruct': ISelfDestruct,
-    'event:SellDrones': ISellDrones,
-    'event:SellExplorationData': ISellExplorationData,
-    'event:SendText': ISendText,
-    'event:SetUserShipName': ISetUserShipName,
-    'event:ShieldState': IShieldState,
-    'event:ShipyardBuy': IShipyardBuy,
-    'event:ShipyardNew': IShipyardNew,
-    'event:ShipyardSell': IShipyardSell,
-    'event:ShipyardSwap': IShipyardSwap,
-    'event:ShipyardTransfer': IShipyardTransfer,
-    'event:StartJump': IStartJump,
-    'event:SupercruiseEntry': ISupercruiseEntry,
-    'event:SupercruiseExit': ISupercruiseExit,
-    'event:Synthesis': ISynthesis,
-    'event:Touchdown': ITouchdown,
-    'event:USSDrop': IUSSDrop,
-    'event:ModuleInfo': IModuleInfo,
-    'event:Undocked': IUndocked,
-    'event:VehicleSwitch': IVehicleSwitch,
-    'event:WingAdd': IWingAdd,
-    'event:WingInvite': IWingInvite,
-    'event:WingJoin': IWingJoin,
-    'event:WingLeave': IWingLeave,
-    'event:RefuelPartial': IRefuelPartial,
-    'event:AfmuRepairs': IAfmuRepairs,
-    'event:RepairDrone': IRepairDrone,
-    'event:Missions': IMissions,
-    'event:Commander': ICommander,
-    'event:Reputation': IReputation,
-    'event:Statistics': IStatistics,
-    'event:NpcCrewPaidWage': INpcCrewPaidWage,
-    'event:StoredShips': IStoredShips,
-    'event:StoredModules': IStoredModules,
-    'event:ShipTargeted': IShipTargeted,
-    'event:Shutdown': IShutdown,
-    'event:UnderAttack': IUnderAttack,
-    'event:DiscoveryScan': IDiscoveryScan,
-    'event:ApproachBody': IApproachBody,
-    'event:FighterRebuilt': IFighterRebuilt,
-    'event:LeaveBody': ILeaveBody,
-    'event:TechnologyBroker': ITechnologyBroker,
-    'event:MaterialTrade': IMaterialTrade,
+export interface GameEvents {
+    'event:ApproachSettlement': ApproachSettlement;
+    'event:Bounty': Bounty;
+    'event:BuyAmmo': BuyAmmo;
+    'event:BuyDrones': BuyDrones;
+    'event:BuyExplorationData': BuyExplorationData;
+    'event:BuyTradeData': BuyTradeData;
+    'event:CapShipBond': CapShipBond;
+    'event:Cargo': Cargo;
+    'event:ChangeCrewRole': ChangeCrewRole;
+    'event:ClearSavedGame': ClearSavedGame;
+    'event:CockpitBreached': CockpitBreached;
+    'event:CollectCargo': CollectCargo;
+    'event:CommitCrime': CommitCrime;
+    'event:CommunityGoalDiscard': CommunityGoalDiscard;
+    'event:CommunityGoalJoin': CommunityGoalJoin;
+    'event:CommunityGoalReward': CommunityGoalReward;
+    'event:CrewAssign': CrewAssign;
+    'event:CrewHire': CrewHire;
+    'event:CrewLaunchFighter': CrewLaunchFighter;
+    'event:CrewMemberJoins': CrewMemberJoins;
+    'event:CrewMemberQuits': CrewMemberQuits;
+    'event:CrewMemberRoleChange': CrewMemberRoleChange;
+    'event:DataScanned': DataScanned;
+    'event:DatalinkScan': DatalinkScan;
+    'event:DatalinkVoucher': DatalinkVoucher;
+    'event:Died': Died;
+    'event:DockFighter': DockFighter;
+    'event:DockSRV': DockSRV;
+    'event:Docked': Docked;
+    'event:DockingCancelled': DockingCancelled;
+    'event:DockingDenied': DockingDenied;
+    'event:DockingGranted': DockingGranted;
+    'event:DockingRequested': DockingRequested;
+    'event:DockingTimeout': DockingTimeout;
+    'event:EjectCargo': EjectCargo;
+    'event:EndCrewSession': EndCrewSession;
+    'event:EngineerApply': EngineerApply;
+    'event:EngineerCraft': EngineerCraft;
+    'event:EngineerProgress': EngineerProgress;
+    'event:EscapeInterdiction': EscapeInterdiction;
+    'event:FSDJump': FSDJump;
+    'event:FactionKillBond': FactionKillBond;
+    'event:FetchRemoteModule': FetchRemoteModule;
+    'event:Fileheader': Fileheader;
+    'event:Friends': Friends;
+    'event:FuelScoop': FuelScoop;
+    'event:HeatDamage': HeatDamage;
+    'event:HeatWarning': HeatWarning;
+    'event:HullDamage': HullDamage;
+    'event:Interdicted': Interdicted;
+    'event:Interdiction': Interdiction;
+    'event:JetConeBoost': JetConeBoost;
+    'event:JetConeDamage': JetConeDamage;
+    'event:JoinACrew': JoinACrew;
+    'event:KickCrewMember': KickCrewMember;
+    'event:LaunchFighter': LaunchFighter;
+    'event:LaunchSRV': LaunchSRV;
+    'event:Liftoff': Liftoff;
+    'event:LoadGame': LoadGame;
+    'event:Loadout': Loadout;
+    'event:Location': Location;
+    'event:MarketBuy': MarketBuy;
+    'event:MarketSell': MarketSell;
+    'event:MassModuleStore': MassModuleStore;
+    'event:MaterialCollected': MaterialCollected;
+    'event:MaterialDiscarded': MaterialDiscarded;
+    'event:MaterialDiscovered': MaterialDiscovered;
+    'event:Materials': Materials;
+    'event:MiningRefined': MiningRefined;
+    'event:MissionAbandoned': MissionAbandoned;
+    'event:MissionAccepted': MissionAccepted;
+    'event:MissionCompleted': MissionCompleted;
+    'event:MissionFailed': MissionFailed;
+    'event:ModuleBuy': ModuleBuy;
+    'event:ModuleRetrieve': ModuleRetrieve;
+    'event:ModuleSell': ModuleSell;
+    'event:ModuleSellRemote': ModuleSellRemote;
+    'event:ModuleStore': ModuleStore;
+    'event:ModuleSwap': ModuleSwap;
+    'event:Music': Music;
+    'event:NewCommander': NewCommander;
+    'event:PVPKill': PVPKill;
+    'event:Passengers': Passengers;
+    'event:PayFines': PayFines;
+    'event:PayLegacyFines': PayLegacyFines;
+    'event:PowerplayJoin': PowerplayJoin;
+    'event:PowerplaySalary': PowerplaySalary;
+    'event:Progress': Progress;
+    'event:Promotion': Promotion;
+    'event:QuitACrew': QuitACrew;
+    'event:Rank': Rank;
+    'event:RebootRepair': RebootRepair;
+    'event:ReceiveText': ReceiveText;
+    'event:RedeemVoucher': RedeemVoucher;
+    'event:RefuelAll': RefuelAll;
+    'event:Repair': Repair;
+    'event:RepairAll': RepairAll;
+    'event:RestockVehicle': RestockVehicle;
+    'event:Resurrect': Resurrect;
+    'event:Scan': Scan;
+    'event:Scanned': Scanned;
+    'event:Screenshot': Screenshot;
+    'event:SelfDestruct': SelfDestruct;
+    'event:SellDrones': SellDrones;
+    'event:SellExplorationData': SellExplorationData;
+    'event:SendText': SendText;
+    'event:SetUserShipName': SetUserShipName;
+    'event:ShieldState': ShieldState;
+    'event:ShipyardBuy': ShipyardBuy;
+    'event:ShipyardNew': ShipyardNew;
+    'event:ShipyardSell': ShipyardSell;
+    'event:ShipyardSwap': ShipyardSwap;
+    'event:ShipyardTransfer': ShipyardTransfer;
+    'event:StartJump': StartJump;
+    'event:SupercruiseEntry': SupercruiseEntry;
+    'event:SupercruiseExit': SupercruiseExit;
+    'event:Synthesis': Synthesis;
+    'event:Touchdown': Touchdown;
+    'event:USSDrop': USSDrop;
+    'event:ModuleInfo': ModuleInfo;
+    'event:Undocked': Undocked;
+    'event:VehicleSwitch': VehicleSwitch;
+    'event:WingAdd': WingAdd;
+    'event:WingInvite': WingInvite;
+    'event:WingJoin': WingJoin;
+    'event:WingLeave': WingLeave;
+    'event:RefuelPartial': RefuelPartial;
+    'event:AfmuRepairs': AfmuRepairs;
+    'event:RepairDrone': RepairDrone;
+    'event:Missions': Missions;
+    'event:Commander': Commander;
+    'event:Reputation': Reputation;
+    'event:Statistics': Statistics;
+    'event:NpcCrewPaidWage': NpcCrewPaidWage;
+    'event:StoredShips': StoredShips;
+    'event:StoredModules': StoredModules;
+    'event:ShipTargeted': ShipTargeted;
+    'event:Shutdown': Shutdown;
+    'event:UnderAttack': UnderAttack;
+    'event:DiscoveryScan': DiscoveryScan;
+    'event:ApproachBody': ApproachBody;
+    'event:FighterRebuilt': FighterRebuilt;
+    'event:LeaveBody': LeaveBody;
+    'event:TechnologyBroker': TechnologyBroker;
+    'event:MaterialTrade': MaterialTrade;
     // stuff
-    'event:Market': IMarket,
-    'event:Shipyard': IShipyard,
-    'event:Outfitting': IOutfitting,
-    'event:ModulesInfo': IModulesInfo,
-    'event:Status': IStatus,
+    'event:Market': Market;
+    'event:Shipyard': Shipyard;
+    'event:Outfitting': Outfitting;
+    'event:ModulesInfo': ModulesInfo;
+    'event:Status': Status;
 }
 
 export type Events = {
     // Unscoped
     'event': EDEvent,
-    'file': ILogFileSwap,
+    'file': LogFileSwap,
     'warn': Error,
     'error': Error,
 } & GameEvents;
@@ -341,7 +339,7 @@ export interface EDLog {
     on<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
     once<K extends keyof Events>(event: K, cb: (event: Events[K]) => void): this;
     listenerCount<K extends keyof Events>(event: K): number;
-    emit<K extends keyof Events>(event: K, value: Events[K]): boolean
+    emit<K extends keyof Events>(event: K, value: Events[K]): boolean;
 }
 
 export class EDLog extends EventEmitter {
@@ -358,9 +356,9 @@ export class EDLog extends EventEmitter {
      *
      * @param backlog Optional configuration settings.
      */
-    public start(backlog: IBacklogOptions = {}): EDEvent[] {
+    public start(backlog: BacklogOptions = {}): EDEvent[] {
         const dir = directory();
-        this.watcher = fs.watch(dir, (eventType, fileName) => {
+        this.watcher = watch(dir, (eventType, fileName) => {
             if (eventType === 'change') {
                 return;
             }
@@ -412,7 +410,7 @@ export class EDLog extends EventEmitter {
     /**
      * Ends the log reader.
      */
-    public end (): void {
+    public end(): void {
         delete this.fileName;
         if (this.fileStream) {
             this.fileStream.close();
@@ -423,7 +421,7 @@ export class EDLog extends EventEmitter {
         if (this.watcher) {
             this.watcher.close();
         }
-        for(const watcher of this.watchers) {
+        for (const watcher of this.watchers) {
             watcher.close();
         }
         this.removeAllListeners();
@@ -438,7 +436,7 @@ export class EDLog extends EventEmitter {
     }
 
     private emitFileEvent(path: string): void {
-        this.emitEvent(new EDEvent(JSON.parse(readFileSync(path, 'utf8'))))
+        this.emitEvent(new EDEvent(JSON.parse(readFileSync(path, 'utf8'))));
     }
 
     private makeWatcher(file: string) {
@@ -447,14 +445,14 @@ export class EDLog extends EventEmitter {
             if (event !== 'change' || statSync(fullFile).size === 0) {
                 return;
             }
-            this.emitFileEvent(fullFile)
+            this.emitFileEvent(fullFile);
         }));
         setImmediate(() => {
             this.emitFileEvent(fullFile);
         });
     }
 
-    private listenToFile (file: string, skip: boolean = false) {
+    private listenToFile(file: string, skip = false) {
         file = join(directory(), file);
         this.emit('file', {
             file,

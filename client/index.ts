@@ -1,29 +1,29 @@
-import { writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { locations, distance, EDPosition } from '../src/EDLog/locations';
-import { EDLog } from '../src/EDLog/EDLog';
-import { speak } from 'say';
-import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
-import { IFSDJump, IReceiveText, IBounty, IStartJump, ISendText, IBaseLocation } from '../src/EDLog/events';
+import { readFileSync, writeFileSync } from 'fs';
 import { sampleSize } from 'lodash';
-import { AsyncQueue } from '../src/util/AsyncQueue';
-import { Client as EDSMClient, ICommanderMapEntry, ICoordinate } from '../src/EDSM/Client';
-import { HTTPClient } from '../src/util/HTTPClient';
-import { GalaxyMapWatcher, IMove } from '../src/EDSM/GalaxyMapWatcher';
+import { join } from 'path';
+import { speak } from 'say';
 import { inspect } from 'util';
 import { EDEvent } from '../src/EDLog/EDEvent';
+import { EDLog } from '../src/EDLog/EDLog';
+import { BaseLocation, Bounty, FSDJump, ReceiveText, SendText, StartJump } from '../src/EDLog/events';
+import { distance, EDPosition, locations } from '../src/EDLog/locations';
+import { byAllegiance, byState, byStateAllegiance } from '../src/EDLog/systemMaterialList';
+import { Client as EDSMClient, CommanderMapEntry, Coordinate } from '../src/EDSM/Client';
+import { GalaxyMapWatcher, Move } from '../src/EDSM/GalaxyMapWatcher';
+import { AsyncQueue } from '../src/util/AsyncQueue';
+import { HTTPClient } from '../src/util/HTTPClient';
 
-function handler (error: Error) {
+function handler(error: Error) {
     console.log(inspect(error, {
-        showHidden: true,
         depth: 3,
+        showHidden: true,
     }));
 }
 
 process.on('uncaughtException', handler)
 .on('unhandledRejection', handler);
 
-function edLocationToEDSM(pos: EDPosition): ICoordinate {
+function edLocationToEDSM(pos: EDPosition): Coordinate {
     return {
         x: pos[0],
         y: pos[1],
@@ -31,20 +31,20 @@ function edLocationToEDSM(pos: EDPosition): ICoordinate {
     };
 }
 
-export interface IRawSettings {
+export interface RawSettings {
     blocked: string[];
     tracked: string[];
 }
 
 class Client {
-    private criticalFuelLevel: number = 10;
-    private galaxyMapWatcherMinPopDistance: number = 1000;
-    private galaxyMapWatcherCommanderDistance: number = 1000;
-    private materialTruncateLength: number = 5;
+    private criticalFuelLevel = 10;
+    private galaxyMapWatcherMinPopDistance = 1000;
+    private galaxyMapWatcherCommanderDistance = 1000;
+    private materialTruncateLength = 5;
     private galaxyMapWatcherOptions = {
-        delay: 250,
-        cycleDelay: 20 * 1000,
         additionalDelay: 2500,
+        cycleDelay: 20 * 1000,
+        delay: 250,
     };
     private cachedPosition?: EDPosition;
     private trackList: string[] = [];
@@ -59,18 +59,40 @@ class Client {
     private edsm = new EDSMClient(new HTTPClient());
     private watcher = new GalaxyMapWatcher(this.edsm, this.galaxyMapWatcherOptions);
 
-    private loadSettings () {
+    public start() {
+        this.loadSettings();
+
+        this.attachEventListeners();
+        const backLog = this.log.start({
+            process: true,
+            store: true,
+        });
+        this.listUnknownEvents(backLog);
+        /* console.log(minBy(backLog, e => {
+            if (e.event === 'FSDJump') {
+                const bEv = <IBaseLocation> e;
+                if (distance(bEv.StarPos, [800, 133, 7400]) < 750) {
+                    console.log(bEv.StarSystem, distance(bEv.StarPos, [800, 133, 7400]));
+                }
+            }
+        }));*/
+
+        this.checkAndStartGalaxyWatcher();
+        this.sayQ('Ready');
+    }
+
+    private loadSettings() {
         try {
-            const rawSettings: IRawSettings = require('./settings.json');
+            const rawSettings: RawSettings = require('./settings.json');
             this.settings = {
-                tracked: new Set(rawSettings.tracked || []),
                 blocked: new Set(rawSettings.blocked || []),
+                tracked: new Set(rawSettings.tracked || []),
             };
         } catch (e) {
             this.settings = {
-                tracked: new Set<string>(),
                 blocked: new Set<string>(),
-            }
+                tracked: new Set<string>(),
+            };
             if (e.code === 'MODULE_NOT_FOUND') {
                 this.sayQ('Settings file not found, loading default');
             } else {
@@ -80,14 +102,14 @@ class Client {
 
     }
 
-    private storeSettings () {
+    private storeSettings() {
         if (!this.settings) {
             throw new Error('Setting not loaded');
         }
         const { blocked, tracked } = this.settings;
         writeFileSync(join(__dirname, 'settings.json'), JSON.stringify({
-            tracked: [...tracked.values()],
             blocked: [...blocked.values()],
+            tracked: [...tracked.values()],
         }));
     }
 
@@ -120,15 +142,15 @@ class Client {
         .on('error', err => this.sayQ(`Error: ${err.message}`));
     }
 
-    private formatCoord({x, y, z}: ICoordinate): string {
+    private formatCoord({x, y, z}: Coordinate): string {
         return `${x.toFixed(1)} ${y.toFixed(1)} ${z.toFixed(1)}`;
     }
 
-    private formatCommanderInfo (cmdr: ICommanderMapEntry, distance: number): string {
-        return `${cmdr.cmdrName || 'Unknown' }\nSystem: ${cmdr.systemName || this.formatCoord(cmdr.coordinates)}\nDistance: ${distance.toFixed(1)} light years.`
+    private formatCommanderInfo(cmdr: CommanderMapEntry, dist: number): string {
+        return `${cmdr.cmdrName || 'Unknown' }\nSystem: ${cmdr.systemName || this.formatCoord(cmdr.coordinates)}\nDistance: ${dist.toFixed(1)} light years.`
     }
 
-    private onCommanderMoved(event: IMove) {
+    private onCommanderMoved(event: Move) {
         if (this.trackList.includes(event.entry.user)) {
             this.edsm.locationToSystem(event.entry.coordinates)
             .then(system => {
@@ -151,7 +173,7 @@ class Client {
         }
     }
 
-    private listUnknownEvents (backLog: EDEvent[]) {
+    private listUnknownEvents(backLog: EDEvent[]) {
 
         const knownEvents = this.knownEvents = readFileSync(join(__dirname, '../src/EDLog/EDLog.ts'), 'utf8')
         .trim()
@@ -160,7 +182,7 @@ class Client {
         .filter(match => match)
         .map(match => match![1]);
 
-        let unknown: string[] = [];
+        const unknown: string[] = [];
         backLog.forEach(ev => {
             if (!knownEvents.includes(ev.event) && !unknown.includes(ev.event)) {
                 unknown.push(ev.event);
@@ -185,7 +207,7 @@ class Client {
         }
     }
 
-    private checkAndStartGalaxyWatcher () {
+    private checkAndStartGalaxyWatcher() {
         const running = this.watcher.isRunning();
         if (running && !this.isDeepSpace()) {
             this.watcher.stop();
@@ -200,31 +222,9 @@ class Client {
         }
     }
 
-    public start() {
-        this.loadSettings();
-
-        this.attachEventListeners();
-        const backLog = this.log.start({
-            process: true,
-            store: true,
-        });
-        this.listUnknownEvents(backLog);
-        /** console.log(minBy(backLog, e => {
-            if (e.event === 'FSDJump') {
-                const bEv = <IBaseLocation> e;
-                if (distance(bEv.StarPos, [800, 133, 7400]) < 750) {
-                    console.log(bEv.StarSystem, distance(bEv.StarPos, [800, 133, 7400]));
-                }
-            }
-        }));*/
-
-        this.checkAndStartGalaxyWatcher();
-        this.sayQ('Ready');
-    }
-
     private sayQ(text: string, extra?: object) {
         this.queue.push(
-            (cb: (error: Error | undefined) => void) => speak(text, '', 1, err => cb(err ? new Error(err) : undefined))
+            (cb: (error: Error | undefined) => void) => speak(text, '', 1, err => cb(err ? new Error(err) : undefined)),
         );
         console.log(text);
         if (extra) {
@@ -232,17 +232,17 @@ class Client {
         }
     }
 
-    private onLocation (event: IBaseLocation) {
+    private onLocation(event: BaseLocation) {
         this.cachedPosition = event.StarPos;
     }
 
-    private isDeepSpace (): boolean {
+    private isDeepSpace(): boolean {
         const minDist = this.galaxyMapWatcherMinPopDistance;
         const pos = this.getPosition();
-        return distance(pos, locations.Sol) > minDist && distance(pos, locations.Colonia) > minDist
+        return distance(pos, locations.Sol) > minDist && distance(pos, locations.Colonia) > minDist;
     }
 
-    private onFSDJump (event: IFSDJump) {
+    private onFSDJump(event: FSDJump) {
         this.onLocation(event);
         this.checkAndStartGalaxyWatcher();
         const solDistance = distance(event.StarPos, locations.Sol);
@@ -280,8 +280,8 @@ class Client {
                 info.push(`Materials: ${materials.join(', ')}`);
             }
         }
-        if(event.FuelLevel < this.criticalFuelLevel) {
-            info.push(`Warning: Check fuel level!`);
+        if (event.FuelLevel < this.criticalFuelLevel) {
+            info.push('Warning: Check fuel level!');
         }
         if (info.length === 0) {
             return;
@@ -289,18 +289,18 @@ class Client {
         this.sayQ(info.join('\n'));
     }
 
-    private onReceiveText(event: IReceiveText) {
+    private onReceiveText(event: ReceiveText) {
         switch (event.Channel) {
             case 'npc':
             const { settings } = this;
-                if (!settings) {
+            if (!settings) {
                     throw new Error('Settings not loaded');
                 }
-                if ([...settings.blocked].some(entry => (event.From_Localised || event.From || '').includes(entry))) {
+            if ([...settings.blocked].some(entry => (event.From_Localised || event.From || '').includes(entry))) {
                     return;
                 }
-                this.sayQ(`Message from ${event.From_Localised || event.From}: ${event.Message_Localised}`);
-                break;
+            this.sayQ(`Message from ${event.From_Localised || event.From}: ${event.Message_Localised}`);
+            break;
             case 'player':
                 if (event.From && event.From.startsWith('&')) {
                     this.sayQ(`Direct message from ${event.From.substring(1)}: ${event.Message}`);
@@ -325,7 +325,7 @@ class Client {
         }
     }
 
-    private onSendText(event: ISendText) {
+    private onSendText(event: SendText) {
         if (event.Message.includes('Potter')) {
             this.sayQ('GODDAMNIT HARRY!');
         }
@@ -355,20 +355,25 @@ class Client {
                             this.sayQ(`${cmdrs.length} results, please reduce search radius`);
                             return;
                         }
-                        cmdrs.sort(([,a], [,b]) => a - b)
-                        cmdrs.forEach(([cmdr, distance]) => {
-                            this.sayQ(`${cmdr.cmdrName || 'Unknown' }, ${distance.toFixed(1)}, ${cmdr.systemName || 'Unknown'}`, {
+                        cmdrs.sort(([, a], [, b]) => a - b);
+                        cmdrs.forEach(([cmdr, dist]) => {
+                            this.sayQ(`${cmdr.cmdrName || 'Unknown' }, ${dist.toFixed(1)}, ${cmdr.systemName || 'Unknown'}`, {
                                 edsmId: cmdr.user,
                             });
                         });
                         return;
                     }
                     this.watcher.findClosestAutoComplete(edLocationToEDSM(this.getPosition()))
-                    .then(([closest, distance]) => {
-                        this.sayQ(`Closest Commander ${this.formatCommanderInfo(closest, distance)}`, {
+                    .then(res => {
+                        if (!res) {
+                            this.sayQ('Nothing found');
+                            return;
+                        }
+                        const [closest, dist] = res;
+                        this.sayQ(`Closest Commander ${this.formatCommanderInfo(closest, dist)}`, {
                             edsmId: closest.user,
-                            pos: this.getPosition(),
                             otherPos: closest.coordinates,
+                            pos: this.getPosition(),
                         });
                     });
                     break;
@@ -385,11 +390,11 @@ class Client {
         }
     }
 
-    private onBounty(event: IBounty) {
+    private onBounty(event: Bounty) {
         this.sayQ(`Killed ${event.Target} for ${event.TotalReward} `);
     }
 
-    private onStartJump(event: IStartJump) {
+    private onStartJump(event: StartJump) {
         if (event.JumpType === 'Supercruise') {
             return;
         }

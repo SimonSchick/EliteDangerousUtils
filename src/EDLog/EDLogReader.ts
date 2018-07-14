@@ -1,12 +1,12 @@
+import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { readdirSync, readFileSync } from "fs";
 import { RawLog } from './EDEvent';
 
 export class EDLogReader {
     public static readonly fileMatcher = /Journal\.(\d+)\.\d+.log$/;
     private files?: string[];
 
-    public fetchFiles (directory: string) {
+    public fetchFiles(directory: string) {
         return this.files = readdirSync(directory)
         .map(fileName => EDLogReader.fileMatcher.exec(fileName))
         .filter(match => !!match)

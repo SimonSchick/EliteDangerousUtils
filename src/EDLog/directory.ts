@@ -1,5 +1,5 @@
-import { join } from "path";
-import { homedir } from "os";
+import { homedir } from 'os';
+import { join } from 'path';
 
 let out: string;
 export function directory(): string {

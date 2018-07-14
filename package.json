@@ -18,9 +18,11 @@
     "@types/request": "^2.47.1",
     "jsonschema": "^1.2.4",
     "lodash": "^4.17.10",
+    "prettier": "^1.13.7",
     "rimraf": "^2.6.0",
     "say": "^0.15.0",
     "ts-node": "^7.0.0",
+    "tslint": "^5.10.0",
     "typescript": "^2.9.2",
     "typescript-json-schema": "^0.25.1"
   },
@@ -39,11 +41,17 @@
   "scripts": {
     "start": "ts-node client",
     "build": "rimraf dist && tsc",
+    "lint": "tslint -p tsconfig.json -t verbose && tslint -p build/tsconfig.json -t verbose && tslint -p demo/tsconfig.json -t verbose && tslint -p client/tsconfig.json -t verbose",
     "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/SimonSchick/EliteDangerousUtils"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "prettier": {
+    "trailingComma": "all",
+    "singleQuote": true,
+    "printWidth": 100
+  }
 }

@@ -1,21 +1,21 @@
-import { HTTPClient, Options } from '../util/HTTPClient';
 import { EDPosition } from '../EDLog/locations';
+import { HTTPClient, Options, Response } from '../util/HTTPClient';
 
-export interface ICoordinate {
+export interface Coordinate {
     x: number;
     y: number;
     z: number;
 }
 
-export interface ICommandMapPage {
+export interface CommandMapPage {
     maxItems: number;
     maxPage: number;
-    items: ICommanderMapEntry[];
+    items: CommanderMapEntry[];
 }
 
-export interface ICommanderMapEntry {
+export interface CommanderMapEntry {
     user: string;
-    coordinates: ICoordinate;
+    coordinates: Coordinate;
     cmdrUrl: string;
     cmdrName: string;
     systemName: string;
@@ -24,11 +24,11 @@ export interface ICommanderMapEntry {
 /**
  * @see {@link https://www.edsm.net/en/api}
  */
-export interface ISystemsQuery {
+export interface SystemsQuery {
     /**
      * Query origin coordinates
      */
-    position: ICoordinate;
+    position: Coordinate;
     /**
      * Query size of search selector.
      */
@@ -39,7 +39,7 @@ export interface ISystemsQuery {
     systemName?: string;
 }
 
-export interface IRawSystemQuery {
+export interface RawSystemQuery {
     systemName?: string;
     x?: number | string;
     y?: number | string;
@@ -47,20 +47,60 @@ export interface IRawSystemQuery {
     size?: number;
 }
 
-export interface ISystemQueryResponse {
+export interface SystemQueryResponse {
     name: string;
 }
 
 export class Client {
-    public static convertEDSMToEDVector (coord: ICoordinate): EDPosition {
+    public static convertEDSMToEDVector(coord: Coordinate): EDPosition {
         return [coord.x, coord.y, coord.z];
     }
 
-    constructor (private httpClient: HTTPClient, private apiKey?: string) {
+    constructor(private httpClient: HTTPClient, private apiKey?: string) {
 
     }
 
-    private request<T>(opts: Options) {
+    public async getSystemsInCube(query: SystemsQuery): Promise<SystemQueryResponse[]> {
+        return (await this.request<SystemQueryResponse[]>({
+            qs: this.buildSystemQuery(query),
+            uri: '/api-v1/cube-systems',
+        })).body;
+    }
+
+    public async locationToSystem(position: Coordinate): Promise<string> {
+        const [r] = await this.getSystemsInCube({
+            position,
+            size: 2,
+        });
+        return r && r.name;
+    }
+
+    public async getCommanderMapPage(page: number, language = 'en'): Promise<CommandMapPage> {
+        return (await this.request<CommandMapPage>({
+            headers: {
+                'x-requested-with': 'XMLHttpRequest',
+            },
+            uri: `/${language}/map/users/live/p/${page}`,
+        })).body;
+    }
+
+    public async getCommanderMap(language = 'en'): Promise<CommanderMapEntry[]> {
+        return this.getCommanderMapInternal(language);
+    }
+
+    private async getCommanderMapInternal(
+        language: string,
+        currentPage = 1,
+        data: CommanderMapEntry[] = [],
+    ): Promise<CommanderMapEntry[]> {
+        const res = await this.getCommanderMapPage(0, language);
+        if (res.maxPage === currentPage) {
+            return data.concat(res.items);
+        }
+        return this.getCommanderMapInternal(language, currentPage + 1, data);
+    }
+
+    private async request<T>(opts: Options): Promise<Response<T>> {
         opts.uri = `https://www.edsm.net${opts.uri}`;
         opts.json = true;
         if (this.apiKey) {
@@ -72,31 +112,7 @@ export class Client {
         return this.httpClient.request<T>(opts);
     }
 
-    public getCommanderMapPage(page: number, language = 'en'): Promise<ICommandMapPage> {
-        return this.request<ICommandMapPage>({
-            uri: `/${language}/map/users/live/p/${page}`,
-            headers: {
-                'x-requested-with': 'XMLHttpRequest',
-            }
-        })
-        .then(r => r.body);
-    }
-
-    private getCommanderMapInternal(language: string, currentPage: number = 1, data: ICommanderMapEntry[] = []): Promise<ICommanderMapEntry[]> {
-        return this.getCommanderMapPage(0, language)
-        .then(res => {
-            if (res.maxPage === currentPage) {
-                return data.concat(res.items);
-            }
-            return this.getCommanderMapInternal(language, currentPage + 1, data);
-        });
-    }
-
-    public getCommanderMap(language = 'en'): Promise<ICommanderMapEntry[]> {
-        return this.getCommanderMapInternal(language)
-    }
-
-    private buildSystemQuery (query: ISystemsQuery): IRawSystemQuery {
+    private buildSystemQuery(query: SystemsQuery): RawSystemQuery {
         const { systemName, position, size } = query;
         if (!systemName && !position) {
             throw new Error('systemName or position is required');
@@ -104,7 +120,7 @@ export class Client {
         if (systemName && position) {
             throw new Error('systemName and position are exclusive');
         }
-        const ret: IRawSystemQuery = {
+        const ret: RawSystemQuery = {
             size,
         };
         if (systemName) {
@@ -116,21 +132,5 @@ export class Client {
             ret.z = position.z.toFixed(1);
         }
         return ret;
-    }
-
-    public getSystemsInCube (query: ISystemsQuery): Promise<ISystemQueryResponse[]> {
-        return this.request<ISystemQueryResponse[]>({
-            uri: '/api-v1/cube-systems',
-            qs: this.buildSystemQuery(query),
-        })
-        .then(r => r.body);
-    }
-
-    public locationToSystem (position: ICoordinate): Promise<string> {
-        return this.getSystemsInCube({
-            position,
-            size: 2,
-        })
-        .then(([r]) => r && r.name);
     }
 }

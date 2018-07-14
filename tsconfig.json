@@ -18,8 +18,8 @@
         "noStrictGenericChecks": false,
         "baseUrl": ".",
         "lib": [
-            "es2017",
-            "es2015.iterable"
+            "esnext",
+            "es2015.iterable",
         ],
         "paths": {
             "*": [

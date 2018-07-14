@@ -232,7 +232,6 @@ export type OptionalSlots =
     'Bobble09' |
     'Bobble10' |
 
-
     'ShipName0' |
     'ShipName1' |
     'ShipName2' |

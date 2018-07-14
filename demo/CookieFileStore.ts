@@ -1,23 +1,106 @@
-import { ICookie, ICookieStore } from '../src/EDCompanionAPI';
 import { readFile, writeFile } from 'fs';
+import { Cookie, CookieStore } from '../src/EDCompanionAPI';
 
-export interface ICookieStorage {
+export interface CookieStorage {
     [domain: string]: {
         [path: string]: {
-            [key: string]: ICookie;
-        }
-    }
+            [key: string]: Cookie;
+        };
+    };
 }
 
-export class CookieFileStore implements ICookieStore {
-    private data: ICookieStorage;
+export class CookieFileStore implements CookieStore {
     public synchronous = true;
-    constructor (private fileName: string, private forceReadOnAccess: boolean = false) {
+    private data?: CookieStorage;
+    constructor(private fileName: string, private forceReadOnAccess = false) {
     }
 
-    private loadData (cb: (err: Error) => void) {
+    public findCookie(domain: string, path: string, key: string, cb: (err?: Error, cookie?: Cookie) => void) {
+        this.loadData((err, data) => {
+            if (err) {
+                return cb(err);
+            }
+            if (!data![domain]) {
+                return cb();
+            }
+            if (!data![domain][path]) {
+                return cb();
+            }
+            cb(undefined, data![domain][path][key] || null);
+        });
+    }
+
+    public findCookies(domain: string, _path: string, cb: (err?: Error, cookies?: Cookie[]) => void) {
+        this.loadData((err, data) => {
+            if (err) {
+                return cb(err);
+            }
+            if (!data![domain]) {
+                return cb(undefined, []);
+            }
+            if (!data![domain]) {
+                return cb();
+            }
+            let out: Cookie[] = [];
+            for (const domainData of Object.values(data![domain])) {
+                out = out.concat(Object.values(domainData));
+            }
+            cb(undefined, out);
+        });
+    }
+
+    public putCookie(cookie: Cookie, cb: (err: Error) => void) {
+        this.loadData((err, data) => {
+            if (err) {
+                return cb(err);
+            }
+            if (!data![cookie.domain]) {
+                data![cookie.domain] = {};
+            }
+            if (!data![cookie.domain][cookie.path]) {
+                data![cookie.domain][cookie.path] = {};
+            }
+            data![cookie.domain][cookie.path][cookie.key] = cookie;
+            this.saveData(cb);
+        });
+    }
+
+    public updateCookie(_oldCookie: Cookie, newCookie: Cookie, cb: (err: Error) => void) {
+        this.putCookie(newCookie, cb);
+    }
+
+    public removeCookie(domain: string, path: string, key: string, cb: (err: Error) => void) {
+        this.loadData((err, data) => {
+            if (err) {
+                return cb(err);
+            }
+            if (data![domain] && data![domain][path] && data![domain][path][key]) {
+                delete data![domain][path][key];
+            }
+            this.saveData(cb);
+        });
+    }
+
+    public removeCookies(domain: string, path: string, cb: (err?: Error) => void) {
+        this.loadData((err, data) => {
+            if (err) {
+                return cb(err);
+            }
+            if (!data![domain]) {
+                return cb();
+            }
+            if (path) {
+                delete data![domain][path];
+            } else {
+                delete data![domain];
+            }
+            this.saveData(cb);
+        });
+    }
+
+    private loadData(cb: (err: undefined | Error, data?: CookieStorage) => void): void {
         if (this.data && !this.forceReadOnAccess) {
-            return cb(null);
+            return cb(undefined, this.data);
         }
 
         readFile(this.fileName, 'utf8', (error, data) => {
@@ -26,105 +109,19 @@ export class CookieFileStore implements ICookieStore {
             }
             try {
                 this.data = JSON.parse(data);
-                cb(null);
+                cb(undefined, this.data);
             } catch (error) {
                 cb(error);
             }
         });
     }
 
-    private saveData (cb: (err: Error) => void) {
+    private saveData(cb: (err: Error) => void) {
         this.loadData(err => {
             if (err) {
                 return cb(err);
             }
             writeFile(this.fileName, JSON.stringify(this.data), cb);
-        });
-    }
-
-    public findCookie (domain: string, path: string, key: string, cb: (err: Error, cookie?: ICookie) => void) {
-        this.loadData(err => {
-            if (err) {
-                return cb(err);
-            }
-            if (!this.data[domain]) {
-                return cb(null, null);
-            }
-            if (!this.data[domain][path]) {
-                return cb(null, null);
-            }
-            cb(null, this.data[domain][path][key] || null);
-        });
-    }
-
-    public findCookies (domain: string, _path: string, cb: (err: Error, cookies?: ICookie[]) => void) {
-        this.loadData(err => {
-            if (err) {
-                return cb(err);
-            }
-            if (!this.data[domain]) {
-                return cb(null, []);
-            }
-            const { data } = this;
-            if (!this.data[domain]) {
-                return cb(null, null);
-            }
-            const out: ICookie[] = [];
-            for (const path in data[domain]) {
-                for (const key in data[domain][path]) {
-                    out.push(data[domain][path][key]);
-                }
-            }
-            cb(null, out);
-        });
-    }
-
-    public putCookie (cookie: ICookie, cb: (err: Error) => void) {
-        this.loadData(err => {
-            if (err) {
-                return cb(err);
-            }
-            if (!this.data[cookie.domain]) {
-                this.data[cookie.domain] = {};
-            }
-            if (!this.data[cookie.domain][cookie.path]) {
-                this.data[cookie.domain][cookie.path] = {};
-            }
-            this.data[cookie.domain][cookie.path][cookie.key] = cookie;
-            this.saveData(cb);
-        });
-    };
-
-    public updateCookie (_oldCookie: ICookie, newCookie: ICookie, cb: (err: Error) => void) {
-        this.putCookie(newCookie, cb);
-    };
-
-    public removeCookie(domain: string, path: string, key: string, cb: (err: Error) => void) {
-        this.loadData(err => {
-            if (err) {
-                return cb(err);
-            }
-            if (this.data[domain] && this.data[domain][path] && this.data[domain][path][key]) {
-                delete this.data[domain][path][key];
-            }
-            this.saveData(cb);
-        });
-    }
-
-    public removeCookies (domain: string, path: string, cb: (err: Error) => void) {
-        this.loadData(err => {
-            if (err) {
-                return cb(err);
-            }
-            if (!this.data[domain]) {
-                return cb(null);
-            }
-            if (path) {
-                delete this.data[domain][path];
-            } else {
-                delete this.data[domain];
-            }
-            this.saveData(cb);
         });
     }
 }

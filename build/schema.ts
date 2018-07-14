@@ -1,6 +1,6 @@
-import { EDLogReader } from './../src/EDLog/EDLogReader';
-import { join } from 'path';
 import { Validator } from 'jsonschema';
+import { join } from 'path';
+import { EDLogReader } from './../src/EDLog/EDLogReader';
 
 import { buildGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { directory } from '../src/EDLog/directory';
@@ -12,8 +12,8 @@ function run() {
     });
 
     const generator = buildGenerator(program, {
-        required: true,
         noExtraProps: true,
+        required: true,
         // topRef: true,
     });
 
@@ -44,11 +44,8 @@ function run() {
                 }
                 errors++;
                 console.log('Invalid schema', r, res.errors);
-                known.add(e.message)
+                known.add(e.message);
             });
-
-            if (res.errors.some(e => !known.has(e.message))) {
-            }
         }
     });
     console.log('errors', errors);

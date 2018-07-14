@@ -4,7 +4,7 @@ export type Response<T> = request.RequestResponse & { body: T };
 export type Options = request.OptionsWithUri;
 
 export class HTTPError extends Error {
-    constructor (public response: Response<any>) {
+    constructor(public response: Response<any>) {
         super(`Request failed with status code ${response.statusCode}.`);
     }
 }
@@ -24,13 +24,27 @@ export class HTTPClient {
     public static Jar() {
         return request.jar();
     }
-    private generateError (response: Response<any>): HTTPError | void {
+
+    public async request<T>(opts: Options): Promise<Response<T>> {
+        return new Promise<Response<T>>((resolve, reject) => {
+            request(opts, (error, response: Response<T>) => {
+                error = error || this.generateError(response);
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(response);
+            });
+        });
+    }
+
+    private generateError(response: Response<any>): HTTPError | void {
         const { statusCode } = response;
         if (!statusCode) {
             throw new Error('Failed with no status code');
         }
         if (statusCode < 200 || statusCode >= 300) {
-            switch(statusCode) {
+            switch (statusCode) {
                 case 400:
                     return new BadRequest(response);
                 case 401:
@@ -54,17 +68,4 @@ export class HTTPClient {
         }
         return undefined;
     }
-    public request<T>(opts: Options): Promise<Response<T>> {
-        return new Promise<Response<T>>((resolve, reject) => {
-            request(opts, (error, response: Response<T>) => {
-                error = error || this.generateError(response);
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(response);
-            });
-        });
-    }
-
 }

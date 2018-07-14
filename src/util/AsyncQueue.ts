@@ -3,12 +3,12 @@ export class AsyncQueue extends EventEmitter {
     private queue: ((cb: (error: Error | undefined) => void) => void)[] = [];
     private isDraining = false;
 
-    push (call: (cb: (error: Error | undefined) => void) => void) {
+    public push(call: (cb: (error: Error | undefined) => void) => void) {
         this.queue.push(call);
         this.drain();
     }
 
-    drain (ignoreDrain = false) {
+    private drain(ignoreDrain = false) {
         if (this.isDraining && !ignoreDrain) {
             return;
         }
@@ -23,6 +23,6 @@ export class AsyncQueue extends EventEmitter {
                 this.emit('error', error);
             }
             this.drain(true);
-        })
+        });
     }
 }

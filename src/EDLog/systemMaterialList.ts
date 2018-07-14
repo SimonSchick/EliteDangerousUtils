@@ -1,12 +1,12 @@
 import {
-    FactionState,
     Allegiance,
+    FactionState,
 } from './events';
 
 export const byAllegiance: Partial<{
     [state in Allegiance]: string[]
 }> = {
-    Empire: ['Imperial Shielding']
+    Empire: ['Imperial Shielding'],
 };
 
 export const byState: Partial<{
@@ -37,43 +37,43 @@ export const byState: Partial<{
         'Unidentified Scan Archives',
         'Unusual Encrypted Files',
     ],
-    Election: ['Galvanising Alloys', 'Modified Consumer Firmware', 'Unexpected Emission Data'],
-    Retreat: ['Compound Shielding', 'Security Firmware Patch'],
     CivilUnrest: ['Improvised Components'],
     CivilWar:  ['Modified Consumer Firmware'],
+    Election: ['Galvanising Alloys', 'Modified Consumer Firmware', 'Unexpected Emission Data'],
+    Outbreak: ['Pharmaseutical Isolators', 'Polymer Capacitors'],
+    Retreat: ['Compound Shielding', 'Security Firmware Patch'],
     War: ['Military Supercapacitors', 'Military Grade Alloys', 'Military Supercapacitors'],
-    Outbreak: ['Pharmaseutical Isolators', 'Polymer Capacitors']
-}
+};
 
 export const byStateAllegiance: Partial<{
     [state in FactionState]: Partial<{
         [allegiance in Allegiance]: string[]
     }>}> = {
-    War: {
-        Empire: ['Imperial Shielding'],
-        Federation: ['Core Dynamics Composites']
-    },
     Boom: {
-        Federation: ['Core Dynamics Composites']
+        Federation: ['Core Dynamics Composites'],
     },
     Election: {
         Federation: ['Proprietary Composites'],
     },
-}
+    War: {
+        Empire: ['Imperial Shielding'],
+        Federation: ['Core Dynamics Composites'],
+    },
+};
 
 export const security = {
-    low: ['Configurable Components', 'High Density Composites', 'Mechanical Components'],
-    medium: <string[]>[],
     high: [
         'Chemical Distillery',
         'Chemical Processors',
         'Compound Shielding',
         'Focus Crystals',
         'Refined Focus Crystals',
-        'Shielding Sensors'
+        'Shielding Sensors',
     ],
+    low: ['Configurable Components', 'High Density Composites', 'Mechanical Components'],
+    medium: <string[]>[],
 };
 
 export const government = {
-    Anarchy: ['Conductive Ceramics', 'Conductive Components', 'Electrochemical Arrays', 'Heat Exchangers']
-}
+    Anarchy: ['Conductive Ceramics', 'Conductive Components', 'Electrochemical Arrays', 'Heat Exchangers'],
+};

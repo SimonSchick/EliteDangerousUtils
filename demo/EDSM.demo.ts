@@ -1,17 +1,16 @@
-import { Client, ICoordinate } from '../src/EDSM/Client';
-import { HTTPClient } from '../src/util/HTTPClient';
+import { Client, Coordinate } from '../src/EDSM/Client';
 import { GalaxyMapWatcher } from '../src/EDSM/GalaxyMapWatcher';
+import { HTTPClient } from '../src/util/HTTPClient';
 
 const client = new Client(new HTTPClient());
 
-
-function prettyCoordinate (coord: ICoordinate): string {
+function prettyCoordinate(coord: Coordinate): string {
     return `${coord.x.toFixed(2)}, ${coord.y.toFixed(2)}, ${coord.z.toFixed(2)}`;
 }
 
 const watcher = new GalaxyMapWatcher(client, {
-    delay: 250,
     cycleDelay: 1000,
+    delay: 250,
 });
 
 watcher.on('moved', move => {
