@@ -54,6 +54,7 @@ import {
   EscapeInterdiction,
   FactionKillBond,
   FetchRemoteModule,
+  FighterDestroyed,
   FighterRebuilt,
   Fileheader,
   Friends,
@@ -68,6 +69,7 @@ import {
   JetConeDamage,
   JoinACrew,
   KickCrewMember,
+  LaunchDrone,
   LaunchFighter,
   LaunchSRV,
   LeaveBody,
@@ -90,6 +92,7 @@ import {
   MissionAccepted,
   MissionCompleted,
   MissionFailed,
+  MissionRedirected,
   Missions,
   ModuleBuy,
   ModuleInfo,
@@ -102,8 +105,10 @@ import {
   Music,
   NewCommander,
   NpcCrewPaidWage,
+  NpcCrewRank,
   Outfitting,
   Passengers,
+  PayBounties,
   PayFines,
   PayLegacyFines,
   PowerplayJoin,
@@ -149,6 +154,7 @@ import {
   SupercruiseEntry,
   SupercruiseExit,
   Synthesis,
+  SystemsShutdown,
   TechnologyBroker,
   Touchdown,
   UnderAttack,
@@ -319,6 +325,12 @@ export interface GameEvents {
   'event:LeaveBody': LeaveBody;
   'event:TechnologyBroker': TechnologyBroker;
   'event:MaterialTrade': MaterialTrade;
+  'event:MissionRedirected': MissionRedirected;
+  'event:PayBounties': PayBounties;
+  'event:LaunchDrone': LaunchDrone;
+  'event:SystemsShutdown': SystemsShutdown;
+  'event:FighterDestroyed': FighterDestroyed;
+  'event:NpcCrewRank': NpcCrewRank;
   // stuff
   'event:Market': Market;
   'event:Shipyard': Shipyard;

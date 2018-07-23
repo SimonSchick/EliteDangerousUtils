@@ -30,7 +30,7 @@ function run() {
         if (r.event === 'Scan') {
             return;
         }
-        const interfaceName = `I${r.event}`;
+        const interfaceName = r.event;
         const res = validator.validate(r, { $ref: `/Events#/definitions/${interfaceName}` }, {
             allowUnknownAttributes: false,
         });

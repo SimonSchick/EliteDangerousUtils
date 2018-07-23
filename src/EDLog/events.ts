@@ -14,7 +14,8 @@ export type StationType =
   | 'Bernal'
   | 'Outpost'
   | 'SurfaceStation'
-  | 'AsteroidBase';
+  | 'AsteroidBase'
+  | 'MegaShip';
 export type Faction = 'Empire' | 'Alliance' | 'Federation' | 'PilotsFederation' | 'Guardian';
 export type Allegiance = 'None' | 'Independent' | Faction;
 export type FactionState =
@@ -42,7 +43,10 @@ export type Economy =
   | '$economy_Refinery;'
   | '$economy_Terraforming;'
   | '$economy_Service;'
-  | '$economy_Repair;';
+  | '$economy_Repair;'
+  | '$economy_Tourism;'
+  | '$economy_Prison;';
+
 export type Security =
   | '$SYSTEM_SECURITY_low;'
   | '$SYSTEM_SECURITY_medium;'
@@ -108,6 +112,7 @@ export interface FSDJump extends BaseLocation {
   JumpDist: number;
   FuelUsed: number;
   FuelLevel: number;
+  BoostUsed?: number;
 }
 
 export interface FactionInfo {
@@ -164,6 +169,7 @@ export interface Bounty extends EventBase {
   Reward?: number;
   TotalReward?: number;
   SharedWithOthers?: number;
+  Faction?: string;
   Rewards?: {
     Faction: string;
     Reward: number;
@@ -224,6 +230,8 @@ export interface CommitCrime extends EventBase {
     | 'assault'
     | 'collidedAtSpeedInNoFireZone'
     | 'collidedAtSpeedInNoFireZoneHullDamage'
+    // wut
+    | 'collidedAtSpeedInNoFireZone_hulldamage'
     | 'disobeyPolice'
     | 'dockingMajorBlockingAirlock'
     | 'dockingMajorBlockingLandingPad'
@@ -270,24 +278,62 @@ export interface Mission extends EventBase {
   Commodity?: string;
   Commodity_Localised?: string;
   Reward?: number;
+
+  Donation?: string | number;
+  Wing?: boolean;
+
+  TargetFaction?: string;
+
+  TargetType?: string;
+  TargetType_Localised?: string;
+
+  Target?: string;
+  Target_Localised?: string;
+}
+
+export type Trend = 'UpGood' | 'DownGood' | 'UpBad' | 'DownBad' | 'None';
+
+export interface FactionEffect {
+  Faction: string;
+  Effects: {
+    Effect: string;
+    Effect_Localised: string;
+    Trend: Trend;
+  }[];
+  Influence: {
+    SystemAddress: number;
+    Trend: Trend;
+  }[];
+  Reputation: Trend;
 }
 
 export interface MissionAccepted extends Mission {
-  Influence: string;
-  TargetType?: string;
   TargetFaction?: string;
   KillCount?: number;
-  TargetType_Localised?: string;
   LocalisedName: string;
   PassengerCount?: number;
   PassengerVIPs?: boolean;
   PassengerWanted?: boolean;
   PassengerType?: 'Terrorist' | 'Tourist' | 'AidWorker';
-  Reputation: string;
+  Influence: 'Med';
+  Reputation: 'Med';
 }
 
 export interface MissionCompleted extends Mission {
-  Donation?: number;
+  FactionEffects: FactionEffect[];
+  MaterialsReward?: {
+    Count: number;
+    Name: string;
+    Name_Localised?: string;
+    Category: string;
+    Category_Localised: string;
+  }[];
+
+  CommodityReward?: {
+    Name: string;
+    Name_Localised: string;
+    Count: number;
+  }[];
 }
 
 export interface ModuleEvent extends EventBase {
@@ -300,7 +346,7 @@ export interface ModuleEvent extends EventBase {
 export interface ModuleStoreEvent extends ModuleEvent {
   EngineerModifications?: string;
   Quality?: number;
-  Level: number;
+  Level?: number;
   Hot: boolean;
 }
 
@@ -346,6 +392,7 @@ export interface ModuleBuy extends ModuleEvent, Partial<BaseBaseSell>, Partial<M
 export interface ModuleSell extends ModuleEvent, BaseBaseSell {}
 
 export interface ModuleSwap extends EventBase {
+  MarketID: number;
   FromSlot: AllSlots;
   ToSlot: AllSlots;
   FromItem: string;
@@ -463,6 +510,7 @@ export interface Docked extends DockBase, VeryBaseLocation {
     Name_Localised: string;
     Proportion: number;
   }[];
+  Wanted?: true;
 }
 
 export interface Undocked extends DockBase {}
@@ -540,12 +588,14 @@ export interface HullDamage extends EventBase {
 
 export interface InterdictionBase extends EventBase {
   Interdictor: string;
+  Interdictor_Localised?: string;
   IsPlayer: boolean;
+  CombatRank?: number;
 }
 
 export interface Interdicted extends InterdictionBase {
   Submitted: boolean;
-  Faction: string;
+  Faction?: string;
   Power?: Power;
 }
 
@@ -595,11 +645,14 @@ export interface ShipyardSwap extends EventBase {
 
 export interface ShipyardTransfer extends EventBase {
   ShipType: string;
+  ShipType_Localised?: string;
   ShipID: number;
   System: string;
   Distance: number;
   TransferPrice: number;
   TransferTime: number;
+  MarketID: number;
+  ShipMarketID: number;
 }
 
 export interface EjectCargo extends EventBase {
@@ -715,7 +768,7 @@ export interface DatalinkScan extends EventBase {
 
 export interface DatalinkVoucher extends EventBase {
   Reward: number;
-  VictimFaction: Faction;
+  VictimFaction: Faction | '';
   PayeeFaction: Faction;
 }
 
@@ -789,8 +842,9 @@ export interface Interdiction extends EventBase {
   Success: boolean;
   IsPlayer: boolean;
   Faction?: string;
-  CombatRank?: CombatRank;
+  CombatRank?: number;
   Power?: Power;
+  Interdicted: string;
 }
 
 export interface ApproachSettlement extends EventBase {
@@ -1034,7 +1088,9 @@ export interface CrewEvent extends EventBase {
   Crew: string;
 }
 
-export interface CrewMemberJoins extends CrewEvent {}
+export interface CrewMemberJoins extends CrewEvent {
+  Crew: string;
+}
 
 export interface CrewLaunchFighter extends CrewEvent {}
 
@@ -1044,8 +1100,9 @@ export interface CrewMemberRoleChange extends CrewEvent {
 
 export interface CrewMemberQuits extends CrewEvent {}
 
-export interface CrewHire extends CrewEvent {
-  name: string;
+export interface CrewHire extends EventBase {
+  Name: string;
+  CrewID: number;
   Faction: string;
   Cost: number;
   CombatRank: number;
@@ -1101,7 +1158,8 @@ export interface Music extends EventBase {
     | 'Combat_Unknown'
     | 'Unknown_Settlement'
     | 'Interdiction'
-    | 'Unknown_Exploration';
+    | 'Unknown_Exploration'
+    | 'Combat_CapitalShip';
 }
 
 export interface PassengerManifest {
@@ -1244,6 +1302,7 @@ export interface Statistics extends EventBase {
   Crew: {
     NpcCrew_TotalWages: number;
     NpcCrew_Hired: number;
+    NpcCrew_Died?: number;
   };
   Multicrew: {
     Multicrew_Time_Total: number;
@@ -1294,10 +1353,11 @@ export interface ShipThing {
 }
 
 export interface RemoteShip extends ShipThing {
-  StarSystem: string;
-  ShipMarketID: number;
-  TransferTime: number;
-  TransferPrice: number;
+  StarSystem?: string;
+  ShipMarketID?: number;
+  TransferTime?: number;
+  InTransit?: true;
+  TransferPrice?: number;
 }
 
 export interface StoredShips extends EventBase, StatStationData {
@@ -1310,15 +1370,16 @@ export interface StoredModules extends EventBase, StatStationData {
     Name: string;
     Name_Localised: string;
     StorageSlot: number;
-    StarSystem: string;
-    MarketID: number;
-    TransferCost: number;
-    TransferTime: number;
+    StarSystem?: string;
+    MarketID?: number;
+    TransferCost?: number;
+    TransferTime?: number;
     BuyPrice: number;
     Hot: boolean;
     EngineerModifications?: string;
     Level?: number;
     Quality?: number;
+    InTransit?: true;
   }[];
 }
 
@@ -1404,11 +1465,14 @@ export interface FighterRebuilt extends EventBase {
   Loadout: FighterLoadout;
 }
 
-export interface MaterialExchange {
+export interface MaterialDefinition {
   Material: string;
   Material_Localised?: string;
   Category: string;
   Category_Localised: string;
+}
+
+export interface MaterialExchange extends MaterialDefinition {
   Quantity: number;
 }
 
@@ -1437,6 +1501,43 @@ export interface TechnologyBroker extends EventBase {
     Count: number;
     Category: MaterialType;
   }[];
+}
+
+export interface MissionRedirected extends EventBase {
+  MissionID: number;
+  Name: string;
+  NewDestinationStation: string;
+  NewDestinationSystem: string;
+  OldDestinationStation: string;
+  OldDestinationSystem: string;
+}
+
+export interface PayBounties extends EventBase {
+  Amount: number;
+  Faction: string;
+  Faction_Localised: string;
+  ShipID: number;
+  BrokerPercentage?: number;
+}
+
+export type DroneType = 'Recon' | 'Collection';
+
+export interface LaunchDrone extends EventBase {
+  Type: DroneType;
+}
+
+export interface SystemsShutdown extends EventBase {
+
+}
+
+export interface FighterDestroyed extends EventBase {
+
+}
+
+export interface NpcCrewRank extends EventBase {
+  NpcCrewId: number;
+  NpcCrewName: string;
+  RankCombat: number;
 }
 
 // Stat events

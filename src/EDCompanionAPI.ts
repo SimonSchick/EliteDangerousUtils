@@ -1,7 +1,7 @@
 import { MandatorySlots, OptionalSlots } from './common';
 import { HTTPClient, Options, Response } from './util/HTTPClient';
 
-export interface Commander {
+export interface CompanionCommander {
   id: number;
   name: string;
   credits: number;
@@ -183,7 +183,7 @@ export interface APIRemoteShip extends APIShip {
 }
 
 export interface APIResponseRoot {
-  commander: Commander;
+  commander: CompanionCommander;
   lastSystem: APISystemInfo;
   lastStarport: StartPortInfo;
   ship: APIShip;

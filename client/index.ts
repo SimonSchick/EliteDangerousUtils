@@ -191,7 +191,7 @@ class Client {
     )
       .trim()
       .split('\n')
-      .map(line => line.match(/'event:(.*?)': (.*?),/))
+      .map(line => line.match(/'event:(.*?)': (.*?);/))
       .filter(match => match)
       .map(match => match![1]));
 
