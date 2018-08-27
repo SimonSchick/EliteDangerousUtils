@@ -45,7 +45,8 @@ export type Economy =
   | '$economy_Service;'
   | '$economy_Repair;'
   | '$economy_Tourism;'
-  | '$economy_Prison;';
+  | '$economy_Prison;'
+  | '$economy_Damaged;';
 
 export type Security =
   | '$SYSTEM_SECURITY_low;'
@@ -66,7 +67,7 @@ export type Power =
   | 'Edmund Mahon'
   | 'Denton Patreus'
   | 'Zachary Hudson'
-  | 'Zermina Torval'
+  | 'Zemina Torval'
   | 'Archon Delaine'
   | 'Aisling Duval'
   | 'A. Lavigny-Duval'
@@ -246,7 +247,8 @@ export interface CommitCrime extends EventBase {
     | 'illegalCargo'
     | 'interdiction'
     | 'murder'
-    | 'piracy';
+    | 'piracy'
+    | 'recklessWeaponsDischarge';
   // deprecated
   Victim_Localised?: string;
   Faction: string;
@@ -315,8 +317,8 @@ export interface MissionAccepted extends Mission {
   PassengerVIPs?: boolean;
   PassengerWanted?: boolean;
   PassengerType?: 'Terrorist' | 'Tourist' | 'AidWorker';
-  Influence: 'Med';
-  Reputation: 'Med';
+  Influence: 'Med' | 'None';
+  Reputation: 'Med' | 'None';
 }
 
 export interface MissionCompleted extends Mission {
@@ -337,7 +339,7 @@ export interface MissionCompleted extends Mission {
 }
 
 export interface ModuleEvent extends EventBase {
-  MarketID: number;
+  MarketID?: number;
   Slot?: AllSlots;
   Ship: string;
   ShipID: number;
@@ -371,8 +373,8 @@ export interface MassModuleStore extends ModuleEvent {
     Name: string;
     Name_Localised: string;
     EngineerModifications?: string;
-    Quality: number;
-    Level: number;
+    Quality?: number;
+    Level?: number;
     Hot: boolean;
   }[];
 }
@@ -458,7 +460,7 @@ export interface DockingDenied extends DockingEvent {
 
 export interface MarketEvent extends EventBase {
   Type: string;
-  Type_Localised: string;
+  Type_Localised?: string;
   Count: number;
   MarketID: number;
 }
@@ -484,7 +486,7 @@ export interface MarketSell extends MarketEvent {
 export interface DockBase extends EventBase {
   StationName: string;
   StationType: StationType;
-  StationState?: 'UnderRepairs';
+  StationState?: 'UnderRepairs' | 'Damaged';
   MarketID?: number;
 }
 
@@ -577,6 +579,8 @@ export interface EngineerApply extends EngineerEvent {
 
 export interface EngineerProgress extends EventBase {
   Engineer: string;
+  EngineerID: number;
+  Progress?: 'Unlocked';
   Rank: number;
 }
 
@@ -625,6 +629,8 @@ export interface RepairAll extends EventBase {
 }
 
 export interface ShipyardSell extends EventBase {
+  MarketID: number;
+  ShipType_Localised: string;
   ShipType: string;
   SellShipID: number;
   ShipPrice: number;
@@ -843,8 +849,8 @@ export interface Interdiction extends EventBase {
   IsPlayer: boolean;
   Faction?: string;
   CombatRank?: number;
-  Power?: Power;
-  Interdicted: string;
+  Power?: Allegiance;
+  Interdicted?: string;
 }
 
 export interface ApproachSettlement extends EventBase {
@@ -863,7 +869,8 @@ export interface DataScanned extends EventBase {
     | 'Unknown_Uplink'
     | 'ShipUplink'
     | 'ListeningPost'
-    | 'ANCIENTCODEX';
+    | 'ANCIENTCODEX'
+    | 'AbandonedDataLog';
 }
 
 export type Promotion = Partial<Rank>;
@@ -996,6 +1003,7 @@ export interface BuyTradeData extends EventBase {
 
 export interface MiningRefined extends EventBase {
   Type: string;
+  Type_Localised?: string;
 }
 
 export interface CockpitBreached extends EventBase {}
@@ -1159,7 +1167,8 @@ export interface Music extends EventBase {
     | 'Unknown_Settlement'
     | 'Interdiction'
     | 'Unknown_Exploration'
-    | 'Combat_CapitalShip';
+    | 'Combat_CapitalShip'
+    | 'Damaged_Starport';
 }
 
 export interface PassengerManifest {
@@ -1398,7 +1407,7 @@ export interface ShipTargetedStage0 extends ShipTargetedStage0Base {
   ScanStage: 0;
 }
 
-export type LegalStatus = 'Clean' | 'Wanted' | 'Lawless' | 'Unknown';
+export type LegalStatus = 'Clean' | 'Wanted' | 'Lawless' | 'Unknown' | 'Enemy' | 'WantedEnemy';
 
 interface ShipTargetedStage1Base extends ShipTargetedStage0Base {
   PilotName: string;
@@ -1520,7 +1529,7 @@ export interface PayBounties extends EventBase {
   BrokerPercentage?: number;
 }
 
-export type DroneType = 'Recon' | 'Collection';
+export type DroneType = 'Recon' | 'Collection' | 'Prospector';
 
 export interface LaunchDrone extends EventBase {
   Type: DroneType;
@@ -1538,6 +1547,46 @@ export interface NpcCrewRank extends EventBase {
   NpcCrewId: number;
   NpcCrewName: string;
   RankCombat: number;
+}
+
+export interface Powerplay extends EventBase {
+  Power: string;
+  Rank: number;
+  Votes: number;
+  Merits: number;
+  TimePledged: number;
+}
+
+export interface PowerplayVoucher extends EventBase {
+  Power: string;
+  Systems: string[];
+}
+
+export interface CargoDepot extends EventBase {
+  MissionID: number;
+  UpdateType: 'Deliver';
+  CargoType: string;
+  Count: number;
+  StartMarketID: number;
+  EndMarketID: number;
+  ItemsCollected: number;
+  ItemsDelivered: number;
+  TotalItemsToDeliver: number;
+  Progress: number;
+}
+
+export interface NavBeaconScan extends EventBase {
+  SystemAddress: number;
+  NumBodies: number;
+}
+
+export interface EngineerContribution extends EventBase {
+  Engineer: string;
+  EngineerID: number;
+  Type: string;
+  Commodity: string;
+  Quantity: number;
+  TotalQuantity: number;
 }
 
 // Stat events

@@ -165,6 +165,11 @@ import {
   WingInvite,
   WingJoin,
   WingLeave,
+  Powerplay,
+  PowerplayVoucher,
+  CargoDepot,
+  NavBeaconScan,
+  EngineerContribution,
 } from './events';
 
 export interface BacklogOptions {
@@ -331,6 +336,11 @@ export interface GameEvents {
   'event:SystemsShutdown': SystemsShutdown;
   'event:FighterDestroyed': FighterDestroyed;
   'event:NpcCrewRank': NpcCrewRank;
+  'event:Powerplay': Powerplay;
+  'event:PowerplayVoucher': PowerplayVoucher;
+  'event:CargoDepot': CargoDepot;
+  'event:NavBeaconScan': NavBeaconScan;
+  'event:EngineerContribution': EngineerContribution;
   // stuff
   'event:Market': Market;
   'event:Shipyard': Shipyard;
