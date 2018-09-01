@@ -46,7 +46,8 @@ export type Economy =
   | '$economy_Repair;'
   | '$economy_Tourism;'
   | '$economy_Prison;'
-  | '$economy_Damaged;';
+  | '$economy_Damaged;'
+  | '$economy_Rescue;';
 
 export type Security =
   | '$SYSTEM_SECURITY_low;'
@@ -73,7 +74,7 @@ export type Power =
   | 'A. Lavigny-Duval'
   | 'Pranav Antal'
   | 'Yuri Grom';
-export type FighterLoadout = 'zero' | 'two';
+export type FighterLoadout = 'zero' | 'two' | 'one';
 
 export interface VeryBaseLocation {
   SystemAddress?: number;
@@ -316,7 +317,7 @@ export interface MissionAccepted extends Mission {
   PassengerCount?: number;
   PassengerVIPs?: boolean;
   PassengerWanted?: boolean;
-  PassengerType?: 'Terrorist' | 'Tourist' | 'AidWorker';
+  PassengerType?: 'Terrorist' | 'Tourist' | 'AidWorker' | 'Refugee';
   Influence: 'Med' | 'None';
   Reputation: 'Med' | 'None';
 }
@@ -580,8 +581,8 @@ export interface EngineerApply extends EngineerEvent {
 export interface EngineerProgress extends EventBase {
   Engineer: string;
   EngineerID: number;
-  Progress?: 'Unlocked';
-  Rank: number;
+  Progress?: 'Unlocked' | 'Invited' | 'Known';
+  Rank?: number;
 }
 
 export interface HullDamage extends EventBase {
@@ -870,7 +871,9 @@ export interface DataScanned extends EventBase {
     | 'ShipUplink'
     | 'ListeningPost'
     | 'ANCIENTCODEX'
-    | 'AbandonedDataLog';
+    | 'AbandonedDataLog'
+    | 'AncientPylon'
+    | 'TouristBeacon';
 }
 
 export type Promotion = Partial<Rank>;
@@ -1587,6 +1590,14 @@ export interface EngineerContribution extends EventBase {
   Commodity: string;
   Quantity: number;
   TotalQuantity: number;
+}
+
+export interface SearchAndRescue extends EventBase {
+  Reward: number;
+  Count: number;
+  Name: string;
+  Name_Localised: string;
+  MarketID: number;
 }
 
 // Stat events

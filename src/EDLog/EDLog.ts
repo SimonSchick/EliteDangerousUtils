@@ -18,6 +18,7 @@ import {
   BuyTradeData,
   CapShipBond,
   Cargo,
+  CargoDepot,
   ChangeCrewRole,
   ClearSavedGame,
   CockpitBreached,
@@ -49,6 +50,7 @@ import {
   EjectCargo,
   EndCrewSession,
   EngineerApply,
+  EngineerContribution,
   EngineerCraft,
   EngineerProgress,
   EscapeInterdiction,
@@ -103,6 +105,7 @@ import {
   ModuleStore,
   ModuleSwap,
   Music,
+  NavBeaconScan,
   NewCommander,
   NpcCrewPaidWage,
   NpcCrewRank,
@@ -111,8 +114,10 @@ import {
   PayBounties,
   PayFines,
   PayLegacyFines,
+  Powerplay,
   PowerplayJoin,
   PowerplaySalary,
+  PowerplayVoucher,
   Progress,
   Promotion,
   PVPKill,
@@ -132,6 +137,7 @@ import {
   Scan,
   Scanned,
   Screenshot,
+  SearchAndRescue,
   SelfDestruct,
   SellDrones,
   SellExplorationData,
@@ -165,11 +171,6 @@ import {
   WingInvite,
   WingJoin,
   WingLeave,
-  Powerplay,
-  PowerplayVoucher,
-  CargoDepot,
-  NavBeaconScan,
-  EngineerContribution,
 } from './events';
 
 export interface BacklogOptions {
@@ -341,6 +342,7 @@ export interface GameEvents {
   'event:CargoDepot': CargoDepot;
   'event:NavBeaconScan': NavBeaconScan;
   'event:EngineerContribution': EngineerContribution;
+  'event:SearchAndRescue': SearchAndRescue;
   // stuff
   'event:Market': Market;
   'event:Shipyard': Shipyard;
