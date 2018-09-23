@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { sampleSize } from 'lodash';
 import { join } from 'path';
 import { speak } from 'say';
 import { inspect } from 'util';
@@ -19,6 +18,7 @@ import { Client as EDSMClient, CommanderMapEntry, Coordinate } from '../src/EDSM
 import { GalaxyMapWatcher, Move } from '../src/EDSM/GalaxyMapWatcher';
 import { AsyncQueue } from '../src/util/AsyncQueue';
 import { HTTPClient } from '../src/util/HTTPClient';
+import { sampleSize } from '../src/util/sampleSize';
 
 function handler(error: Error) {
   console.log(

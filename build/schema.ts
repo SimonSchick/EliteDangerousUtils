@@ -6,48 +6,48 @@ import { buildGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { directory } from '../src/EDLog/directory';
 
 function run() {
-    const file = join(__dirname, '../src/EDLog/events.ts');
-    const program = getProgramFromFiles([file], {
-        strictNullChecks: true,
+  const file = join(__dirname, '../src/EDLog/events.ts');
+  const program = getProgramFromFiles([file], {
+    strictNullChecks: true,
+  });
+
+  const generator = buildGenerator(program, {
+    noExtraProps: true,
+    required: true,
+    // topRef: true,
+  });
+
+  const schema = generator!.getSchemaForSymbols(generator!.getMainFileSymbols(program));
+
+  const raw = new EDLogReader().read(directory());
+
+  const validator = new Validator();
+  const known = new Set<string>();
+  validator.addSchema(schema, '/Events');
+  let errors = 0;
+  raw.forEach(r => {
+    // False positiv
+    if (r.event === 'Scan') {
+      return;
+    }
+    const interfaceName = r.event;
+    const res = validator.validate(r, { $ref: `/Events#/definitions/${interfaceName}` }, {
+      allowUnknownAttributes: false,
     });
-
-    const generator = buildGenerator(program, {
-        noExtraProps: true,
-        required: true,
-        // topRef: true,
-    });
-
-    const schema = generator!.getSchemaForSymbols(generator!.getMainFileSymbols(program));
-
-    const raw = new EDLogReader().read(directory());
-
-    const validator = new Validator();
-    const known = new Set<string>();
-    validator.addSchema(schema, '/Events');
-    let errors = 0;
-    raw.forEach(r => {
-        // False positiv
-        if (r.event === 'Scan') {
-            return;
+    if (!res.valid || res.errors.length > 0) {
+      res.errors.forEach(e => {
+        if (known.has(e.message)) {
+          return;
         }
-        const interfaceName = r.event;
-        const res = validator.validate(r, { $ref: `/Events#/definitions/${interfaceName}` }, {
-            allowUnknownAttributes: false,
-        });
-        if (!res.valid || res.errors.length > 0) {
-            res.errors.forEach(e => {
-                if (known.has(e.message)) {
-                    return;
-                }
-                if (e.property.startsWith('instance.Modules[')) {
-                    return;
-                }
-                errors++;
-                console.log('Invalid schema', r, res.errors);
-                known.add(e.message);
-            });
+        if (e.property.startsWith('instance.Modules[')) {
+          return;
         }
-    });
-    console.log('errors', errors);
+        errors++;
+        console.log('Invalid schema', r, res.errors);
+        known.add(e.message);
+      });
+    }
+  });
+  console.log('errors', errors);
 }
 run();

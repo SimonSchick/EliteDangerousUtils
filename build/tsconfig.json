@@ -9,19 +9,16 @@
         "noFallthroughCasesInSwitch": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "strictNullChecks": true,
         "module": "commonjs",
         "sourceMap": true,
         "target": "es2017",
         "strict": true,
         "noEmit": true,
-        "noStrictGenericChecks": false,
         "baseUrl": ".",
         "lib": [
             "es2017",
             "es2015.iterable"
-        ],
-        "alwaysStrict": true
+        ]
     },
     "include": [
         "./schema.ts"

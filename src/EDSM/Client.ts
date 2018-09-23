@@ -16,9 +16,9 @@ export interface CommandMapPage {
 export interface CommanderMapEntry {
   user: string;
   coordinates: Coordinate;
-  cmdrUrl: string;
-  cmdrName: string;
-  systemName: string;
+  cmdrUrl?: string;
+  cmdrName?: string;
+  systemName?: string;
 }
 
 /**
