@@ -8,7 +8,9 @@ import {
   BaseLocation,
   Bounty,
   FSDJump,
+  LandableBody,
   ReceiveText,
+  Scan,
   SendText,
   StartJump,
 } from '../src/EDLog/events';
@@ -20,7 +22,7 @@ import { AsyncQueue } from '../src/util/AsyncQueue';
 import { HTTPClient } from '../src/util/HTTPClient';
 import { sampleSize } from '../src/util/sampleSize';
 
-function handler(error: Error) {
+function handler(error: unknown) {
   console.log(
     inspect(error, {
       depth: 3,
@@ -50,9 +52,9 @@ class Client {
   private galaxyMapWatcherCommanderDistance = 1000;
   private materialTruncateLength = 5;
   private galaxyMapWatcherOptions = {
-    additionalDelay: 2500,
-    cycleDelay: 20 * 1000,
-    delay: 250,
+    additionalDelay: 1000,
+    cycleDelay: 2.5 * 1000,
+    delay: 200,
   };
   private cachedPosition?: EDPosition;
   private trackList: string[] = [];
@@ -124,7 +126,7 @@ class Client {
   }
 
   private onError(err: Error) {
-    this.sayQ(`Error: ${err.message}`);
+    this.sayQ(`Error: ${err.stack}`);
   }
 
   private attachEventListeners() {
@@ -135,7 +137,7 @@ class Client {
       .on('event:Bounty', event => this.onBounty(event))
       .on('event:StartJump', event => this.onStartJump(event))
       .on('event:Location', event => this.onLocation(event))
-      .on('file', ev => console.log(ev.file))
+      .on('event:Scan', event => this.onScan(event))
       .on('event', ev => {
         if (!this.knownEvents) {
           throw new Error('Events not loaded');
@@ -153,11 +155,22 @@ class Client {
     this.watcher
       .once('cycle', () => this.sayQ('Galaxy watcher fetch complete'))
       .on('moved', ev => this.onCommanderMoved(ev))
-      .on('error', err => this.sayQ(`Error: ${err.message}`));
+      .on('error', err => this.sayQ(`Error: ${err.stack}`));
   }
 
   private formatCoord({ x, y, z }: Coordinate): string {
     return `${x.toFixed(1)} ${y.toFixed(1)} ${z.toFixed(1)}`;
+  }
+
+  private onScan(event: Scan): void {
+    if ('Materials' in event) {
+      const materials = (<LandableBody>event).Materials;
+      console.table(materials.map(v => ({ name: v.Name, content: `${v.Percent.toFixed(3)}%` })));
+      const found = materials.find(({ Name }) => Name === 'polonium');
+      if (found && found.Percent > 0.7) {
+        this.sayQ(`Polonium rich planet ${event.BodyName}`);
+      }
+    }
   }
 
   private formatCommanderInfo(cmdr: CommanderMapEntry, dist: number): string {
@@ -180,6 +193,7 @@ class Client {
     if (dist < this.galaxyMapWatcherCommanderDistance) {
       const system = await this.edsm.locationToSystem(event.entry.coordinates);
       event.entry.systemName = system;
+      console.log(event.entry.user);
       this.sayQ(`Nearby Commander ${this.formatCommanderInfo(event.entry, dist)}`);
     }
   }
@@ -237,8 +251,9 @@ class Client {
   }
 
   private sayQ(text: string, extra?: object) {
+    console.log(new Date().toISOString());
     this.queue.push((cb: (error: Error | undefined) => void) =>
-      speak(text, '', 1, err => cb(err ? new Error(err) : undefined)),
+      speak(text, '', 1.5, err => cb(err ? new Error(err) : undefined)),
     );
     console.log(text);
     if (extra) {
@@ -318,6 +333,9 @@ class Client {
             (event.From_Localised || event.From || '').includes(entry),
           )
         ) {
+          return;
+        }
+        if (event.Message.startsWith('$COMMS_entered')) {
           return;
         }
         this.sayQ(`Message from ${event.From_Localised || event.From}: ${event.Message_Localised}`);
@@ -428,7 +446,6 @@ class Client {
     }
     if (event.StarClass === 'H' || event.StarClass === 'N' || event.StarClass.startsWith('D')) {
       this.sayQ(`Jumping to ${event.StarClass} class star.`);
-      this.sayQ('Warning, potential hazard.');
     }
   }
 }

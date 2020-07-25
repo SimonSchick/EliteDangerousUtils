@@ -244,7 +244,8 @@ export type OptionalSlots =
   | 'WeaponColour'
   | 'EngineColour'
   | 'PlanetaryApproachSuite'
-  | 'Paintjob'
+  | 'PaintJob'
+  | 'VesselVoice'
   | Slots;
 
 export type MandatorySlots =

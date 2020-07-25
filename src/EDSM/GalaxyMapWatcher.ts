@@ -153,9 +153,7 @@ export class GalaxyMapWatcher extends EventEmitter {
     } catch (err) {
       this.emit('error', err);
     } finally {
-      const baseDelay =
-        this.options.delay +
-        (this.fetchCycle > 0 ? this.options.additionalDelay || this.options.delay : 0);
+      const baseDelay = (this.fetchCycle > 0 ? this.options.additionalDelay || this.options.delay : 0);
       const cycleDelay = this.lastPage === 0 ? this.options.cycleDelay : 0;
       this.timer = setTimeout(() => {
         // tslint:disable-next-line no-floating-promises

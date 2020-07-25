@@ -23,10 +23,11 @@ function run() {
 
   const validator = new Validator();
   const known = new Set<string>();
-  validator.addSchema(schema, '/Events');
+  validator.addSchema(<any>schema, '/Events');
   let errors = 0;
+  let deduped = 0;
   raw.forEach(r => {
-    // False positiv
+    // False positive
     if (r.event === 'Scan') {
       return;
     }
@@ -35,19 +36,32 @@ function run() {
       allowUnknownAttributes: false,
     });
     if (!res.valid || res.errors.length > 0) {
-      res.errors.forEach(e => {
+      const unknownErrors = res.errors.filter(e => {
         if (known.has(e.message)) {
-          return;
+          deduped++;
+          return false;
         }
         if (e.property.startsWith('instance.Modules[')) {
           return;
         }
         errors++;
-        console.log('Invalid schema', r, res.errors);
         known.add(e.message);
+        return true;
       });
+      if (unknownErrors.length === 0) {
+        return;
+      }
+      console.log('Invalid schema', r);
+      console.log(unknownErrors.map(e => ({
+        argument: e.argument,
+        instance: e.instance,
+        message: e.message,
+        name: e.name,
+        property: e.property,
+      })));
     }
   });
   console.log('errors', errors);
+  console.log('deduped', deduped);
 }
 run();

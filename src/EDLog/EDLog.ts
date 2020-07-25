@@ -22,6 +22,7 @@ import {
   ChangeCrewRole,
   ClearSavedGame,
   CockpitBreached,
+  CodexEntry,
   CollectCargo,
   Commander,
   CommitCrime,
@@ -34,6 +35,7 @@ import {
   CrewMemberJoins,
   CrewMemberQuits,
   CrewMemberRoleChange,
+  CrimeVictim,
   DatalinkScan,
   DatalinkVoucher,
   DataScanned,
@@ -61,12 +63,17 @@ import {
   Fileheader,
   Friends,
   FSDJump,
+  FSDTarget,
+  FSSAllBodiesFound,
+  FSSDiscoveryScan,
+  FSSSignalDiscovered,
   FuelScoop,
   HeatDamage,
   HeatWarning,
   HullDamage,
   Interdicted,
   Interdiction,
+  InvitedToSquadron,
   JetConeBoost,
   JetConeDamage,
   JoinACrew,
@@ -104,6 +111,7 @@ import {
   ModulesInfo,
   ModuleStore,
   ModuleSwap,
+  MultiSellExplorationData,
   Music,
   NavBeaconScan,
   NewCommander,
@@ -132,8 +140,10 @@ import {
   RepairAll,
   RepairDrone,
   Reputation,
+  ReservoirReplenished,
   RestockVehicle,
   Resurrect,
+  SAAScanComplete,
   Scan,
   Scanned,
   Screenshot,
@@ -152,6 +162,7 @@ import {
   ShipyardSwap,
   ShipyardTransfer,
   Shutdown,
+  SingleCommunityGoal,
   StartJump,
   Statistics,
   Status,
@@ -343,6 +354,17 @@ export interface GameEvents {
   'event:NavBeaconScan': NavBeaconScan;
   'event:EngineerContribution': EngineerContribution;
   'event:SearchAndRescue': SearchAndRescue;
+  'event:FSDTarget': FSDTarget;
+  'event:FSSDiscoveryScan': FSSDiscoveryScan;
+  'event:FSSAllBodiesFound': FSSAllBodiesFound;
+  'event:ReservoirReplenished': ReservoirReplenished;
+  'event:FSSSignalDiscovered': FSSSignalDiscovered;
+  'event:CodexEntry': CodexEntry;
+  'event:SAAScanComplete': SAAScanComplete;
+  'event:InvitedToSquadron': InvitedToSquadron;
+  'event:MultiSellExplorationData': MultiSellExplorationData;
+  'event:CrimeVictim': CrimeVictim;
+  'event:SingleCommunityGoal': SingleCommunityGoal;
   // stuff
   'event:Market': Market;
   'event:Shipyard': Shipyard;
@@ -419,16 +441,16 @@ export class EDLog extends EventEmitter {
       throw new Error('No backlog');
     }
     const realEvent = event.replace('event:', '');
-    return findLast(this.backlog, ev => ev.event === realEvent);
+    return <GameEvents[K]>findLast(this.backlog, ev => ev.event === realEvent);
   }
 
-  public getAll<K extends keyof GameEvents>(event: K): GameEvents[K] {
+  public getAll<K extends keyof GameEvents>(event: K): GameEvents[K][] {
     // TODO: This isn't great but works
     if (!this.backlog) {
       throw new Error('No backlog');
     }
     const realEvent = event.replace('event:', '');
-    return <GameEvents[K]>this.backlog.filter(ev => ev.event === realEvent);
+    return <GameEvents[K][]>this.backlog.filter(ev => ev.event === realEvent);
   }
 
   /**

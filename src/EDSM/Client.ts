@@ -101,6 +101,9 @@ export class Client {
   private async request<T>(opts: Options): Promise<Response<T>> {
     opts.uri = `https://www.edsm.net${opts.uri}`;
     opts.json = true;
+    opts.headers = opts.headers || {};
+    opts.headers.referer = 'https://www.edsm.net/en/map/users';
+    opts.headers['x-requested-with'] = 'XMLHttpRequest';
     if (this.apiKey) {
       if (!opts.qs) {
         opts.qs = {};

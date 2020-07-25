@@ -15,7 +15,7 @@ export type StationType =
   | 'Outpost'
   | 'SurfaceStation'
   | 'AsteroidBase'
-  | 'MegaShip';
+  | 'MegaShip' | 'CraterOutpost';
 export type Faction = 'Empire' | 'Alliance' | 'Federation' | 'PilotsFederation' | 'Guardian';
 export type Allegiance = 'None' | 'Independent' | Faction;
 export type FactionState =
@@ -31,7 +31,8 @@ export type FactionState =
   | 'Election'
   | 'Investment'
   | 'Outbreak'
-  | 'War';
+  | 'War'
+  | 'PirateAttack';
 export type Economy =
   | '$economy_None;'
   | '$economy_Colony;'
@@ -85,7 +86,9 @@ export interface BaseLocation extends EventBase, VeryBaseLocation {
   SystemAllegiance?: Allegiance | '';
   SystemEconomy: Economy;
   SystemSecondEconomy?: Economy;
-  SystemFaction?: string;
+  SystemFaction?: {
+    name: string;
+  };
   FactionState?: FactionState;
   StarPos: EDPosition;
   Population?: number;
@@ -100,21 +103,35 @@ export interface BaseLocation extends EventBase, VeryBaseLocation {
 
   Powers?: Power[];
   PowerplayState?:
-    | 'Exploited'
-    | 'Controlled'
-    | 'InPrepareRadius'
-    | 'Prepared'
-    | 'Contested'
-    | 'Turmoil'
-    | 'HomeSystem';
+  | 'Exploited'
+  | 'Controlled'
+  | 'InPrepareRadius'
+  | 'Prepared'
+  | 'Contested'
+  | 'Turmoil'
+  | 'HomeSystem';
 }
 
-export interface FSDJump extends BaseLocation {
+export interface WarFaction {
+  Name: string;
+  Stake: string;
+  WonDays: number;
+}
+
+export interface Conflict {
+  WarType: string; // TODO: Narrow
+  Status: 'active' | '';
+  Faction1: WarFaction;
+  Faction2: WarFaction;
+}
+
+export interface FSDJump extends BaseLocation, SupercruiseExit {
   Factions?: FactionInfo[];
   JumpDist: number;
   FuelUsed: number;
   FuelLevel: number;
   BoostUsed?: number;
+  Conflicts: Conflict[];
 }
 
 export interface FactionInfo {
@@ -131,6 +148,9 @@ export interface FactionInfo {
   Government: string;
   Influence: number;
   Allegiance: Allegiance;
+  Happiness: string;
+  Happiness_Localised?: string;
+  MyReputation: number;
 }
 
 export interface Location extends BaseLocation {
@@ -145,6 +165,9 @@ export interface Location extends BaseLocation {
   Factions?: FactionInfo[];
   MarketID?: number;
   BodyID?: number;
+  Conflicts: Conflict[];
+  StationGovernment?: string;
+  StationGovernment_Localised?: string;
 }
 
 export interface ReceiveText extends EventBase {
@@ -190,6 +213,7 @@ export interface LaunchSRV extends EventBase {
 
 export interface LoadGame extends EventBase {
   Commander: string;
+  FID: string;
   Ship: string;
   Ship_Localised?: string;
   ShipID: number;
@@ -217,7 +241,7 @@ export interface Rank extends EventBase {
   CQC: number;
 }
 
-export interface Progress extends Rank {}
+export interface Progress extends Rank { }
 
 export interface SupercruiseExit extends EventBase, VeryBaseLocation {
   Body: string;
@@ -225,31 +249,32 @@ export interface SupercruiseExit extends EventBase, VeryBaseLocation {
   BodyType: BodyType;
 }
 
-export interface SupercruiseEntry extends EventBase, VeryBaseLocation {}
+export interface SupercruiseEntry extends EventBase, VeryBaseLocation { }
+
+export type CrimeType = 'assault'
+| 'collidedAtSpeedInNoFireZone'
+| 'collidedAtSpeedInNoFireZoneHullDamage'
+// wut
+| 'collidedAtSpeedInNoFireZone_hulldamage'
+| 'disobeyPolice'
+| 'dockingMajorBlockingAirlock'
+| 'dockingMajorBlockingLandingPad'
+| 'dockingMajorTresspass'
+| 'dockingMinorBlockingAirlock'
+| 'dockingMinorBlockingLandingPad'
+| 'dockingMinorTresspass'
+| 'dumpingDangerous'
+| 'dumpingNearStation'
+| 'fireInNoFireZone'
+| 'fireInStation'
+| 'illegalCargo'
+| 'interdiction'
+| 'murder'
+| 'piracy'
+| 'recklessWeaponsDischarge';
 
 export interface CommitCrime extends EventBase {
-  CrimeType:
-    | 'assault'
-    | 'collidedAtSpeedInNoFireZone'
-    | 'collidedAtSpeedInNoFireZoneHullDamage'
-    // wut
-    | 'collidedAtSpeedInNoFireZone_hulldamage'
-    | 'disobeyPolice'
-    | 'dockingMajorBlockingAirlock'
-    | 'dockingMajorBlockingLandingPad'
-    | 'dockingMajorTresspass'
-    | 'dockingMinorBlockingAirlock'
-    | 'dockingMinorBlockingLandingPad'
-    | 'dockingMinorTresspass'
-    | 'dumpingDangerous'
-    | 'dumpingNearStation'
-    | 'fireInNoFireZone'
-    | 'fireInStation'
-    | 'illegalCargo'
-    | 'interdiction'
-    | 'murder'
-    | 'piracy'
-    | 'recklessWeaponsDischarge';
+  CrimeType: CrimeType;
   // deprecated
   Victim_Localised?: string;
   Faction: string;
@@ -265,9 +290,9 @@ export interface MaterialEvent extends EventBase {
   Count: number;
 }
 
-export interface MaterialCollected extends MaterialEvent {}
+export interface MaterialCollected extends MaterialEvent { }
 
-export interface MaterialDiscarded extends MaterialEvent {}
+export interface MaterialDiscarded extends MaterialEvent { }
 
 export interface Mission extends EventBase {
   Faction: string;
@@ -337,6 +362,7 @@ export interface MissionCompleted extends Mission {
     Name_Localised: string;
     Count: number;
   }[];
+  KillCount?: number;
 }
 
 export interface ModuleEvent extends EventBase {
@@ -366,7 +392,7 @@ export interface ModuleStoreBase {
   StoredItem_Localised: string;
 }
 
-export interface ModuleStore extends ModuleStoreEvent, ModuleStoreBase {}
+export interface ModuleStore extends ModuleStoreEvent, ModuleStoreBase { }
 
 export interface MassModuleStore extends ModuleEvent {
   Items: {
@@ -392,7 +418,7 @@ export interface ModuleBuy extends ModuleEvent, Partial<BaseBaseSell>, Partial<M
   BuyPrice: number;
 }
 
-export interface ModuleSell extends ModuleEvent, BaseBaseSell {}
+export interface ModuleSell extends ModuleEvent, BaseBaseSell { }
 
 export interface ModuleSwap extends EventBase {
   MarketID: number;
@@ -422,7 +448,7 @@ export interface RefuelPartial extends RefuelBase {
   Amount: number;
 }
 
-export interface BuyAmmo extends RefuelBase {}
+export interface BuyAmmo extends RefuelBase { }
 
 export interface SellExplorationData extends EventBase {
   Systems: string[];
@@ -442,21 +468,21 @@ export interface DockingGranted extends DockingEvent {
   LandingPad: number;
 }
 
-export interface DockingRequested extends DockingEvent {}
+export interface DockingRequested extends DockingEvent { }
 
-export interface DockingCancelled extends DockingEvent {}
+export interface DockingCancelled extends DockingEvent { }
 
-export interface DockingTimeout extends DockingEvent {}
+export interface DockingTimeout extends DockingEvent { }
 
 export interface DockingDenied extends DockingEvent {
   Reason:
-    | 'NoSpace'
-    | 'TooLarge'
-    | 'Hostile'
-    | 'Offences'
-    | 'Distance'
-    | 'ActiveFighter'
-    | 'NoReason';
+  | 'NoSpace'
+  | 'TooLarge'
+  | 'Hostile'
+  | 'Offences'
+  | 'Distance'
+  | 'ActiveFighter'
+  | 'NoReason';
 }
 
 export interface MarketEvent extends EventBase {
@@ -516,20 +542,20 @@ export interface Docked extends DockBase, VeryBaseLocation {
   Wanted?: true;
 }
 
-export interface Undocked extends DockBase {}
+export interface Undocked extends DockBase { }
 
 export interface USSDrop extends EventBase {
   USSType:
-    | '$USS_Type_Aftermath;'
-    | '$USS_Type_VeryValuableSalvage;'
-    | '$USS_Type_Salvage;'
-    | '$USS_Type_WeaponsFire;'
-    | '$USS_Type_Convoy;'
-    | '$USS_Type_DistressSignal;'
-    | '$USS_Type_MissionTarget;'
-    | '$USS_Type_ValuableSalvage;'
-    | '$USS_Type_Ceremonial;'
-    | '$USS_Type_NonHuman;';
+  | '$USS_Type_Aftermath;'
+  | '$USS_Type_VeryValuableSalvage;'
+  | '$USS_Type_Salvage;'
+  | '$USS_Type_WeaponsFire;'
+  | '$USS_Type_Convoy;'
+  | '$USS_Type_DistressSignal;'
+  | '$USS_Type_MissionTarget;'
+  | '$USS_Type_ValuableSalvage;'
+  | '$USS_Type_Ceremonial;'
+  | '$USS_Type_NonHuman;';
   USSType_Localised: string;
   USSThreat: number;
 }
@@ -543,8 +569,8 @@ export interface PlayerController {
   PlayerControlled: boolean;
 }
 
-export interface Touchdown extends Partial<GeoEvent>, PlayerController {}
-export interface Liftoff extends Partial<GeoEvent>, PlayerController {}
+export interface Touchdown extends Partial<GeoEvent>, PlayerController { }
+export interface Liftoff extends Partial<GeoEvent>, PlayerController { }
 
 export interface EngineerEvent extends EventBase {
   EngineerID: number;
@@ -578,11 +604,16 @@ export interface EngineerApply extends EngineerEvent {
   Override?: string;
 }
 
-export interface EngineerProgress extends EventBase {
+export interface SingleEngineer {
   Engineer: string;
   EngineerID: number;
   Progress?: 'Unlocked' | 'Invited' | 'Known';
   Rank?: number;
+  RankProgress?: number;
+}
+
+export interface EngineerProgress extends EventBase {
+  Engineers: SingleEngineer[];
 }
 
 export interface HullDamage extends EventBase {
@@ -610,6 +641,7 @@ export interface EscapeInterdiction extends InterdictionBase {
 }
 
 export interface LaunchFighter extends EventBase {
+  ID: number;
   Loadout: FighterLoadout;
   PlayerControlled: boolean;
 }
@@ -670,16 +702,16 @@ export interface EjectCargo extends EventBase {
   PowerplayOrigin?: string;
 }
 
-export interface HeatWarning extends EventBase {}
+export interface HeatWarning extends EventBase { }
 
-export interface HeatDamage extends EventBase {}
+export interface HeatDamage extends EventBase { }
 
 export interface Screenshot extends EventBase {
   Filename: string;
   Width: number;
   Height: number;
   System: string;
-  Body: string;
+  Body?: string;
   Latitude?: number;
   Longitude?: number;
   Altitude?: number;
@@ -727,7 +759,7 @@ export interface Synthesis extends EventBase {
   }[];
 }
 
-export interface DockSRV extends EventBase {}
+export interface DockSRV extends EventBase { }
 
 export type CombatRank =
   | 'Harmless'
@@ -740,7 +772,7 @@ export type CombatRank =
   | 'Deadly'
   | 'Elite';
 
-export interface Suicide extends EventBase {}
+export interface Suicide extends EventBase { }
 
 export interface SingleDeath extends EventBase {
   KillerName: string;
@@ -811,7 +843,9 @@ export interface ModuleSellRemote extends ModuleEvent, BaseBaseSell {
   ServerId: number;
 }
 
-export interface DockFighter extends EventBase {}
+export interface DockFighter extends EventBase {
+  ID: number;
+}
 
 export interface VehicleSwitch extends EventBase {
   // Apparently nothing when it's the SRV
@@ -819,7 +853,7 @@ export interface VehicleSwitch extends EventBase {
 }
 
 export interface RestockVehicle extends EventBase {
-  Type: 'independent_fighter' | 'federation_fighter' | 'imperial_fighter';
+  Type: 'independent_fighter' | 'federation_fighter' | 'imperial_fighter' | 'gdn_hybrid_fighter_v3';
   Loadout: FighterLoadout;
   Cost: number;
   Count: number;
@@ -858,22 +892,27 @@ export interface ApproachSettlement extends EventBase {
   MarketID?: number;
   Name_Localised?: string;
   Name: string;
+  SystemAddress: number;
+  BodyID: number;
+  BodyName: string;
+  Latitude: number;
+  Longitude: number;
 }
 
 export interface DataScanned extends EventBase {
   Type:
-    | 'DataPoint'
-    | 'DataLink'
-    | 'ListenigPost'
-    | 'AdandonedDataLog'
-    | 'WreckedShip'
-    | 'Unknown_Uplink'
-    | 'ShipUplink'
-    | 'ListeningPost'
-    | 'ANCIENTCODEX'
-    | 'AbandonedDataLog'
-    | 'AncientPylon'
-    | 'TouristBeacon';
+  | 'DataPoint'
+  | 'DataLink'
+  | 'ListenigPost'
+  | 'AdandonedDataLog'
+  | 'WreckedShip'
+  | 'Unknown_Uplink'
+  | 'ShipUplink'
+  | 'ListeningPost'
+  | 'ANCIENTCODEX'
+  | 'AbandonedDataLog'
+  | 'AncientPylon'
+  | 'TouristBeacon';
 }
 
 export type Promotion = Partial<Rank>;
@@ -904,7 +943,7 @@ export interface CommunityEventbase extends EventBase {
   System: string;
 }
 
-export interface CommunityGoalJoin extends CommunityEventbase {}
+export interface CommunityGoalJoin extends CommunityEventbase { }
 
 export interface CommunityGoalReward extends CommunityEventbase {
   Reward: number;
@@ -939,7 +978,7 @@ export interface ShipyardNew extends EventBase {
   NewShipID: number;
 }
 
-export interface CapShipBond extends FactionKillBond {}
+export interface CapShipBond extends FactionKillBond { }
 
 export interface Ring {
   Name: string;
@@ -978,10 +1017,13 @@ export interface Body extends ScanBase {
   SurfaceGravity: number;
   SurfacePressure: number;
   Landable?: true;
+}
+
+export interface LandableBody extends Body {
   Materials: {
     Name: string;
-    Percentage: number;
-  };
+    Percent: number;
+  }[];
 }
 
 export interface NonCentralBody extends ScanBase {
@@ -992,7 +1034,7 @@ export interface NonCentralBody extends ScanBase {
   OrbitalPeriod: number;
 }
 
-export type Scan = (Star | Body) & Partial<NonCentralBody>;
+export type Scan = (Star | Body | LandableBody) & Partial<NonCentralBody>;
 
 export interface BuyExplorationData extends EventBase {
   System: string;
@@ -1009,7 +1051,7 @@ export interface MiningRefined extends EventBase {
   Type_Localised?: string;
 }
 
-export interface CockpitBreached extends EventBase {}
+export interface CockpitBreached extends EventBase { }
 
 export interface DronesEvent extends EventBase {
   Type: 'Drones';
@@ -1026,7 +1068,7 @@ export interface SellDrones extends DronesEvent {
   TotalSale: number;
 }
 
-export interface SelfDestruct extends EventBase {}
+export interface SelfDestruct extends EventBase { }
 
 export interface Cargo extends EventBase {
   Inventory: {
@@ -1035,6 +1077,8 @@ export interface Cargo extends EventBase {
     Count: number;
     Stolen: number;
   }[];
+  Vessel: 'Ship';
+  Count: number;
 }
 
 export interface BaseModule {
@@ -1043,9 +1087,9 @@ export interface BaseModule {
   On: boolean;
   Priority: number;
   Health: number;
-  Value: number;
   EngineerBlueprint?: string;
   EngineeringLevel?: number;
+  Engineering?: object; // TODO
 }
 
 export interface AmmoWeaponModule extends BaseModule {
@@ -1062,6 +1106,14 @@ export interface Loadout extends EventBase {
   HullValue?: number;
   ModulesValue?: number;
   Modules: (BaseModule | AmmoWeaponModule)[];
+  MaxJumpRange: number;
+  CargoCapacity: number;
+  UnladenMass: number;
+  HullHealth: number;
+  FuelCapacity: {
+    Main: number;
+    Reserve: number;
+  };
 }
 
 export type Materials = {
@@ -1103,13 +1155,13 @@ export interface CrewMemberJoins extends CrewEvent {
   Crew: string;
 }
 
-export interface CrewLaunchFighter extends CrewEvent {}
+export interface CrewLaunchFighter extends CrewEvent { }
 
 export interface CrewMemberRoleChange extends CrewEvent {
   Role: 'Idle' | 'FireCon' | 'FighterCon';
 }
 
-export interface CrewMemberQuits extends CrewEvent {}
+export interface CrewMemberQuits extends CrewEvent { }
 
 export interface CrewHire extends EventBase {
   Name: string;
@@ -1151,27 +1203,27 @@ export interface Friends extends EventBase {
 
 export interface Music extends EventBase {
   MusicTrack:
-    | 'NoTrack'
-    | 'MainMenu'
-    | 'Starport'
-    | 'SystemMap'
-    | 'Supercruise'
-    | 'DestinationFromSupercruise'
-    | 'GalacticPowers'
-    | 'Exploration'
-    | 'GalaxyMap'
-    | 'Combat_Dogfight'
-    | 'Combat_LargeDogFight'
-    | 'Combat_SRV'
-    | 'DestinationFromHyperspace'
-    | 'Unknown_Encounter'
-    | 'GuardianSites'
-    | 'Combat_Unknown'
-    | 'Unknown_Settlement'
-    | 'Interdiction'
-    | 'Unknown_Exploration'
-    | 'Combat_CapitalShip'
-    | 'Damaged_Starport';
+  | 'NoTrack'
+  | 'MainMenu'
+  | 'Starport'
+  | 'SystemMap'
+  | 'Supercruise'
+  | 'DestinationFromSupercruise'
+  | 'GalacticPowers'
+  | 'Exploration'
+  | 'GalaxyMap'
+  | 'Combat_Dogfight'
+  | 'Combat_LargeDogFight'
+  | 'Combat_SRV'
+  | 'DestinationFromHyperspace'
+  | 'Unknown_Encounter'
+  | 'GuardianSites'
+  | 'Combat_Unknown'
+  | 'Unknown_Settlement'
+  | 'Interdiction'
+  | 'Unknown_Exploration'
+  | 'Combat_CapitalShip'
+  | 'Damaged_Starport' | 'SystemAndSurfaceScanner' | 'Codex';
 }
 
 export interface PassengerManifest {
@@ -1197,7 +1249,7 @@ export interface RepairDrone extends EventBase {
   HullRepaired: number;
 }
 
-export interface ModuleInfo extends EventBase {}
+export interface ModuleInfo extends EventBase { }
 
 export interface MissionInfo {
   MissionID: number;
@@ -1214,6 +1266,7 @@ export interface Missions extends EventBase {
 
 export interface Commander extends EventBase {
   Name: string;
+  FID: string;
 }
 
 export interface Reputation extends EventBase {
@@ -1233,6 +1286,7 @@ export interface Statistics extends EventBase {
     Spent_On_Ammo_Consumables: number;
     Insurance_Claims: number;
     Spent_On_Insurance: number;
+    Owned_Ship_Count: number;
   };
   Combat: {
     Bounties_Claimed: number;
@@ -1281,6 +1335,7 @@ export interface Statistics extends EventBase {
     Total_Hyperspace_Jumps: number;
     Greatest_Distance_From_Start: number;
     Time_Played: number;
+    Efficient_Scans: number;
   };
   Passengers: {
     Passengers_Missions_Accepted: number;
@@ -1451,7 +1506,7 @@ export type ShipTargeted =
   | ShipTargetedStage2
   | ShipTargetedStage3;
 
-export interface Shutdown extends EventBase {}
+export interface Shutdown extends EventBase { }
 
 export interface UnderAttack extends EventBase {
   Target: string;
@@ -1469,12 +1524,13 @@ export interface BodyPromixity extends EventBase {
   BodyID: number;
 }
 
-export interface ApproachBody extends BodyPromixity {}
+export interface ApproachBody extends BodyPromixity { }
 
-export interface LeaveBody extends BodyPromixity {}
+export interface LeaveBody extends BodyPromixity { }
 
 export interface FighterRebuilt extends EventBase {
   Loadout: FighterLoadout;
+  ID: number;
 }
 
 export interface MaterialDefinition {
@@ -1543,7 +1599,7 @@ export interface SystemsShutdown extends EventBase {
 }
 
 export interface FighterDestroyed extends EventBase {
-
+  ID: number;
 }
 
 export interface NpcCrewRank extends EventBase {
@@ -1696,4 +1752,100 @@ export interface Status extends EventBase {
   Longitude?: number;
   Altitude?: number;
   Heading?: number;
+}
+
+export interface FSDTarget extends EventBase {
+  Name: string;
+  SystemAddress: number;
+  RemainingJumpsInRoute: number;
+}
+
+export interface FSSDiscoveryScan extends EventBase {
+  SystemName: string;
+  SystemAddress: number;
+  Progress: number;
+  BodyCount: number;
+  NonBodyCount: number;
+}
+
+export interface FSSAllBodiesFound extends EventBase {
+  SystemName: string;
+  SystemAddress: number;
+  Count: number;
+}
+
+export interface ReservoirReplenished extends EventBase {
+  FuelMain: number;
+  FuelReservoir: number;
+}
+
+export interface FSSSignalDiscovered extends EventBase {
+  SystemAddress: number;
+  SignalName: string;
+  SignalName_Localised?: string;
+  IsStation?: boolean;
+}
+
+export interface CodexEntry extends EventBase {
+  SystemAddress?: number;
+  System: string;
+  EntryID: number;
+  Name: string;
+  Name_Localised: string;
+  SubCategory: string;
+  SubCategory_Localised: string;
+  Category: string;
+  Category_Localised: string;
+  Region: string;
+  Region_Localised: string;
+  IsNewEntry: boolean;
+}
+
+export interface SAAScanComplete extends EventBase {
+  BodyName: string;
+  BodyID: number;
+  ProbesUsed: number;
+  EfficiencyTarget: number;
+}
+
+export interface InvitedToSquadron extends EventBase {
+  SquadronName: string;
+}
+
+export interface MultiSellExplorationData extends EventBase {
+  Discovered: {
+    SystemName: string;
+    NumBodies: number;
+  }[];
+}
+
+export interface CrimeVictim extends EventBase {
+  Offender: string;
+  CrimeType: CrimeType;
+  Bounty: number;
+}
+
+export interface SingleCommunityGoal {
+  GCID: number;
+  Title: string;
+  SystemName: string;
+  MarketName: string;
+  Expiry: string; // Date
+  IsComplete: boolean;
+  CurrentTotal: number;
+  PlayerContribution: number;
+  NumContributors: number;
+  TopRankSize: number;
+  PlayerInTopRank: number;
+  TierReached: string;
+  TopTier: {
+    Name: string;
+    Bonus: string;
+  }
+  PlayerPercentileBand: number;
+  Bonus: number;
+}
+
+export interface CommunityGoal {
+
 }
